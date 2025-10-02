@@ -1,7 +1,7 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'crypto';
 
 export const requestID = (req, res, next) => {
-    const ridFromUpstream = req.headers['x-request-id'];
+    const ridFromUpstream = req.headers['x-request-id']; //Lay id 
     const rid = typeof ridFromUpstream === 'string' && ridFromUpstream.trim()
         ? ridFromUpstream.trim()
         : randomUUID();
@@ -9,4 +9,4 @@ export const requestID = (req, res, next) => {
     req.requestId = rid;
     res.setHeader('X-Request-Id', rid);
     next();
-}  // Tao id cho moi request de tracking
+}  // Tao id cho moi request de tracking()
