@@ -23,7 +23,7 @@ app.use((req, res) => {
             error: { code: 'NO_ROUTE', message: 'No matching route' }
         });
     }
-    return forward(req, res, route); s
+    return forward(req, res, route);
 })
 app.listen(config.port, () => {
     console.log(`Server is running on http://localhost:${config.port}`);
