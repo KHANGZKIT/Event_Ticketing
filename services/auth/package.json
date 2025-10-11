@@ -1,24 +1,26 @@
 {
-  "name": "gateway",
+  "name": "auth",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
-  "type": "module",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "node --watch src/server.js" 
   },
   "keywords": [],
   "author": "",
+  "type": "module",
   "license": "ISC",
   "dependencies": {
+    "@app/db": "file:../../packages/db",
+    "@prisma/client": "^6.16.3",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
-    "uuid": "^13.0.0"
+    "zod": "^4.1.12"
   }
 }

@@ -1,24 +1,19 @@
 {
-  "name": "db",
+  "name": "@app/db",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "type": "module",
+  "main": "src/client.js",
+  "exports": { ".": "./src/client.js" },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "prisma": "^6.16.2",
+    "dotenv": "^17.2.3"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate": "prisma generate",
-    "migrate:dev": "prisma migrate dev --name init",
-    "studio": "prisma studio",
+    "migrate:dev": "prisma migrate dev",
     "db:seed": "prisma db seed"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@prisma/client": "^6.16.3",
-    "prisma": "^6.16.3"
+  "prisma": {
+    "seed": "node src/seed.js"
   }
 }

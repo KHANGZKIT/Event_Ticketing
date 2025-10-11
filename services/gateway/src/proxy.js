@@ -2,49 +2,62 @@ import http from 'http';
 import https from 'https';
 import { URL } from 'url';
 
-export const forward = (req, res, route) => {
-    const targetUrl = new URL(req.originalUrl, route.target);
-    const client = targetUrl.protocol === 'https:' ? https : http; // Chon giao thuc phu hop
-
-    //Headers
-    const headers = { ...req.headers }; // Copy headers tu request goc
-    Object.keys(headers).forEach(h => { if (h.startsWith('x-user-')) delete headers[h]; });
-    headers['x-request-id'] = req.requestId;
-    if (req.user) {
-        headers['x-user-id'] = req.user.id;
-        headers['x-user-roles'] = (req.user.roles || []).join(',');
-    }
-
-    // 2) Tạo request tới service
-    const options = {
-        method: req.method,
-        headers,
-        timeout: 5000
-    };
-    const started = Date.now();
-
-    const proxyReq = client.request(targetUrl, options, (proxyRes) => {
-        // 3) Copy status + headers trả về
-        res.status(proxyRes.statusCode || 502);
-        const hopByHop = new Set(['connection', 'transfer-encoding', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'upgrade']);
-        for (const [k, v] of Object.entries(proxyRes.headers)) {
-            if (v !== undefined && !hopByHop.has(k.toLowerCase())) res.setHeader(k, v);
+// Forward request tới service đích
+export function forward(req, res, route, timeoutMs = 5000) {
+    try {
+        if (!route || !route.target) {
+            return res.status(502).json({
+                error: { code: 'BAD_TARGET', message: 'Invalid route target' }
+            });
         }
-        proxyRes.pipe(res);
-        proxyRes.on('end', () => {
-            // console.log(`[GW] rid=${req.requestId} ${req.method} ${req.originalUrl} -> ${proxyRes.statusCode} ${Date.now()-started}ms`);
+
+        // Nếu backend không muốn prefix /api/... thì strip prefix ở đây:
+        // const stripped = req.originalUrl.replace(route.prefix, '') || '/';
+        // const pathToUse = stripped.startsWith('/') ? stripped : `/${stripped}`;
+        const pathToUse = req.originalUrl; // giữ nguyên nếu backend đã handle prefix
+
+        const targetUrl = new URL(pathToUse, route.target); // base phải là absolute
+        const client = targetUrl.protocol === 'https:' ? https : http;
+
+        // Chuẩn hoá headers (bỏ hop-by-hop headers)
+        const headers = { ...req.headers };
+        delete headers['host'];
+        delete headers['connection'];
+        delete headers['keep-alive'];
+        delete headers['transfer-encoding'];
+        delete headers['content-length'];
+
+        headers['x-request-id'] = req.requestId || headers['x-request-id'];
+        if (req.user) {
+            headers['x-user-id'] = req.user.id;
+            headers['x-user-email'] = req.user.email || '';
+            headers['x-user-roles'] = (req.user.roles || []).join(',');
+        }
+
+        const options = { method: req.method, headers, timeout: timeoutMs };
+
+        const proxyReq = client.request(targetUrl, options, (proxyRes) => {
+            res.status(proxyRes.statusCode || 502);
+            for (const [k, v] of Object.entries(proxyRes.headers || {})) {
+                if (typeof v !== 'undefined') res.setHeader(k, v);
+            }
+            proxyRes.pipe(res);
         });
-    });
 
-    proxyReq.on('timeout', () => proxyReq.destroy(new Error('GATEWAY_TIMEOUT')));
-    proxyReq.on('error', (err) => {
-        const code = err.message === 'GATEWAY_TIMEOUT' ? 504 : 502;
-        res.status(code).json({ error: { code: code === 504 ? 'GATEWAY_TIMEOUT' : 'BAD_GATEWAY', message: err.message, traceId: req.requestId } });
-    });
+        proxyReq.on('timeout', () => proxyReq.destroy(new Error('GATEWAY_TIMEOUT')));
+        proxyReq.on('error', (err) => {
+            res.status(err.message === 'GATEWAY_TIMEOUT' ? 504 : 502).json({
+                error: {
+                    code: err.message === 'GATEWAY_TIMEOUT' ? 'GATEWAY_TIMEOUT' : 'BAD_GATEWAY',
+                    message: err.message
+                }
+            });
+        });
 
-    // 4) Stream body từ client sang service
-    if (req.readableEnded) proxyReq.end();
-    else req.pipe(proxyReq);
+        if (req.readable) req.pipe(proxyReq);
+        else proxyReq.end();
+
+    } catch (e) {
+        res.status(500).json({ error: { code: 'PROXY_URL_ERROR', message: e.message } });
+    }
 }
-
-

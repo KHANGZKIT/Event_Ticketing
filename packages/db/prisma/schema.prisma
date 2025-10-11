@@ -41,21 +41,34 @@ model Event {
   id        String   @id @default(uuid())
   name      String
   city      String?
-  startsAt  DateTime?
-  createdAt DateTime @default(now())
+  startsAt  DateTime?         // thời điểm “chính” (ví dụ suất đầu tiên)
+  createdAt DateTime  @default(now())
   shows     Show[]
+
+  @@index([startsAt])
 }
 
 model Show {
-  id        String   @id @default(uuid())
-  eventId   String
-  start     DateTime        //Gio dien ra
-  venue     String?         //Dia Diem
-  seatMapId String?       
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  bookings  Booking[]
-  tickets   Ticket[]
+  id         String   @id @default(uuid())
+  eventId    String
+  startsAt   DateTime            // giờ diễn (UTC)
+  venue      String?             // địa điểm
+  seatMapId  String?
+  status     ShowStatus @default(scheduled)  // optional
+
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  bookings   Booking[]
+  tickets    Ticket[]
+
+  @@index([eventId])
+  @@index([startsAt])
 }
+
+enum ShowStatus {
+  scheduled
+  cancelled
+}
+
 
 model Booking {
   id        String   @id @default(uuid())
