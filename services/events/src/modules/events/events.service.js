@@ -46,3 +46,52 @@ export async function listShowsOfEvent(eventId, query) {
 
     return prisma.show.findMany({ where, orderBy: { startsAt: 'asc' } });
 }
+
+export async function createEvent(data) {
+
+    return prisma.event.create({
+        data: {
+            ...data,
+            startsAt: data.startsAt ? new Date(data.startsAt) : null,
+        },
+        select: { id: true, name: true, city: true, startsAt: true, cover: true, createdAt: true, updatedAt: true }
+    });
+}
+
+export async function updateEvent(id, data) {
+
+    const exsits = await prisma.event.findFirst({
+        where: { id, deletedAt: null },
+        select: { id: true }
+    })
+
+    if (!exsits) {
+        const e = new Error('Event not found');
+        e.status = 404;
+        throw e;
+    }
+    return prisma.event.update({
+        where: { id },
+        data: {
+            ...(data.name !== undefined ? { name: data.name } : {}),
+            ...(data.city !== undefined ? { city: data.city } : {}),
+            ...(data.cover !== undefined ? { cover: data.cover } : {}),
+            ...(data.startsAt !== undefined ? { startsAt: data.startsAt ? new Date(data.startsAt) : null } : {})
+        },
+        select: { id: true, name: true, city: true, cover: true, startsAt: true, createdAt: true, updatedAt: true }
+    });
+}
+
+export async function deleteEvent(id) {
+
+    const exists = await prisma.event.findFirst({
+        where: { id, deletedAt: null },
+        select: { id: true }
+    });
+    if (!exists) {
+        const e = new Error('Event not found');
+        e.status = 404;
+        throw e;
+    }
+    await prisma.event.update({ where: { id }, data: { deletedAt: new Date() } });
+}

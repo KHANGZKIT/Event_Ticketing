@@ -6,6 +6,13 @@ import jwt from 'jsonwebtoken';
 
 export async function register(body) {
     const { email, password, fullName } = registerSchema.parse(body);
+
+    if (email === process.env.ADMIN_EMAIL) {
+        const e = new Error('This email is reserved');
+        e.status = 403;
+        throw e;
+    }
+
     const existed = await prisma.user.findUnique({ where: { email } });
     if (existed) {
         const error = new Error('Email already exists');
@@ -18,7 +25,12 @@ export async function register(body) {
         select: { id: true, email: true, fullName: true, createdAt: true },
     });
 
-    return user;
+    const userRole = await prisma.role.findUnique({ where: { name: 'user' } });
+    if (userRole) {
+        await prisma.userRole.create({ data: { userId: user.id, roleId: userRole.id } });
+    }
+
+    return { id: user.id, email: user.email, fullName: user.fullName, createdAt: user.createdAt };
 
 }
 
@@ -33,12 +45,38 @@ export async function login(body) {
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1d' });
     return { token };
 }
+
 export async function getMe(userId) {
-    if (!userId) {
-        const e = new Error('Unauthorized'); e.status = 401; throw e;
-    }
-    return prisma.user.findUnique({
+    if (!userId) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
+
+    const u = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, email: true, fullName: true, createdAt: true }
+        select: {
+            id: true,
+            email: true,
+            fullName: true,
+            createdAt: true,
+            roles: {
+                select: {
+                    role: { select: { name: true } }
+                }
+            }
+        }
     });
+
+    if (!u) { const e = new Error('User not found'); e.status = 404; throw e; }
+
+    const roleNames = u.roles.map(r => r.role.name);
+
+    return {
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName,
+        createdAt: u.createdAt,
+        roles: roleNames,
+        isAdmin: roleNames.includes('admin'),
+        isStaff: roleNames.includes('staff'),
+        isUser: roleNames.includes('user'),
+    };
 }
+
