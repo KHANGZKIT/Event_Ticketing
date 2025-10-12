@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventa — Vé sự kiện đẹp & mượt (Inspired by Ticketbox)</title>
+    <meta name="description"
+        content="Đặt vé sự kiện, lễ hội, hòa nhạc, hài kịch... Giữ chỗ 5’, thanh toán an toàn, QR check-in." />
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --page: #0f141a;
+            --card: #121923;
+            --card-2: #141d28;
+            --muted: #a9b1bd;
+            --text: #ecf1ff;
+            --border: rgba(255, 255, 255, .09);
+            --accent: #7a5af8;
+            --accent-2: #22d1ee;
+            --ok: #31d0aa;
+            --warn: #f5b94a;
+            --radius: 16px;
+            --radius-lg: 22px;
+            --shadow: 0 24px 70px rgba(2, 8, 20, .45);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(1000px 600px at 0% -10%, rgba(122, 90, 248, .18), transparent 40%),
+                radial-gradient(700px 500px at 100% 0%, rgba(34, 209, 238, .12), transparent 40%),
+                linear-gradient(180deg, var(--bg) 0%, var(--page) 38%, #0c121a 100%);
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 20px
+        }
+
+        /* NAV */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 70;
+            backdrop-filter: saturate(150%) blur(14px);
+            background: linear-gradient(180deg, rgba(8, 12, 18, .8), rgba(8, 12, 18, .5));
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-inner {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            letter-spacing: .2px;
+            margin-right: auto
+        }
+
+        .logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 9px;
+            background: conic-gradient(from 210deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 28px rgba(122, 90, 248, .45)
+        }
+
+        .nav {
+            display: flex;
+            gap: 12px
+        }
+
+        .nav a {
+            color: var(--muted);
+            padding: 10px 12px;
+            border-radius: 12px
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, .06);
+            color: var(--text)
+        }
+
+        .grow {
+            flex: 1
+        }
+
+        .searchbar {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .input,
+        select {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 10px 12px;
+            outline: none
+        }
+
+        .input:focus,
+        select:focus {
+            border-color: rgba(122, 90, 248, .55);
+            box-shadow: 0 0 0 4px rgba(122, 90, 248, .12)
+        }
+
+        .btn {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .04);
+            color: var(--text);
+            cursor: pointer;
+            transition: all .2s ease
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35)
+        }
+
+        .btn.primary {
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 20px 40px rgba(122, 90, 248, .25)
+        }
+
+        /* HERO */
+        .hero {
+            padding: 28px 0 10px
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 22px
+        }
+
+        @media (max-width: 960px) {
+            .hero-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .headline {
+            font-size: clamp(28px, 5.8vw, 54px);
+            line-height: 1.05;
+            font-weight: 900;
+            margin: 0
+        }
+
+        .sub {
+            margin: 10px 0 16px;
+            color: var(--muted)
+        }
+
+        .hero-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+            box-shadow: var(--shadow)
+        }
+
+        .hero-media {
+            height: 260px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.06)
+        }
+
+        .hero-media:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 -60px 140px rgba(0, 0, 0, .5)
+        }
+
+        .hero-body {
+            padding: 16px
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            background: rgba(255, 255, 255, .03);
+            cursor: pointer
+        }
+
+        .chip.active {
+            background: linear-gradient(135deg, rgba(122, 90, 248, .22), rgba(34, 209, 238, .1));
+            color: var(--text);
+            border-color: rgba(122, 90, 248, .5)
+        }
+
+        /* SECTIONS */
+        .section {
+            padding: 24px 0
+        }
+
+        .section h2 {
+            margin: 0 0 10px
+        }
+
+        /* CAROUSEL */
+        .carousel {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(240px, 1fr);
+            gap: 14px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scroll-snap-type: x mandatory
+        }
+
+        .carousel>* {
+            scroll-snap-align: start
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px
+        }
+
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr)
+            }
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media (max-width: 520px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+            position: relative
+        }
+
+        .cover {
+            height: 180px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.03);
+            transition: transform .35s ease
+        }
+
+        .card:hover .cover img {
+            transform: scale(1.07)
+        }
+
+        .badge {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .5);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(6px)
+        }
+
+        .body {
+            padding: 14px
+        }
+
+        .title {
+            margin: 0 0 6px;
+            font-weight: 800
+        }
+
+        .meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .right {
+            margin-left: auto;
+            color: #e9ecff
+        }
+
+        .stock {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(122, 90, 248, .2);
+            border: 1px solid rgba(122, 90, 248, .35)
+        }
+
+        .quick {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px
+        }
+
+        /* COLLECTIONS */
+        .collection {
+            display: grid;
+            grid-template-columns: .9fr 1.1fr;
+            gap: 16px
+        }
+
+        @media (max-width: 900px) {
+            .collection {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .tile {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02))
+        }
+
+        /* VENUES */
+        .venue {
+            min-width: 240px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--card-2)
+        }
+
+        .venue .vcover {
+            height: 120px;
+            overflow: hidden
+        }
+
+        .venue img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .venue .vbody {
+            padding: 12px;
+            color: var(--muted)
+        }
+
+        /* FOOTER */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 26px 0;
+            color: var(--muted)
+        }
+
+        /* REVEAL */
+        .reveal {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity .5s ease, transform .5s ease
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: none
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="container nav-inner">
+            <div class="brand"><span class="logo"></span> <span>Eventa</span></div>
+            <nav class="nav">
+                <a href="#home">Trang chủ</a>
+                <a href="#events">Sự kiện</a>
+                <a href="#collections">Bộ sưu tập</a>
+                <a href="#venues">Địa điểm</a>
+                <a href="#organizer">Nhà tổ chức</a>
+            </nav>
+            <div class="grow"></div>
+            <div class="searchbar">
+                <input id="q" class="input" placeholder="Tìm sự kiện, nghệ sĩ..." />
+                <select id="city">
+                    <option value="">Tỉnh/Thành phố</option>
+                    <option>Hà Nội</option>
+                    <option>TP. Hồ Chí Minh</option>
+                    <option>Đà Nẵng</option>
+                </select>
+                <select id="cat">
+                    <option value="">Danh mục</option>
+                    <option value="music">Âm nhạc</option>
+                    <option value="comedy">Hài kịch</option>
+                    <option value="sports">Thể thao</option>
+                    <option value="theater">Kịch/Nhạc kịch</option>
+                    <option value="festival">Lễ hội</option>
+                </select>
+                <button id="searchBtn" class="btn">Tìm</button>
+                <button class="btn primary">Bán vé</button>
+            </div>
+        </div>
+    </header>
+
+    <section id="home" class="hero container">
+        <div class="hero-grid">
+            <div>
+                <h1 class="headline reveal">Khám phá & đặt vé — nhanh, đẹp, mượt.</h1>
+                <p class="sub reveal">Lấy cảm hứng từ Ticketbox với giao diện hiện đại hơn: dark neon, glass blur,
+                    animation tinh tế, nhiều bộ sưu tập gợi ý.</p>
+                <div class="chips reveal" id="quickChips">
+                    <button class="chip active" data-key="featured">Nổi bật</button>
+                    <button class="chip" data-key="today">Hôm nay</button>
+                    <button class="chip" data-key="weekend">Cuối tuần</button>
+                    <button class="chip" data-key="nearby">Gần bạn</button>
+                </div>
+            </div>
+            <aside class="hero-card reveal" aria-hidden="true">
+                <div class="hero-media"><img alt="Hero"
+                        src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600&auto=format&fit=crop" />
+                </div>
+                <div class="hero-body">
+                    <div class="chips">
+                        <span class="chip">Đối tác: LiveNation</span>
+                        <span class="chip">MoMo · VNPay</span>
+                        <span class="chip">Venue Alliance</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <main class="container">
+        <section id="events" class="section">
+            <h2 class="reveal">Sự kiện nổi bật</h2>
+            <div id="grid" class="grid"></div>
+        </section>
+
+        <section id="collections" class="section">
+            <h2 class="reveal">Bộ sưu tập gợi ý</h2>
+            <div class="collection">
+                <div class="tile reveal">
+                    <h3>Top tuần này</h3>
+                    <div id="col-top" class="carousel"></div>
+                </div>
+                <div class="tile reveal">
+                    <h3>Âm nhạc & Lễ hội</h3>
+                    <div id="col-music" class="carousel"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="venues" class="section">
+            <h2 class="reveal">Địa điểm nổi bật</h2>
+            <div id="venueRow" class="carousel"></div>
+        </section>
+
+        <section id="organizer" class="section">
+            <div class="collection">
+                <div class="tile reveal">
+                    <h2>Nhà tổ chức: bán vé trong vài phút</h2>
+                    <ul>
+                        <li>Tạo sự kiện & sơ đồ ghế</li>
+                        <li>Giữ chỗ 5’, coupon & kiểm soát doanh thu</li>
+                        <li>Widget nhúng & API</li>
+                    </ul>
+                    <div style="display:flex; gap:10px; margin-top:10px">
+                        <button class="btn primary">Bắt đầu</button>
+                        <button class="btn">Tư vấn</button>
+                    </div>
+                </div>
+                <div class="tile reveal" aria-hidden="true">
+                    <div class="hero-media" style="height:240px"><img alt="Audience"
+                            src="https://images.unsplash.com/photo-1517638851339-4aa32003c11a?q=80&w=1600&auto=format&fit=crop" />
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container"
+            style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap">
+            <div style="display:flex; align-items:center; gap:10px"><span class="logo"></span> <strong>Eventa</strong>
+            </div>
+            <div style="color:var(--muted)">© <span id="year"></span> Eventa</div>
+        </div>
+    </footer>
+
+    <script>
+        const $ = (q, el = document) => el.querySelector(q); const $$ = (q, el = document) => [...el.querySelectorAll(q)];
+
+        // Demo data (inspired structure)
+        const events = [
+            { id: '1', t: 'Hoàng Hôn EDM Fest', city: 'TP. Hồ Chí Minh', start: '2025-11-22T19:30:00', price: 299000, cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200&auto=format&fit=crop', cat: 'music', stock: 120 },
+            { id: '2', t: 'Rooftop Comedy Night', city: 'Hà Nội', start: '2025-10-30T20:00:00', price: 149000, cover: 'https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?q=80&w=1200&auto=format&fit=crop', cat: 'comedy', stock: 56 },
+            { id: '3', t: 'City Derby Finals', city: 'Đà Nẵng', start: '2025-10-18T18:00:00', price: 390000, cover: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=1200&auto=format&fit=crop', cat: 'sports', stock: 32 },
+            { id: '4', t: 'Broadway Classics', city: 'Hà Nội', start: '2025-12-05T19:00:00', price: 450000, cover: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?q=80&w=1200&auto=format&fit=crop', cat: 'theater', stock: 88 },
+            { id: '5', t: 'Indie Fest 2025', city: 'Huế', start: '2025-11-02T16:00:00', price: 250000, cover: 'https://images.unsplash.com/photo-1517638851339-4aa32003c11a?q=80&w=1200&auto=format&fit=crop', cat: 'festival', stock: 190 },
+            { id: '6', t: 'Symphony Under Stars', city: 'TP. Hồ Chí Minh', start: '2025-10-20T20:00:00', price: 320000, cover: 'https://images.unsplash.com/photo-1517249378219-3a5a4c223a43?q=80&w=1200&auto=format&fit=crop', cat: 'music', stock: 44 },
+            { id: '7', t: 'Improv Laughs', city: 'Đà Nẵng', start: '2025-10-12T19:30:00', price: 99000, cover: 'https://images.unsplash.com/photo-1503095396549-807759245b35?q=80&w=1200&auto=format&fit=crop', cat: 'comedy', stock: 12 },
+            { id: '8', t: 'National Cup Final', city: 'Hà Nội', start: '2025-11-10T17:00:00', price: 410000, cover: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?q=80&w=1200&auto=format&fit=crop', cat: 'sports', stock: 74 }
+        ];
+
+        const venues = [
+            { name: 'Saigon Arena', city: 'TP. Hồ Chí Minh', cover: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop' },
+            { name: 'Hanoi Grand Theater', city: 'Hà Nội', cover: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?q=80&w=1200&auto=format&fit=crop' },
+            { name: 'Da Nang Stadium', city: 'Đà Nẵng', cover: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=1200&auto=format&fit=crop' },
+            { name: 'Hue Festival Park', city: 'Huế', cover: 'https://images.unsplash.com/photo-1517638851339-4aa32003c11a?q=80&w=1200&auto=format&fit=crop' }
+        ];
+
+        const grid = $('#grid'); const colTop = $('#col-top'); const colMusic = $('#col-music'); const venueRow = $('#venueRow');
+
+        function vnd(n) { return n.toLocaleString('vi-VN') + '₫' }
+        function fmt(iso) { const d = new Date(iso); return d.toLocaleString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) }
+
+        function card(e) {
+            return `<article class="card reveal" data-cat="${e.cat}">
+        <div class="cover"><img src="${e.cover}" alt="${e.t}"/><span class="badge">${e.city}</span><span class="stock">Còn ${e.stock} vé</span></div>
+        <div class="body"><h3 class="title">${e.t}</h3>
+          <div class="meta"><span>${fmt(e.start)}</span><span class="right">Từ ${vnd(e.price)}</span></div>
+          <div class="quick"><button class="btn">Giữ chỗ 5’</button><button class="btn primary">Mua vé</button></div>
+        </div>
+      </article>`;
+        }
+
+        function vcard(v) {
+            return `<div class="venue reveal"><div class="vcover"><img alt="${v.name}" src="${v.cover}"/></div><div class="vbody"><strong>${v.name}</strong><div>${v.city}</div></div></div>`;
+        }
+
+        function render(list) { grid.innerHTML = list.map(card).join(''); observe(); parallax(); }
+
+        function buildCollections() {
+            const top = [...events].sort((a, b) => b.stock - a.stock).slice(0, 6);
+            const music = events.filter(e => e.cat === 'music').slice(0, 6);
+            colTop.innerHTML = top.map(card).join('');
+            colMusic.innerHTML = music.map(card).join('');
+        }
+
+        function buildVenues() { venueRow.innerHTML = venues.map(vcard).join(''); observe(); }
+
+        // Filters (nav bar + chips)
+        $('#searchBtn').addEventListener('click', applyFilters);
+        $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+        function applyFilters() {
+            const q = $('#q').value.trim().toLowerCase();
+            const city = $('#city').value; const cat = $('#cat').value;
+            let list = [...events];
+            if (q) list = list.filter(x => `${x.t} ${x.city}`.toLowerCase().includes(q));
+            if (city) list = list.filter(x => x.city === city);
+            if (cat) list = list.filter(x => x.cat === cat);
+            render(list);
+        }
+
+        $('#quickChips').addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip'); if (!chip) return;
+            $$('#quickChips .chip').forEach(c => c.classList.remove('active')); chip.classList.add('active');
+            const k = chip.dataset.key; const now = new Date();
+            let list = [...events];
+            if (k === 'today') list = list.filter(x => new Date(x.start).toDateString() === now.toDateString());
+            if (k === 'weekend') list = list.filter(x => [0, 6].includes(new Date(x.start).getDay()));
+            if (k === 'nearby') list = list.filter(x => ['Hà Nội', 'TP. Hồ Chí Minh'].includes(x.city));
+            render(list);
+        });
+
+        // Parallax
+        function parallax() { $$('.card .cover').forEach(cv => { const img = cv.querySelector('img'); cv.onmousemove = (e) => { const r = cv.getBoundingClientRect(); const rx = (e.clientX - r.left) / r.width - .5; const ry = (e.clientY - r.top) / r.height - .5; img.style.transform = `scale(1.08) translate(${rx * -8}px, ${ry * -8}px)` }; cv.onmouseleave = () => { img.style.transform = 'scale(1.03)' } }) }
+
+        // Reveal
+        let io; function observe() { if (io) io.disconnect(); io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold: .12 }); $$('.reveal').forEach(el => io.observe(el)); }
+
+        // Init
+        render(events); buildCollections(); buildVenues(); observe();
+        $('#year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

@@ -12,6 +12,7 @@ function ensureUrl(name) {
 export const routes = [
     { prefix: '/api/auth', target: ensureUrl('AUTH_SVC_URL') },
     { prefix: '/api/events', target: ensureUrl('EVENT_SVC_URL') },
+    { prefix: '/api/shows', target: ensureUrl('SHOW_SVC_URL') },
     { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL') },
     { prefix: '/api/orders', target: ensureUrl('ORDER_SVC_URL') },
     { prefix: '/api/payments', target: ensureUrl('PAYMENT_SVC_URL') },

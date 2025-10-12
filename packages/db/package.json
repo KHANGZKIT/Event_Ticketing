@@ -9,9 +9,11 @@
     "prisma": "^6.16.2",
     "dotenv": "^17.2.3"
   },
+  
   "scripts": {
     "migrate:dev": "prisma migrate dev",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db": "npx prisma studio"
   },
   "prisma": {
     "seed": "node src/seed.js"
