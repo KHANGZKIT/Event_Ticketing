@@ -35,3 +35,21 @@ export const deleteShow = async (req, res, next) => {
     }
 }
 
+export const getSeatMap = async (req, res, next) => {
+    try {
+        res.json(await svc.getSeatMap(req.params.id));
+    } catch (e) {
+        next(e);
+    }
+}
+
+export const getAvailability = async (req, res, next) => {
+    try {
+        res.json(await svc.getAvailability(req.params.id));
+    } catch (e) {
+        next(e);
+    }
+}
+
+
+

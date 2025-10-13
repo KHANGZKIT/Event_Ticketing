@@ -1,0 +1,15 @@
+{
+  "id": "m1",
+  "name": "My Dinh Basic",
+  "priceTiers": {
+    "VIP": 1200000,
+    "A": 800000,
+    "B": 500000
+  },
+  "zones": [
+    { "id": "VIP", "rows": [{ "id": "A", "from": 1, "to": 20 }, { "id": "B", "from": 1, "to": 20 }] },
+    { "id": "A",   "rows": [{ "id": "C", "from": 1, "to": 25 }, { "id": "D", "from": 1, "to": 25 }] },
+    { "id": "B",   "rows": [{ "id": "E", "from": 1, "to": 30 }, { "id": "F", "from": 1, "to": 30 }] }
+  ],
+  "format": "ROW_NUM"
+}

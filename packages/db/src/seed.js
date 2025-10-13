@@ -63,7 +63,7 @@ async function seedSampleData() {
     console.log('✓ Seeded events/shows (seed-e1, seed-s1, seed-s2)');
 }
 
-async function main() {
+async function main() {+
     await seedRoles();
     await ensureAdminUser();    // <<-- thay cho grantAdminByEmail
     await seedSampleData();

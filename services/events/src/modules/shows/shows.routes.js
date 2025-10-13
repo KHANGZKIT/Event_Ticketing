@@ -5,6 +5,8 @@ import { Router } from 'express';
 const r = Router();
 
 r.get('/:id', ctrl.getShow);
+r.get('/:id/seatmap', ctrl.getSeatMap);
+r.get('/:id/availability', ctrl.getAvailability);
 
 r.post('/', authGuard, requireRole('admin'), ctrl.createShow);
 r.patch('/:id', authGuard, requireRole('admin'), ctrl.updateShow);
