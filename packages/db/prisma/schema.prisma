@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,13 +8,13 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           String      @id @default(uuid())
+  email        String      @unique
   passwordHash String
   fullName     String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime    @default(now())
   roles        UserRole[]
-  bookings     Booking[]
+  orders       Order[]     // ⬅️ đổi từ bookings -> orders
 }
 
 model Role {
@@ -42,9 +36,9 @@ model Event {
   name      String
   city      String?
   cover     String?
-  startsAt  DateTime?         // thời điểm “chính” (ví dụ suất đầu tiên)
+  startsAt  DateTime?
   createdAt DateTime  @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   shows     Show[]
 
@@ -53,18 +47,18 @@ model Event {
 }
 
 model Show {
-  id         String   @id @default(uuid())
+  id         String      @id @default(uuid())
   eventId    String
-  startsAt   DateTime            // giờ diễn (UTC)
-  venue      String?             // địa điểm
+  startsAt   DateTime
+  venue      String?
   seatMapId  String?
-  status     ShowStatus @default(scheduled)  // optional
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  status     ShowStatus  @default(scheduled)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   deletedAt  DateTime?
-  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  bookings   Booking[]
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   tickets    Ticket[]
+  orders     Order[]     // ⬅️ đổi từ bookings -> orders
 
   @@index([eventId])
   @@index([startsAt])
@@ -76,29 +70,34 @@ enum ShowStatus {
   cancelled
 }
 
-
-model Booking {
-  id        String   @id @default(uuid())
+model Order {
+  id        String      @id @default(uuid())
   userId    String
   showId    String
-  status    BookingStatus @default(pending)
-  createdAt DateTime @default(now())
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  show      Show   @relation(fields: [showId], references: [id], onDelete: Cascade)
+  amount    Int
+  status    OrderStatus @default(pending) // ⬅️ cần enum có pending
+  createdAt DateTime    @default(now())
+  tickets   Ticket[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
 }
 
-enum BookingStatus {
-  approved
-  pending
+enum OrderStatus {
+  pending   // ⬅️ thêm
+  paid
+  failed
   cancelled
 }
 
 model Ticket {
-  id      String @id @default(uuid())
-  showId  String
-  seatId  String
-  orderId String?
-  show    Show   @relation(fields: [showId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  showId      String
+  seatId      String
+  orderId     String?
+  checkedInAt DateTime?
+  show        Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+  order       Order?   @relation(fields: [orderId], references: [id])
 
   @@unique([showId, seatId]) // chống double-book
 }
