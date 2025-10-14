@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import eventsRouter from './modules/events/events.routes.js';
 import showsRouter from './modules/shows/shows.routes.js';
 import holdsRouter from './modules/holds/holds.routes.js';
+import ordersRouter from './modules/orders/orders.routes.js'
 import { errorHandler } from './middlewares/error.js';
 
 const app = express();
@@ -17,7 +18,8 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'events' }))
 
 app.use('/api/events', eventsRouter);
 app.use('/api/shows', showsRouter);
-app.use('/api/holds', holdsRouter); 
+app.use('/api/holds', holdsRouter);
+app.use('/api/orders', ordersRouter);
 
 app.use(errorHandler);
 
