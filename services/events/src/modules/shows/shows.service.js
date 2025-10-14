@@ -1,6 +1,7 @@
 import { prisma } from '@app/db';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { getHeldSeatByShow } from '../holds/holds.service.js';
 
 export async function getShow(id) {
     const s = await prisma.show.findUnique({ where: { id } });
@@ -104,6 +105,7 @@ function expandSeatsFromTemplate(tpl) {
 }
 
 export async function getSeatMap(showId) {
+    // 1) Lấy show từ DB và kiểm tra có seatMapId không
     const show = await prisma.show.findFirst({
         where: { id: showId, deletedAt: null },
         select: { id: true, seatMapId: true },
@@ -114,7 +116,7 @@ export async function getSeatMap(showId) {
         e.status = 404;
         throw e;
     }
-
+    // 2) Đọc file template seat map theo seatMapId
     const tpl = await loadSeatMapTemplate(show.seatMapId);
 
     return {
@@ -125,6 +127,8 @@ export async function getSeatMap(showId) {
 }
 
 export async function getAvailability(showId, redis) {
+
+    //Check show
     const show = await prisma.show.findFirst({
         where: { id: showId, deletedAt: null },
         select: { id: true, seatMapId: true }
@@ -135,10 +139,11 @@ export async function getAvailability(showId, redis) {
         e.status = 404;
         throw e;
     }
-
+    //Lay du lieu tu template
     const tpl = await loadSeatMapTemplate(show.seatMapId);
     const allSeats = new Set(expandSeatsFromTemplate(tpl).map(s => s.seatId));
 
+    //Kiem tra ticket
     const soldTickets = await prisma.ticket.findMany({
         where: { showId },
         select: { seatId: true }
@@ -146,22 +151,14 @@ export async function getAvailability(showId, redis) {
 
     const sold = new Set(soldTickets.map(t => t.seatId));
 
-    // 3) ghế held (để sau)
-    // const held = new Set();
-    // if (redis) {
-    //   const keys = await redis.keys(`hold:${showId}:*`);
-    //   for (const k of keys) {
-    //     const seatId = k.split(':').pop();
-    //     held.add(seatId);
-    //   }
-    // }
-
+    // Neu dang cho thanh toan
+    const held = getHeldSeatByShow(showId);
 
     const availability = [];
     for (const seatId of allSeats) {
         let state = 'available';
-        if (sold.has(seatId)) state = 'sold';
-        // else if (held.has(seatId)) state = 'held';
+        if (sold.has(seatId)) state = 'sold'
+        else if (held.has(seatId)) state = 'held'
         availability.push({ seatId, state });
     }
 
