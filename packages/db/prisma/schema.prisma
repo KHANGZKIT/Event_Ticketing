@@ -75,6 +75,7 @@ model Order {
   userId    String
   showId    String
   amount    Int
+  currency  String      @default("VND")
   status    OrderStatus @default(pending) // ⬅️ cần enum có pending
   createdAt DateTime    @default(now())
   tickets   Ticket[]
@@ -100,4 +101,6 @@ model Ticket {
   order       Order?   @relation(fields: [orderId], references: [id])
 
   @@unique([showId, seatId]) // chống double-book
+  @@index([orderId])
+  @@index([checkedInAt])
 }
