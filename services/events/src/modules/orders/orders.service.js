@@ -68,10 +68,11 @@ export async function checkout(userId, body) {
                     userId,
                     showId: hold.showId,
                     amount,
+                    currency: 'VND',
                     status: 'paid', // hoặc 'pending'
                 },
                 select: {
-                    id: true, userId: true, showId: true, amount: true, status: true, createdAt: true
+                    id: true, userId: true, showId: true, amount: true, currency: true, status: true, createdAt: true
                 },
             });
 
