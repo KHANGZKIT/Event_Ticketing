@@ -1,147 +1,239 @@
-//Chỉnh mắt cho Login
+// ========================
+// CẤU HÌNH API (Gateway)
+// ========================
+const API_BASE = 'http://localhost:4000/api';
+const AUTH_BASE = `${API_BASE}/auth`;
+
+/* --------------------------------------------------
+ *  SVG MẮT (chuẩn, không có "...")
+ * -------------------------------------------------- */
+const eyeSVG = {
+  show: `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+     stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+     class="lucide lucide-eye">
+  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8"/>
+  <circle cx="12" cy="12" r="3"/>
+</svg>`,
+  hide: `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+     stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+     class="lucide lucide-eye-off">
+  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.17-6.87"/>
+  <path d="M1 1l22 22"/>
+  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+</svg>`
+};
+
+/* --------------------------------------------------
+ *  MẮT: LOGIN
+ * -------------------------------------------------- */
 (function () {
   const passInput = document.getElementById('login-password');
-  const eyeWrap   = document.querySelector('#togglePassLogin'); // dùng id mới
-
+  const eyeWrap = document.querySelector('#togglePassLogin');
   if (!passInput || !eyeWrap) return;
-
-  const eyeSVG = {
-    show: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>',
-
-    hide: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off-icon lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>'
-  };
 
   function togglePassword() {
     const isHidden = passInput.type === 'password';
     passInput.type = isHidden ? 'text' : 'password';
     eyeWrap.innerHTML = isHidden ? eyeSVG.hide : eyeSVG.show;
   }
-
-  // Click & keyboard (Enter/Space) để accessibility tốt hơn
   eyeWrap.addEventListener('click', togglePassword);
   eyeWrap.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      togglePassword();
-    }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePassword(); }
   });
 })();
 
-//Chỉnh mắt cho Sign up
+/* --------------------------------------------------
+ *  MẮT: REGISTER (password)
+ * -------------------------------------------------- */
 (function () {
-  const passInput = document.getElementById('signup-password');
-  const eyeWrap   = document.querySelector('#togglePassSignup'); // dùng id mới
-
+  const passInput = document.getElementById('register-password');
+  const eyeWrap = document.querySelector('#togglePassregister');
   if (!passInput || !eyeWrap) return;
 
-  const eyeSVG = {
-    show: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>',
-
-    hide: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off-icon lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>'
-  };
-
-  function togglePasswordSignUp() {
+  function togglePasswordRegister() {
     const isHidden = passInput.type === 'password';
     passInput.type = isHidden ? 'text' : 'password';
     eyeWrap.innerHTML = isHidden ? eyeSVG.hide : eyeSVG.show;
   }
-
-  // Click & keyboard (Enter/Space) để accessibility tốt hơn
-  eyeWrap.addEventListener('click', togglePasswordSignUp);
+  eyeWrap.addEventListener('click', togglePasswordRegister);
   eyeWrap.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      togglePasswordSignUp();
-    }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePasswordRegister(); }
   });
 })();
 
-//Chỉnh mắt cho repassword signup
+/* --------------------------------------------------
+ *  MẮT: REGISTER (repassword)
+ * -------------------------------------------------- */
 (function () {
-  const passInput = document.getElementById('signup-repassword');
-  const eyeWrap   = document.querySelector('#toggleRepassSignup'); // dùng id mới
-
+  const passInput = document.getElementById('register-repassword');
+  const eyeWrap = document.querySelector('#toggleRepassregister');
   if (!passInput || !eyeWrap) return;
 
-  const eyeSVG = {
-    show: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>',
-
-    hide: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off-icon lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>'
-  };
-
-  function toggleRepasswordSignUp() {
+  function toggleRepasswordRegister() {
     const isHidden = passInput.type === 'password';
     passInput.type = isHidden ? 'text' : 'password';
     eyeWrap.innerHTML = isHidden ? eyeSVG.hide : eyeSVG.show;
   }
-
-  // Click & keyboard (Enter/Space) để accessibility tốt hơn
-  eyeWrap.addEventListener('click', toggleRepasswordSignUp);
+  eyeWrap.addEventListener('click', toggleRepasswordRegister);
   eyeWrap.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleRepasswordSignUp();
-    }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRepasswordRegister(); }
   });
 })();
 
-//chuyển qua lại 2 UI 
-const loginContainer = document.querySelector(".form-container");
-const signupContainer = document.querySelector(".regisContainer");
-const goSignup = document.getElementById("goSignup");
-const goLogin = document.getElementById("goLogin");
+/* --------------------------------------------------
+ *  CHUYỂN LOGIN <-> REGISTER
+ * -------------------------------------------------- */
+const loginContainer = document.querySelector('.form-container');
+const registerContainer = document.querySelector('.regisContainer');
+const goregister = document.getElementById('goregister');
+const goLogin = document.getElementById('goLogin');
 
-// Khi bấm "Sign up" → ẩn form login, hiện form đăng ký
-if (goSignup) {
-  goSignup.addEventListener("click", (e) => {
+if (goregister) {
+  goregister.addEventListener('click', (e) => {
     e.preventDefault();
-    loginContainer.classList.add("hidden");
-    signupContainer.classList.remove("hidden");
+    loginContainer.classList.add('hidden');
+    registerContainer.classList.remove('hidden');
   });
 }
-
-// Khi bấm "Sign in" → ẩn form đăng ký, hiện form login
 if (goLogin) {
-  goLogin.addEventListener("click", (e) => {
+  goLogin.addEventListener('click', (e) => {
     e.preventDefault();
-    signupContainer.classList.add("hidden");
-    loginContainer.classList.remove("hidden");
+    registerContainer.classList.add('hidden');
+    loginContainer.classList.remove('hidden');
   });
 }
 
-// --- Kiểm tra "Mật khẩu không trùng khớp" cho form Sign up ---
-const signupForm      = document.querySelector('.regisContainer .form-box');
-const signupPass      = document.getElementById('signup-password');
-const signupRepass    = document.getElementById('signup-repassword');
+/* --------------------------------------------------
+ *  VALIDATE MẬT KHẨU TRÙNG KHỚP (REGISTER)
+ * -------------------------------------------------- */
+const registerForm = document.querySelector('.regisContainer .form-box');
+const registerPass = document.getElementById('register-password');
+const registerRepass = document.getElementById('register-repassword');
 const passwordErrorEl = document.getElementById('password-error');
 
 function validateMatch() {
-  const ok = signupPass.value === signupRepass.value;
-  // thông báo
+  const ok = (registerPass?.value || '') === (registerRepass?.value || '');
   if (passwordErrorEl) passwordErrorEl.textContent = ok ? '' : 'Mật khẩu không trùng khớp';
-  // viền đỏ ô nhập lại
-  if (signupRepass) signupRepass.classList.toggle('input-error', !ok);
+  if (registerRepass) registerRepass.classList.toggle('input-error', !ok);
   return ok;
 }
-
-// validate theo thời gian thực
-if (signupPass && signupRepass) {
-  ['input','blur'].forEach(ev => {
-    signupPass.addEventListener(ev, validateMatch);
-    signupRepass.addEventListener(ev, validateMatch);
+if (registerPass && registerRepass) {
+  ['input', 'blur'].forEach(ev => {
+    registerPass.addEventListener(ev, validateMatch);
+    registerRepass.addEventListener(ev, validateMatch);
+  });
+}
+if (registerForm) {
+  registerForm.addEventListener('submit', (e) => {
+    if (!validateMatch()) e.preventDefault();
   });
 }
 
-// chặn submit nếu không khớp (không đụng icon mắt)
-if (signupForm) {
-  signupForm.addEventListener('submit', (e) => {
-    if (!validateMatch()) {
-      e.preventDefault();
-      // focus vào ô nhập lại cho tiện sửa
-      signupRepass && signupRepass.focus();
+/* --------------------------------------------------
+ *  SUBMIT LOGIN  (email + password, Remember me)
+ * -------------------------------------------------- */
+const loginForm = document.querySelector('.form-container .form-box');
+const rememberCbx = document.getElementById('remember-me-checkbox');
+
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = (document.getElementById('login-email')?.value || '').trim();
+    const password = (document.getElementById('login-password')?.value || '').trim();
+    if (!email || !password) {
+      alert('Vui lòng nhập đầy đủ Email và Mật khẩu');
+      return;
+    }
+
+    try {
+      console.log('[login] POST ->', `${AUTH_BASE}/login`);
+      const res = await fetch(`${AUTH_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }) // hoặc {identifier, password}
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        alert(data?.message || `Đăng nhập thất bại (HTTP ${res.status}).`);
+        return;
+      }
+
+      const token = data?.token || data?.accessToken;
+      const user = data?.user ?? null;
+      const storage = rememberCbx?.checked ? localStorage : sessionStorage;
+      if (token) storage.setItem('token', token);
+      storage.setItem('user', JSON.stringify(user));
+
+      window.location.href = '/';
+    } catch (err) {
+      console.error(err);
+      alert('Không thể kết nối máy chủ. Kiểm tra Gateway (http://localhost:4000).');
     }
   });
 }
 
+/* --------------------------------------------------
+ *  SUBMIT REGISTER  (email + fullName + password)
+ *  - Thử /register, nếu 404/405 thì fallback sang /signup
+ * -------------------------------------------------- */
+if (registerForm) {
+  registerForm.addEventListener('submit', async (e) => {
+    if (!validateMatch()) return;
+    e.preventDefault();
 
+    const email = (document.getElementById('register-email')?.value || '').trim();
+    const fullName = (document.getElementById('register-fullname')?.value || '').trim();
+    const password = (document.getElementById('register-password')?.value || '').trim();
 
+    if (!email || !fullName || !password) {
+      alert('Vui lòng điền đầy đủ Email / Tên đầy đủ / Mật khẩu');
+      return;
+    }
+
+    const postJSON = async (url, payload) => {
+      console.log('[register] POST ->', url);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      let data = {};
+      try { data = await res.json(); } catch (_) { }
+      return { res, data };
+    };
+
+    try {
+      // 1) Thử /register
+      let { res, data } = await postJSON(`${AUTH_BASE}/register`, { email, fullName, password });
+
+      // 2) Nếu /register không tồn tại → thử /signup
+      if (res.status === 404 || res.status === 405) {
+        console.warn('[register] /register 404/405 → fallback /signup');
+        ({ res, data } = await postJSON(`${AUTH_BASE}/signup`, { email, fullName, password }));
+      }
+
+      if (!res.ok) {
+        alert(data?.message || `Đăng ký thất bại (HTTP ${res.status}).`);
+        return;
+      }
+
+      const token = data?.token || data?.accessToken;
+      const user = data?.user ?? null;
+      if (token) localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      window.location.href = '/';
+    } catch (err) {
+      console.error('[register] error:', err);
+      alert('Không thể kết nối máy chủ. Kiểm tra Gateway (http://localhost:4000) & Auth service.');
+    }
+  });
+}
+
+/* --------------------------------------------------
+ *  KHÔNG DÙNG TOP-LEVEL await
+ * -------------------------------------------------- */

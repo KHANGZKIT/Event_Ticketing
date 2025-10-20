@@ -36,7 +36,6 @@ export async function buildTicketQR(ticketId, requesterId, requesterRoles = []) 
 
     const text = JSON.stringify(payload);
     const pngBuffer = await QRCode.toBuffer(text, { type: 'png', margin: 1, scale: 6 });
-
     return pngBuffer
 }
 

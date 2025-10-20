@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ ghế - Hệ thống bán vé sự kiện</title>
+    <!-- Added QR code library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* ============================================
+           CSS VARIABLES & THEME - MODERN PREMIUM DESIGN
+           ============================================ */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fa;
+            --bg-tertiary: #eef1f6;
+            --text-primary: #1a1f3a;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --primary-color: #e91e63;
+            --primary-hover: #c2185b;
+            --primary-light: #f8bbd0;
+            --accent-color: #1a1f3a;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --vip-color: #e91e63;
+            --vip-light: #fce4ec;
+            --sold-color: #9ca3af;
+            --held-color: #fbbf24;
+            --available-color: #ecfdf5;
+            --selected-color: #d1fae5;
+            --seat-size: 36px;
+            --transition-speed: 200ms;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef1f6 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        input,
+        select {
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 14px;
+            transition: all var(--transition-speed) ease;
+            background-color: var(--bg-primary);
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+        }
+
+        /* ============================================
+           LAYOUT
+           ============================================ */
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app__header {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 28px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app__main {
+            display: flex;
+            flex: 1;
+            gap: 24px;
+            padding: 28px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .app__content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .app__sidebar {
+            width: 360px;
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        /* ============================================
+           HEADER STYLES
+           ============================================ */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .header__info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header__title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .header__meta {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .header__meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .header__controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .header__search {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header__search input {
+            width: 160px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .header__filter {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header__filter select {
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .header__total {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            white-space: nowrap;
+            background: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        /* ============================================
+           LEGEND STYLES
+           ============================================ */
+        .legend {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background-color: var(--bg-primary);
+            border-radius: 10px;
+            font-size: 13px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .legend__item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .legend__seat {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .legend__seat--available {
+            background-color: var(--available-color);
+            border-color: var(--success-color);
+        }
+
+        .legend__seat--selected {
+            background-color: var(--selected-color);
+            border-color: var(--success-color);
+        }
+
+        .legend__seat--held {
+            background-color: var(--held-color);
+            border-color: #f59e0b;
+        }
+
+        .legend__seat--sold {
+            background-color: var(--sold-color);
+            color: white;
+            border-color: var(--sold-color);
+        }
+
+        .legend__seat--vip {
+            background-color: var(--vip-light);
+            border-color: var(--vip-color);
+        }
+
+        /* ============================================
+           STAGE STYLES
+           ============================================ */
+        .stage {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 32px;
+            letter-spacing: 3px;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           SEATMAP STYLES
+           ============================================ */
+        .seatmap {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .seatmap__grid {
+            display: inline-grid;
+            gap: 10px;
+            grid-template-columns: auto repeat(20, var(--seat-size));
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            overflow-x: auto;
+            padding: 12px;
+        }
+
+        .seatmap__row-label {
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            width: 32px;
+            height: var(--seat-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seatmap__col-label {
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            width: var(--seat-size);
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================
+           SEAT BUTTON STYLES
+           ============================================ */
+        .seat {
+            width: var(--seat-size);
+            height: var(--seat-size);
+            border-radius: 6px;
+            border: 2px solid var(--success-color);
+            background-color: var(--available-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--success-color);
+            position: relative;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .seat:hover:not(.seat--sold):not(.seat--held) {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .seat--selected {
+            background-color: var(--selected-color);
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            transform: scale(1.08);
+        }
+
+        .seat--held {
+            background-color: var(--held-color);
+            border-color: #f59e0b;
+            color: #92400e;
+            cursor: not-allowed;
+        }
+
+        .seat--sold {
+            background-color: var(--sold-color);
+            border-color: #9ca3af;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .seat--vip {
+            border-color: var(--vip-color);
+        }
+
+        .seat--vip.seat--available {
+            background-color: var(--vip-light);
+            color: var(--vip-color);
+        }
+
+        .seat__countdown {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           TOOLTIP STYLES
+           ============================================ */
+        .tooltip {
+            position: absolute;
+            background-color: var(--text-primary);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--text-primary);
+        }
+
+        .seat:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ============================================
+           MINI CART STYLES
+           ============================================ */
+        .cart {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .cart__title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart__items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .cart__item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 13px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .cart__item-code {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cart__item-type {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .cart__item-price {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .cart__empty {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .cart__total {
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #fce4ec 100%);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            border: 1px solid #f8bbd0;
+        }
+
+        .cart__total-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .cart__total-amount {
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        .cart__actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn--primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c2185b 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn--primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn--secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn--secondary:hover:not(:disabled) {
+            background-color: var(--bg-tertiary);
+            border-color: var(--primary-color);
+        }
+
+        .btn--danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn--danger:hover:not(:disabled) {
+            background-color: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn__countdown {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--text-primary);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            animation: slideIn 300ms ease forwards;
+            max-width: 320px;
+            font-weight: 500;
+        }
+
+        .toast--warning {
+            background-color: var(--warning-color);
+            color: var(--text-primary);
+        }
+
+        .toast--success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============================================
+           MODAL STYLES - ENHANCED WITH QR CODE
+           ============================================ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+        }
+
+        .modal--active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal__content {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 300ms ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal__title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .modal__body {
+            margin-bottom: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .modal__list {
+            list-style: none;
+            margin: 16px 0;
+            padding: 16px;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .modal__list-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .modal__list-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal__list-item-label {
+            color: var(--text-secondary);
+        }
+
+        .modal__list-item-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* QR Code section styles */
+        .modal__qr-section {
+            display: none;
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #fce4ec 100%);
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .modal__qr-section--active {
+            display: block;
+        }
+
+        .modal__qr-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 12px;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .modal__qr-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        .modal__total {
+            padding: 16px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 24px;
+            border: 1px solid var(--success-color);
+        }
+
+        .modal__total-label {
+            color: var(--text-secondary);
+        }
+
+        .modal__total-amount {
+            color: var(--success-color);
+            font-size: 24px;
+        }
+
+        .modal__footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* ============================================
+           ARIA LIVE REGION
+           ============================================ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 1024px) {
+            .app__main {
+                flex-direction: column;
+            }
+
+            .app__sidebar {
+                width: 100%;
+                position: static;
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+            }
+
+            .header__controls {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app__header {
+                padding: 16px 20px;
+            }
+
+            .app__main {
+                padding: 16px 20px;
+                gap: 16px;
+            }
+
+            .header__title {
+                font-size: 22px;
+            }
+
+            .header__meta {
+                font-size: 12px;
+                gap: 12px;
+            }
+
+            .header__search input {
+                width: 100px;
+            }
+
+            .legend {
+                gap: 12px;
+                font-size: 12px;
+            }
+
+            .stage {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            :root {
+                --seat-size: 32px;
+            }
+
+            .seatmap__grid {
+                gap: 6px;
+                grid-template-columns: auto repeat(20, var(--seat-size));
+            }
+
+            .modal__content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app__header {
+                padding: 12px 16px;
+            }
+
+            .header__title {
+                font-size: 18px;
+            }
+
+            .header__meta {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .header__controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .header__search input {
+                width: 80px;
+                font-size: 12px;
+            }
+
+            .header__filter select {
+                font-size: 12px;
+            }
+
+            :root {
+                --seat-size: 28px;
+            }
+
+            .seatmap__grid {
+                gap: 4px;
+            }
+
+            .legend {
+                gap: 8px;
+                font-size: 11px;
+            }
+
+            .cart__items {
+                max-height: 200px;
+            }
+
+            .modal__content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- HEADER -->
+        <header class="app__header">
+            <div class="header">
+                <div class="header__info">
+                    <h1 class="header__title">Concert 2025 - Hòa nhạc mùa hè</h1>
+                    <div class="header__meta">
+                        <span class="header__meta-item">📅 15/06/2025</span>
+                        <span class="header__meta-item">🕐 19:00</span>
+                        <span class="header__meta-item">📍 Nhà hát Lớn Hà Nội</span>
+                    </div>
+                </div>
+                <div class="header__controls">
+                    <div class="header__search">
+                        <input type="text" id="searchInput" placeholder="Tìm ghế (A1, B12...)"
+                            aria-label="Tìm kiếm ghế">
+                        <button class="btn btn--secondary" id="searchBtn" aria-label="Tìm kiếm">🔍</button>
+                    </div>
+                    <div class="header__filter">
+                        <label for="filterSelect" class="sr-only">Lọc theo hạng ghế</label>
+                        <select id="filterSelect" aria-label="Lọc theo hạng ghế">
+                            <option value="">Tất cả</option>
+                            <option value="VIP">VIP</option>
+                            <option value="NORMAL">Thường</option>
+                        </select>
+                    </div>
+                    <div class="header__total">
+                        Tổng: <span id="totalPrice">0 ₫</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="app__main">
+            <div class="app__content">
+                <!-- LEGEND -->
+                <div class="legend" role="region" aria-label="Chú thích trạng thái ghế">
+                    <div class="legend__item">
+                        <div class="legend__seat legend__seat--available"></div>
+                        <span>Trống</span>
+                    </div>
+                    <div class="legend__item">
+                        <div class="legend__seat legend__seat--selected"></div>
+                        <span>Đang chọn</span>
+                    </div>
+                    <div class="legend__item">
+                        <div class="legend__seat legend__seat--held"></div>
+                        <span>Đang giữ</span>
+                    </div>
+                    <div class="legend__item">
+                        <div class="legend__seat legend__seat--sold"></div>
+                        <span>Đã bán</span>
+                    </div>
+                    <div class="legend__item">
+                        <div class="legend__seat legend__seat--vip"></div>
+                        <span>VIP</span>
+                    </div>
+                </div>
+
+                <!-- STAGE -->
+                <div class="stage" role="img" aria-label="Sân khấu">STAGE</div>
+
+                <!-- SEATMAP -->
+                <div class="seatmap">
+                    <div class="seatmap__grid" id="seatmapGrid" role="region" aria-label="Sơ đồ ghế">
+                        <!-- Rendered by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR - MINI CART -->
+            <aside class="app__sidebar">
+                <div class="cart">
+                    <h2 class="cart__title">🛒 Giỏ hàng</h2>
+
+                    <div class="cart__items" id="cartItems" role="region" aria-label="Danh sách ghế đã chọn">
+                        <div class="cart__empty">Chưa chọn ghế</div>
+                    </div>
+
+                    <div class="cart__total">
+                        <span class="cart__total-label">Tổng cộng:</span>
+                        <span class="cart__total-amount" id="cartTotal">0 ₫</span>
+                    </div>
+
+                    <div class="cart__actions">
+                        <button class="btn btn--primary" id="holdBtn" disabled aria-label="Giữ ghế trong 5 phút">
+                            ⏱️ Giữ ghế 5:00
+                        </button>
+                        <button class="btn btn--secondary" id="clearBtn" disabled aria-label="Bỏ chọn tất cả ghế">
+                            🗑️ Xóa
+                        </button>
+                        <button class="btn btn--primary" id="confirmBtn" disabled aria-label="Xác nhận đặt vé">
+                            ✓ Thanh toán
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="confirmModal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal__content">
+            <h2 class="modal__title" id="modalTitle">Xác nhận đặt vé</h2>
+
+            <!-- QR Code section for payment -->
+            <div class="modal__qr-section" id="qrSection">
+                <div class="modal__qr-title">Quét mã QR để thanh toán</div>
+                <div id="qrcode"></div>
+                <div class="modal__qr-info">Sử dụng ứng dụng ngân hàng hoặc ví điện tử để quét</div>
+            </div>
+
+            <div class="modal__body">
+                <p>Vui lòng kiểm tra thông tin đặt vé:</p>
+                <ul class="modal__list" id="modalList">
+                    <!-- Rendered by JavaScript -->
+                </ul>
+            </div>
+
+            <div class="modal__total">
+                <span class="modal__total-label">Tổng tiền:</span>
+                <span class="modal__total-amount" id="modalTotal">0 ₫</span>
+            </div>
+
+            <div class="modal__footer">
+                <button class="btn btn--secondary" id="modalCancelBtn">Hủy</button>
+                <button class="btn btn--primary" id="modalConfirmBtn">Xác nhận thanh toán</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARIA LIVE REGION -->
+    <div id="ariaLive" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+        /* ============================================
+           SAMPLE DATA
+           ============================================ */
+        const sampleData = {
+            showId: "show_123",
+            rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+            cols: 20,
+            vipRows: ["A", "B", "C"],
+            held: ["A5", "A6", "B10", "C3"],
+            sold: ["A1", "A2", "D7", "E8", "J20"],
+            prices: { VIP: 250000, NORMAL: 120000 }
+        };
+
+        /* ============================================
+           STATE MANAGEMENT
+           ============================================ */
+        const state = {
+            data: sampleData,
+            selected: new Set(),
+            held: new Set(sampleData.held),
+            sold: new Set(sampleData.sold),
+            holdCountdowns: new Map(),
+            filter: ""
+        };
+
+        /* ============================================
+           UTILITY FUNCTIONS
+           ============================================ */
+
+        /**
+         * Format currency to Vietnamese Dong
+         */
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        /**
+         * Get seat type (VIP or NORMAL)
+         */
+        function getSeatType(row) {
+            return state.data.vipRows.includes(row) ? "VIP" : "NORMAL";
+        }
+
+        /**
+         * Get seat price
+         */
+        function getSeatPrice(row) {
+            const type = getSeatType(row);
+            return state.data.prices[type];
+        }
+
+        /**
+         * Get seat status
+         */
+        function getSeatStatus(code) {
+            if (state.sold.has(code)) return "sold";
+            if (state.held.has(code)) return "held";
+            if (state.selected.has(code)) return "selected";
+            return "available";
+        }
+
+        /**
+         * Announce to screen readers
+         */
+        function announce(message) {
+            const ariaLive = document.getElementById("ariaLive");
+            ariaLive.textContent = message;
+        }
+
+        /**
+         * Show toast notification
+         */
+        function showToast(message, type = "info") {
+            const toast = document.createElement("div");
+            toast.className = `toast toast--${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = "slideIn 300ms ease reverse forwards";
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /**
+         * Format time MM:SS
+         */
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, "0")}`;
+        }
+
+        /* ============================================
+           SEAT SELECTION LOGIC
+           ============================================ */
+
+        /**
+         * Select or deselect a seat
+         */
+        function selectSeat(code) {
+            const status = getSeatStatus(code);
+
+            // Cannot select sold or held seats
+            if (status === "sold" || status === "held") {
+                showToast("Ghế này không thể chọn", "warning");
+                return;
+            }
+
+            // Toggle selection
+            if (state.selected.has(code)) {
+                state.selected.delete(code);
+                announce(`Bỏ chọn ghế ${code}`);
+            } else {
+                // Check max 6 seats limit
+                if (state.selected.size >= 6) {
+                    showToast("Tối đa 6 ghế được chọn", "warning");
+                    announce("Không thể chọn thêm ghế, đã đạt giới hạn 6 ghế");
+                    return;
+                }
+                state.selected.add(code);
+                announce(`Chọn ghế ${code}, ${getSeatType(code)}, giá ${formatMoney(getSeatPrice(code.charAt(0)))}`);
+            }
+
+            updateUI();
+        }
+
+        /**
+         * Clear all selections
+         */
+        function clearSelection() {
+            state.selected.clear();
+            announce("Đã bỏ chọn tất cả ghế");
+            updateUI();
+        }
+
+        /**
+         * Start hold countdown (5 minutes)
+         */
+        function startHoldCountdown() {
+            if (state.selected.size === 0) {
+                showToast("Vui lòng chọn ít nhất 1 ghế", "warning");
+                return;
+            }
+
+            const selectedArray = Array.from(state.selected);
+            let timeLeft = 300; // 5 minutes in seconds
+
+            // Add to held set
+            selectedArray.forEach(code => {
+                state.held.add(code);
+                state.selected.delete(code);
+            });
+
+            announce(`Bắt đầu giữ ${selectedArray.length} ghế trong 5 phút`);
+            showToast(`Giữ ${selectedArray.length} ghế trong 5 phút`, "success");
+
+            // Countdown timer
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+
+                // Update UI
+                selectedArray.forEach(code => {
+                    const seatBtn = document.querySelector(`[data-seat="${code}"]`);
+                    if (seatBtn) {
+                        const countdown = seatBtn.querySelector(".seat__countdown");
+                        if (countdown) {
+                            countdown.textContent = formatTime(timeLeft);
+                        }
+                    }
+                });
+
+                // Time's up
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    selectedArray.forEach(code => {
+                        state.held.delete(code);
+                    });
+                    announce("Hết thời gian giữ ghế");
+                    showToast("Hết thời gian giữ ghế", "warning");
+                    updateUI();
+                }
+            }, 1000);
+
+            state.holdCountdowns.set(selectedArray.join(","), countdownInterval);
+            updateUI();
+        }
+
+        /* ============================================
+           SEARCH & FILTER
+           ============================================ */
+
+        /**
+         * Search for a seat
+         */
+        function searchSeat(code) {
+            code = code.toUpperCase().trim();
+
+            // Validate seat code format
+            if (!/^[A-J]\d{1,2}$/.test(code)) {
+                showToast("Mã ghế không hợp lệ (ví dụ: A1, B12)", "warning");
+                return;
+            }
+
+            // Check if seat exists
+            const row = code.charAt(0);
+            const col = parseInt(code.substring(1));
+            if (col < 1 || col > state.data.cols) {
+                showToast("Ghế không tồn tại", "warning");
+                return;
+            }
+
+            // Scroll to seat and highlight
+            const seatBtn = document.querySelector(`[data-seat="${code}"]`);
+            if (seatBtn) {
+                seatBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+                seatBtn.style.boxShadow = "0 0 0 3px rgba(233, 30, 99, 0.5)";
+                setTimeout(() => {
+                    seatBtn.style.boxShadow = "";
+                }, 2000);
+                announce(`Tìm thấy ghế ${code}`);
+            }
+        }
+
+        /**
+         * Apply filters
+         */
+        function applyFilters() {
+            const filterValue = document.getElementById("filterSelect").value;
+            state.filter = filterValue;
+
+            const seats = document.querySelectorAll(".seat");
+            seats.forEach(seat => {
+                const code = seat.dataset.seat;
+                const row = code.charAt(0);
+                const type = getSeatType(row);
+
+                if (filterValue === "") {
+                    seat.style.display = "";
+                } else if (filterValue === "VIP" && type === "VIP") {
+                    seat.style.display = "";
+                } else if (filterValue === "NORMAL" && type === "NORMAL") {
+                    seat.style.display = "";
+                } else {
+                    seat.style.display = "none";
+                }
+            });
+        }
+
+        /* ============================================
+           RENDER FUNCTIONS
+           ============================================ */
+
+        /**
+         * Render seatmap grid
+         */
+        function renderSeatmap(data) {
+            const grid = document.getElementById("seatmapGrid");
+            grid.innerHTML = "";
+
+            // Column headers
+            const headerRow = document.createElement("div");
+            headerRow.style.gridColumn = "1 / -1";
+            headerRow.style.display = "contents";
+
+            // Empty corner
+            const corner = document.createElement("div");
+            corner.className = "seatmap__row-label";
+            headerRow.appendChild(corner);
+
+            // Column numbers
+            for (let col = 1; col <= data.cols; col++) {
+                const colLabel = document.createElement("div");
+                colLabel.className = "seatmap__col-label";
+                colLabel.textContent = col;
+                headerRow.appendChild(colLabel);
+            }
+            grid.appendChild(headerRow);
+
+            // Rows
+            data.rows.forEach(row => {
+                // Row label
+                const rowLabel = document.createElement("div");
+                rowLabel.className = "seatmap__row-label";
+                rowLabel.textContent = row;
+                grid.appendChild(rowLabel);
+
+                // Seats
+                for (let col = 1; col <= data.cols; col++) {
+                    const code = `${row}${col}`;
+                    const type = getSeatType(row);
+                    const status = getSeatStatus(code);
+                    const price = getSeatPrice(row);
+
+                    const seatBtn = document.createElement("button");
+                    seatBtn.className = `seat seat--${type.toLowerCase()}`;
+                    seatBtn.dataset.seat = code;
+                    seatBtn.setAttribute("aria-pressed", status === "selected");
+                    seatBtn.setAttribute("aria-label", `Ghế ${code}, ${type}, ${formatMoney(price)}`);
+
+                    // Status classes
+                    if (status === "selected") {
+                        seatBtn.classList.add("seat--selected");
+                    } else if (status === "held") {
+                        seatBtn.classList.add("seat--held");
+                    } else if (status === "sold") {
+                        seatBtn.classList.add("seat--sold");
+                    }
+
+                    // Seat content
+                    seatBtn.innerHTML = `
+                        <span>${code}</span>
+                        ${status === "held" ? `<div class="seat__countdown">${formatTime(300)}</div>` : ""}
+                        <div class="tooltip">${code} • ${type} • ${formatMoney(price)}</div>
+                    `;
+
+                    // Event listeners
+                    seatBtn.addEventListener("click", () => selectSeat(code));
+                    seatBtn.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") {
+                            selectSeat(code);
+                        }
+                    });
+
+                    grid.appendChild(seatBtn);
+                }
+            });
+        }
+
+        /**
+         * Update cart display
+         */
+        function updateCart() {
+            const cartItems = document.getElementById("cartItems");
+            const cartTotal = document.getElementById("cartTotal");
+            const totalPrice = document.getElementById("totalPrice");
+
+            if (state.selected.size === 0) {
+                cartItems.innerHTML = '<div class="cart__empty">Chưa chọn ghế</div>';
+                cartTotal.textContent = "0 ₫";
+                totalPrice.textContent = "0 ₫";
+            } else {
+                const items = Array.from(state.selected).sort();
+                let total = 0;
+
+                cartItems.innerHTML = items.map(code => {
+                    const row = code.charAt(0);
+                    const type = getSeatType(row);
+                    const price = getSeatPrice(row);
+                    total += price;
+
+                    return `
+                        <div class="cart__item">
+                            <div>
+                                <div class="cart__item-code">${code}</div>
+                                <div class="cart__item-type">${type}</div>
+                            </div>
+                            <div class="cart__item-price">${formatMoney(price)}</div>
+                        </div>
+                    `;
+                }).join("");
+
+                cartTotal.textContent = formatMoney(total);
+                totalPrice.textContent = formatMoney(total);
+            }
+        }
+
+        /**
+         * Update all UI elements
+         */
+        function updateUI() {
+            renderSeatmap(state.data);
+            updateCart();
+            applyFilters();
+            updateButtons();
+        }
+
+        /**
+         * Update button states
+         */
+        function updateButtons() {
+            const holdBtn = document.getElementById("holdBtn");
+            const clearBtn = document.getElementById("clearBtn");
+            const confirmBtn = document.getElementById("confirmBtn");
+
+            const hasSelection = state.selected.size > 0;
+            holdBtn.disabled = !hasSelection;
+            clearBtn.disabled = !hasSelection;
+            confirmBtn.disabled = !hasSelection;
+        }
+
+        /* ============================================
+           MODAL FUNCTIONS - WITH QR CODE GENERATION
+           ============================================ */
+
+        /**
+         * Generate QR code for payment
+         */
+        function generateQRCode(bookingData) {
+            // Clear previous QR code
+            const qrcodeDiv = document.getElementById("qrcode");
+            qrcodeDiv.innerHTML = "";
+
+            // Create payment data string
+            const paymentData = JSON.stringify({
+                bookingId: "BK" + Date.now(),
+                seats: bookingData.seats,
+                total: bookingData.total,
+                timestamp: new Date().toISOString()
+            });
+
+            // Generate QR code
+            new QRCode(qrcodeDiv, {
+                text: paymentData,
+                width: 200,
+                height: 200,
+                colorDark: "#1a1f3a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        /**
+         * Show confirmation modal
+         */
+        function showConfirmModal() {
+            const modal = document.getElementById("confirmModal");
+            const modalList = document.getElementById("modalList");
+            const modalTotal = document.getElementById("modalTotal");
+            const qrSection = document.getElementById("qrSection");
+
+            const items = Array.from(state.selected).sort();
+            let total = 0;
+
+            modalList.innerHTML = items.map(code => {
+                const row = code.charAt(0);
+                const type = getSeatType(row);
+                const price = getSeatPrice(row);
+                total += price;
+
+                return `
+                    <li class="modal__list-item">
+                        <span class="modal__list-item-label">${code} (${type})</span>
+                        <span class="modal__list-item-value">${formatMoney(price)}</span>
+                    </li>
+                `;
+            }).join("");
+
+            modalTotal.textContent = formatMoney(total);
+
+            generateQRCode({
+                seats: items,
+                total: total
+            });
+            qrSection.classList.add("modal__qr-section--active");
+
+            modal.classList.add("modal--active");
+            modal.setAttribute("aria-hidden", "false");
+            announce(`Xác nhận đặt ${items.length} ghế, tổng tiền ${formatMoney(total)}`);
+        }
+
+        /**
+         * Hide confirmation modal
+         */
+        function hideConfirmModal() {
+            const modal = document.getElementById("confirmModal");
+            const qrSection = document.getElementById("qrSection");
+            modal.classList.remove("modal--active");
+            modal.setAttribute("aria-hidden", "true");
+            qrSection.classList.remove("modal__qr-section--active");
+        }
+
+        /**
+         * Confirm booking
+         */
+        function confirmBooking() {
+            const items = Array.from(state.selected).sort().join(", ");
+            const total = Array.from(state.selected).reduce((sum, code) => {
+                return sum + getSeatPrice(code.charAt(0));
+            }, 0);
+
+            hideConfirmModal();
+            showToast(`✓ Thanh toán thành công! Ghế: ${items}`, "success");
+            announce(`Thanh toán thành công cho ${state.selected.size} ghế, tổng tiền ${formatMoney(total)}`);
+
+            // Clear selection after confirmation
+            setTimeout(() => {
+                clearSelection();
+            }, 1500);
+        }
+
+        /* ============================================
+           EVENT LISTENERS
+           ============================================ */
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initial render
+            renderSeatmap(state.data);
+            updateCart();
+
+            // Search
+            document.getElementById("searchBtn").addEventListener("click", () => {
+                const code = document.getElementById("searchInput").value;
+                searchSeat(code);
+            });
+
+            document.getElementById("searchInput").addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    searchSeat(e.target.value);
+                }
+            });
+
+            // Filter
+            document.getElementById("filterSelect").addEventListener("change", applyFilters);
+
+            // Cart actions
+            document.getElementById("holdBtn").addEventListener("click", startHoldCountdown);
+            document.getElementById("clearBtn").addEventListener("click", clearSelection);
+            document.getElementById("confirmBtn").addEventListener("click", showConfirmModal);
+
+            // Modal
+            document.getElementById("modalCancelBtn").addEventListener("click", hideConfirmModal);
+            document.getElementById("modalConfirmBtn").addEventListener("click", confirmBooking);
+
+            // Close modal on background click
+            document.getElementById("confirmModal").addEventListener("click", (e) => {
+                if (e.target.id === "confirmModal") {
+                    hideConfirmModal();
+                }
+            });
+
+            // Keyboard navigation (arrow keys)
+            document.addEventListener("keydown", (e) => {
+                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                    const focused = document.activeElement;
+                    if (focused && focused.classList.contains("seat")) {
+                        e.preventDefault();
+                        const code = focused.dataset.seat;
+                        const row = code.charCodeAt(0) - 65; // A=0, B=1, etc.
+                        const col = parseInt(code.substring(1));
+
+                        let newRow = row;
+                        let newCol = col;
+
+                        if (e.key === "ArrowUp") newRow = Math.max(0, row - 1);
+                        if (e.key === "ArrowDown") newRow = Math.min(state.data.rows.length - 1, row + 1);
+                        if (e.key === "ArrowLeft") newCol = Math.max(1, col - 1);
+                        if (e.key === "ArrowRight") newCol = Math.min(state.data.cols, col + 1);
+
+                        const newCode = String.fromCharCode(65 + newRow) + newCol;
+                        const newSeat = document.querySelector(`[data-seat="${newCode}"]`);
+                        if (newSeat) newSeat.focus();
+                    }
+                }
+            });
+
+            announce("Sơ đồ ghế đã tải xong. Chọn ghế để bắt đầu.");
+        });
+    </script>
+</body>
+
+</html>
