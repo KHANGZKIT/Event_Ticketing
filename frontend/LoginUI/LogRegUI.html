@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng nhập/Đăng ký</title>
     <link rel="stylesheet" href="/frontend/LoginUI/style/logReg.css">
+    <!-- Tuỳ chọn: tránh 404 favicon -->
+    <link rel="icon" href="data:,">
 </head>
+
 <body>
     <div class="container">
+        <!-- LOGIN -->
         <div class="form-container">
             <div class="form-blob">
                 <img src="/frontend/LoginUI/asset/blob.svg" alt="blob" class="blob-image blob1">
                 <img src="/frontend/LoginUI/asset/blob.svg" alt="blob" class="blob-image blob2">
                 <img src="/frontend/LoginUI/asset/blob.svg" alt="blob" class="blob-image blob3">
             </div>
-        
+
             <div class="form-header">
                 <p>Điền thông tin</p>
                 <h1>Welcome Back</h1>
             </div>
+
             <form class="form-box">
                 <div class="input-group">
                     <input type="email" id="login-email" class="input-field" placeholder="" required>
                     <label for="login-email" class="floating-label">Địa chỉ mail</label>
                 </div>
+
                 <div class="input-group">
                     <input type="password" id="login-password" class="input-field" placeholder="" required>
                     <label for="login-password" class="floating-label">Mật khẩu</label>
                     <div class="eye-icon" id="togglePassLogin" aria-label="Hiện/ẩn mật khẩu">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                        <!-- SVG mắt sẽ do JS thay -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye">
+                            <path
+                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
                     </div>
                 </div>
+
                 <div class="input-group checkbox-group">
                     <div class="form-col remember-me">
                         <input type="checkbox" id="remember-me-checkbox" class="checkbox-field">
@@ -40,27 +54,31 @@
                         <a href="#" class="form-link">Quên mật khẩu</a>
                     </div>
                 </div>
+
                 <button type="submit" class="form-btn form-btn--submit">Sign in</button>
             </form>
+
             <div class="form-divider">
                 <p>Or</p>
             </div>
+
             <div class="form-bottom">
                 <div class="form-social">
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/google.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/google.svg" class="btn-icon" alt="Google">
                     </button>
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/apple.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/apple.svg" class="btn-icon" alt="Apple">
                     </button>
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/facebook.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/facebook.svg" class="btn-icon" alt="Facebook">
                     </button>
                 </div>
-                <p>Chưa có tài khoản ?? <a href="#" class="form-link" id="goSignup">Sign up</a></p>
+                <p>Chưa có tài khoản? <a href="#" class="form-link" id="goregister">Register</a></p>
             </div>
         </div>
 
+        <!-- REGISTER -->
         <div class="regisContainer hidden">
             <div class="form-blob">
                 <img src="/frontend/LoginUI/asset/blob.svg" alt="blob" class="blob-image blob1">
@@ -69,63 +87,74 @@
             </div>
 
             <div class="form-header">
-                <p>Đăng kí tài khoản</p>
+                <p>Đăng ký tài khoản</p>
                 <h1>Điền thông tin</h1>
             </div>
 
             <form class="form-box">
                 <div class="input-group">
-                    <input type="email" id="signup-email" class="input-field" placeholder="" required>
-                    <label for="signup-email" class="floating-label">Địa chỉ mail</label>
+                    <input type="email" id="register-email" class="input-field" placeholder="" required>
+                    <label for="register-email" class="floating-label">Địa chỉ mail</label>
                 </div>
 
                 <div class="input-group">
-                    <input type="tel" id="signup-phone" class="input-field" placeholder="" required>
-                    <label for="signup-phone" class="floating-label">Số điện thoại</label>
+                    <input type="text" id="register-fullname" class="input-field" placeholder="" required>
+                    <label for="register-fullname" class="floating-label">Tên đầy đủ</label>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" id="signup-password" class="input-field" placeholder="" required>
-                    <label for="signup-password" class="floating-label">Mật khẩu</label>
-                    <div class="eye-icon" id="togglePassSignup" aria-label="Hiện/ẩn mật khẩu">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                    <input type="password" id="register-password" class="input-field" placeholder="" required>
+                    <label for="register-password" class="floating-label">Mật khẩu</label>
+                    <div class="eye-icon" id="togglePassregister" aria-label="Hiện/ẩn mật khẩu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye">
+                            <path
+                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" id="signup-repassword" class="input-field" placeholder="" required>
-                    <label for="signup-repassword" class="floating-label">Nhập lại mật khẩu</label>
-                    <div class="eye-icon" id="toggleRepassSignup" aria-label="Hiện/ẩn mật khẩu">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                    <input type="password" id="register-repassword" class="input-field" placeholder="" required>
+                    <label for="register-repassword" class="floating-label">Nhập lại mật khẩu</label>
+                    <div class="eye-icon" id="toggleRepassregister" aria-label="Hiện/ẩn mật khẩu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye">
+                            <path
+                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
                     </div>
                 </div>
 
                 <p id="password-error" class="error-text"></p>
 
-                <button type="submit" class="form-btn form-btn--submit">Sign up</button>
+                <button type="submit" class="form-btn form-btn--submit">Register</button>
             </form>
 
             <div class="form-divider">
-                <p>Or sign up with</p>
+                <p>Or register with</p>
             </div>
 
             <div class="form-bottom">
                 <div class="form-social">
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/google.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/google.svg" class="btn-icon" alt="Google">
                     </button>
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/apple.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/apple.svg" class="btn-icon" alt="Apple">
                     </button>
                     <button class="form-btn form-btn--social">
-                        <img src="/frontend/LoginUI/asset/facebook.svg" class="btn-icon" alt="social icon">
+                        <img src="/frontend/LoginUI/asset/facebook.svg" class="btn-icon" alt="Facebook">
                     </button>
                 </div>
-                <p>Đã có tài khoản ?? <a href="#" class="form-link" id="goLogin">Sign in</a></p>
+                <p>Đã có tài khoản? <a href="#" class="form-link" id="goLogin">Sign in</a></p>
             </div>
         </div>
     </div>
 
     <script src="/frontend/LoginUI/script/logreg.js"></script>
 </body>
+
 </html>
