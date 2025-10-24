@@ -27,13 +27,15 @@ body {
   font-size: 28px;
   letter-spacing: 1px;
 }
+
 .header h1 a {
   color: white;
   text-decoration: none;
 }
 
 .header h1 a:hover {
-  color: #d1f5e1; /* hoặc #2ecc71 nếu muốn hiệu ứng hover */
+  color: #d1f5e1;
+  /* hoặc #2ecc71 nếu muốn hiệu ứng hover */
 }
 
 /* Search bar */
@@ -121,13 +123,16 @@ body {
   color: #2ecc71;
   text-decoration: underline;
 }
+
 /* Dropdown */
 .dropdown {
   position: relative;
   display: flex;
-  align-items: center; /* căn giữa theo chiều dọc */
+  align-items: center;
+  /* căn giữa theo chiều dọc */
   justify-content: center;
 }
+
 .dropdown label,
 .dropbtn {
   background-color: transparent;
@@ -150,12 +155,13 @@ body {
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 100%; /* xuất hiện ngay dưới menu */
+  top: 100%;
+  /* xuất hiện ngay dưới menu */
   left: 0;
   background-color: #27ae60;
   min-width: 180px;
   border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
 
@@ -196,6 +202,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
+
 /* ----- SLIDER ẢNH NỔI BẬT ----- */
 .slider {
   position: relative;
@@ -226,7 +233,8 @@ body {
 }
 
 /* Nút chuyển ảnh */
-.prev, .next {
+.prev,
+.next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -240,7 +248,8 @@ body {
   transition: background 0.3s;
 }
 
-.prev:hover, .next:hover {
+.prev:hover,
+.next:hover {
   background: rgba(0, 0, 0, 0.7);
 }
 
@@ -281,7 +290,8 @@ body {
     height: 220px;
   }
 
-  .prev, .next {
+  .prev,
+  .next {
     font-size: 22px;
   }
 }
@@ -320,17 +330,20 @@ body {
   gap: 40px;
   text-align: left;
 }
+
 .footer div {
   flex: 1 1 250px;
   max-width: 300px;
 }
+
 .footer h4 {
   color: #2ecc71;
   margin-bottom: 12px;
   font-size: 16px;
 }
 
-.footer p, .footer a {
+.footer p,
+.footer a {
   font-size: 14px;
   color: #ccc;
   text-decoration: none;
@@ -370,8 +383,10 @@ body {
     text-align: center;
   }
 }
+
 /* Hiển thị dạng mobile */
 @media (max-width: 768px) {
+
   /* Header */
   .header {
     flex-direction: column;
@@ -422,7 +437,8 @@ body {
     border-radius: 6px;
   }
 
-  .menu li a, .dropbtn {
+  .menu li a,
+  .dropbtn {
     display: block;
     color: white;
     text-decoration: none;
@@ -498,8 +514,10 @@ body {
     font-size: 13px;
   }
 }
+
 /* ----- GIAO DIỆN HEADER MOBILE (giữ ô input search) ----- */
 @media (max-width: 768px) {
+
   /* Header nằm trên 1 hàng ngang */
   .header {
     display: flex;

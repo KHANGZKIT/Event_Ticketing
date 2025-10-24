@@ -1,0 +1,68 @@
+{
+  "id": "map_arena_oval",
+  "name": "Multi-purpose Arena – Oval",
+  "priceTiers": {
+    "VIP": 900000,
+    "A": 600000,
+    "B": 350000,
+    "C": 200000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

@@ -1,0 +1,67 @@
+{
+  "id": "map_cityhall_compact",
+  "name": "City Hall – Compact Split",
+  "priceTiers": {
+    "VIP": 200000,
+    "A": 150000,
+    "B": 100000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "E",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

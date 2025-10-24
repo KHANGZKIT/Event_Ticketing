@@ -1,0 +1,68 @@
+{
+  "id": "map_festival_field",
+  "name": "Festival Field – Deep",
+  "priceTiers": {
+    "VIP": 700000,
+    "A": 400000,
+    "B": 250000,
+    "C": 150000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 26
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 26
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

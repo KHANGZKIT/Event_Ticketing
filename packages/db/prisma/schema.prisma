@@ -7,14 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * ===================== RBAC =====================
+ */
+
 model User {
-  id           String      @id @default(uuid())
-  email        String      @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
   fullName     String?
-  createdAt    DateTime    @default(now())
-  roles        UserRole[]
-  orders       Order[]     // ⬅️ đổi từ bookings -> orders
+  createdAt    DateTime @default(now())
+
+  roles  UserRole[]
+  orders Order[]
+
+  // back-relation cho IdempotencyKey (optional, không ảnh hưởng code cũ)
+  idempotencyKeys IdempotencyKey[]
+
+  @@index([email])
 }
 
 model Role {
@@ -26,81 +36,222 @@ model Role {
 model UserRole {
   userId String
   roleId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
   @@id([userId, roleId])
 }
 
-model Event {
+/**
+ * ============== Venue / SeatMap (optional) ==============
+ */
+
+model Venue {
   id        String   @id @default(uuid())
   name      String
   city      String?
-  cover     String?
-  startsAt  DateTime?
+  address   String?
+  createdAt DateTime @default(now())
+
+  events Event[]
+  shows  Show[]
+  // Không đặt @@unique([name]) để tránh đụng trùng tên địa điểm
+
+  @@index([city])
+}
+
+model SeatMap {
+  id        String   @id @default(uuid())
+  name      String
+  schema    Json // JSON mô tả sơ đồ ghế
+  createdAt DateTime @default(now())
+
+  shows Show[]
+}
+
+/**
+ * ================== Event / Show ==================
+ */
+
+model Event {
+  id       String    @id @default(uuid())
+  name     String
+  city     String?
+  cover    String?
+  startsAt DateTime?
+  venueId   String?  
+  venue   Venue?  @relation(fields: [venueId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  shows     Show[]
+
+  shows Show[]
 
   @@index([deletedAt])
   @@index([startsAt])
+  @@index([venueId])
 }
 
 model Show {
-  id         String      @id @default(uuid())
-  eventId    String
-  startsAt   DateTime
-  venue      String?
-  seatMapId  String?
-  status     ShowStatus  @default(scheduled)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  deletedAt  DateTime?
-  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  tickets    Ticket[]
-  orders     Order[]     // ⬅️ đổi từ bookings -> orders
+  id       String   @id @default(uuid())
+  eventId  String
+  startsAt DateTime
+
+  // GIỮ field cũ để không gãy FE/BE hiện tại:
+  venue String?
+
+  // BỔ SUNG khóa ngoại venue *optional* (nâng cấp dần):
+  venueDbId String?
+  venueDb   Venue?  @relation(fields: [venueDbId], references: [id])
+
+  // GIỮ field cũ:
+  seatMapId String?
+
+  // BỔ SUNG khóa ngoại seatmap *optional*:
+  seatMapDbId String?
+  seatMapDb   SeatMap? @relation(fields: [seatMapDbId], references: [id])
+
+  status    ShowStatus @default(scheduled)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+
+  event       Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets     Ticket[]
+  orders      Order[]
+  ticketTypes ShowTicketType[]
 
   @@index([eventId])
   @@index([startsAt])
   @@index([deletedAt])
+  @@index([venueDbId])
+  @@index([seatMapDbId])
 }
 
 enum ShowStatus {
   scheduled
   cancelled
+  completed
 }
+
+/**
+ * ================= Order / Payment / Ticket =================
+ */
 
 model Order {
   id        String      @id @default(uuid())
   userId    String
   showId    String
-  amount    Int
+  amount    Int // GIỮ Int để không gãy service hiện tại
   currency  String      @default("VND")
-  status    OrderStatus @default(pending) // ⬅️ cần enum có pending
+  status    OrderStatus @default(pending)
   createdAt DateTime    @default(now())
-  tickets   Ticket[]
+  updatedAt DateTime    @updatedAt
+
+  tickets Ticket[]
+  payment Payment?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  // back-relation cho IdempotencyKey (optional)
+  idempotencyKeys IdempotencyKey[]
+
+  @@index([userId, createdAt])
+  @@index([showId])
+  @@index([status])
 }
 
 enum OrderStatus {
-  pending   // ⬅️ thêm
+  pending
   paid
   failed
   cancelled
 }
 
-model Ticket {
-  id          String   @id @default(uuid())
-  showId      String
-  seatId      String
-  orderId     String?
-  checkedInAt DateTime?
-  show        Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
-  order       Order?   @relation(fields: [orderId], references: [id])
+model Payment {
+  id          String        @id @default(uuid())
+  orderId     String        @unique
+  provider    String // "momo", "vnpay", "stripe", ...
+  providerRef String?
+  amount      Int // GIỮ Int; có thể nâng cấp Decimal ở phase 2
+  currency    String        @default("VND")
+  status      PaymentStatus @default(init)
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  @@unique([showId, seatId]) // chống double-book
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([provider, providerRef])
+  @@index([status])
+}
+
+enum PaymentStatus {
+  init
+  succeeded
+  failed
+  refunded
+}
+
+model Ticket {
+  id      String  @id @default(uuid())
+  showId  String
+  seatId  String
+  orderId String?
+
+  // BỔ SUNG code (optional) để chuyển dần sang scan QR nhanh
+  code String? @unique
+
+  checkedInAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  show  Show   @relation(fields: [showId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@unique([showId, seatId]) // chống double-book cùng suất
   @@index([orderId])
   @@index([checkedInAt])
+  @@index([showId])
+}
+
+/**
+ * ============ Bảng giá theo suất (optional) ============
+ */
+
+model ShowTicketType {
+  id        String   @id @default(uuid())
+  showId    String
+  name      String // VIP / Standard / EarlyBird...
+  price     Int // GIỮ Int; có thể nâng cấp Decimal sau
+  capacity  Int
+  createdAt DateTime @default(now())
+
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, name])
+  @@index([showId])
+}
+
+/**
+ * ============ Idempotency cho checkout (optional) ============
+ */
+
+model IdempotencyKey {
+  key         String    @id
+  userId      String?
+  requestHash String
+  orderId     String?
+  status      String // "in_progress" | "succeeded" | "failed"
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+
+  // one-to-many đến User/Order (optional)
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([expiresAt])
 }

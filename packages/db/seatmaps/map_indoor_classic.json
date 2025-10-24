@@ -1,0 +1,60 @@
+{
+  "id": "map_indoor_classic",
+  "name": "Indoor Theater – Classic",
+  "priceTiers": {
+    "VIP": 300000,
+    "A": 200000,
+    "B": 120000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "balcony": false
+  }
+}
