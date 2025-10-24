@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "Event_Ticketing",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:clean": "node packages/db/prisma/cleanup_dev.js",
+    "seed:auto": "node packages/db/prisma/seed_auto.js",
+    "seed:users": "node packages/db/prisma/seed_users.js"
   },
   "private": true,
   "workspaces": [
@@ -23,10 +27,14 @@
   },
   "homepage": "https://github.com/KHANGZKIT/Event_Ticketing#readme",
   "dependencies": {
+    "@prisma/client": "^6.17.1",
+    "axios": "^1.12.2",
+    "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
     "helmet": "^8.1.0",
     "http": "^0.0.1-security",
     "https": "^1.0.0",
@@ -34,5 +42,9 @@
     "qrcode": "^1.5.4",
     "url": "^0.11.4",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "bcryptjs": "^3.0.2",
+    "puppeteer": "^24.25.0"
   }
 }
