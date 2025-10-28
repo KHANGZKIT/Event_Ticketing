@@ -1,0 +1,87 @@
+{
+  "id": "map_bowl_wide",
+  "name": "Stadium Bowl – Wide",
+  "priceTiers": {
+    "VIP": 1000000,
+    "A": 700000,
+    "B": 450000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 26
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "L",
+          "from": 1,
+          "to": 28
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

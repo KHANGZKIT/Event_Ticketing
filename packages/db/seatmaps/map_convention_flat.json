@@ -1,0 +1,62 @@
+{
+  "id": "map_convention_flat",
+  "name": "Convention Hall – Flat",
+  "priceTiers": {
+    "VIP": 500000,
+    "A": 300000,
+    "B": 180000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "E",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

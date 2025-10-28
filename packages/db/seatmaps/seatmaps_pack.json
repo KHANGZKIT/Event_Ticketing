@@ -1,0 +1,771 @@
+[
+  {
+    "id": "map_qk7_split",
+    "name": "Quận 7 – Split Blocks",
+    "priceTiers": {
+      "VIP": 150000,
+      "A": 120000,
+      "B": 90000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "B",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "C",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "E",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "H",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "I",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "J",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM",
+    "meta": {
+      "stagePosition": "north",
+      "splitBlocks": true
+    }
+  },
+  {
+    "id": "map_horseshoe_md",
+    "name": "Mỹ Đình – Horseshoe",
+    "priceTiers": {
+      "VIP": 1200000,
+      "A": 800000,
+      "B": 500000,
+      "C": 300000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 20
+          },
+          {
+            "id": "B",
+            "from": 1,
+            "to": 20
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "C",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 22
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "E",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "H",
+            "from": 1,
+            "to": 24
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "rows": [
+          {
+            "id": "I",
+            "from": 1,
+            "to": 18
+          },
+          {
+            "id": "J",
+            "from": 1,
+            "to": 18
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM",
+    "meta": {
+      "stagePosition": "north"
+    }
+  },
+  {
+    "id": "map_indoor_classic",
+    "name": "Indoor Theater – Classic",
+    "priceTiers": {
+      "VIP": 300000,
+      "A": 200000,
+      "B": 120000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "D",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM",
+    "meta": {
+      "balcony": false
+    }
+  },
+  {
+    "id": "map_bowl_wide",
+    "name": "Stadium Bowl – Wide",
+    "priceTiers": {
+      "VIP": 1000000,
+      "A": 700000,
+      "B": 450000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "B",
+            "from": 1,
+            "to": 24
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "C",
+            "from": 1,
+            "to": 26
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 26
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 26
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 26
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "G",
+            "from": 1,
+            "to": 28
+          },
+          {
+            "id": "H",
+            "from": 1,
+            "to": 28
+          },
+          {
+            "id": "I",
+            "from": 1,
+            "to": 28
+          },
+          {
+            "id": "J",
+            "from": 1,
+            "to": 28
+          },
+          {
+            "id": "K",
+            "from": 1,
+            "to": 28
+          },
+          {
+            "id": "L",
+            "from": 1,
+            "to": 28
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_cityhall_compact",
+    "name": "City Hall – Compact Split",
+    "priceTiers": {
+      "VIP": 200000,
+      "A": 150000,
+      "B": 100000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 10
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "E",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "H",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_beach_open",
+    "name": "Beach Open Air – Split",
+    "priceTiers": {
+      "VIP": 600000,
+      "A": 350000,
+      "B": 200000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 16
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 18
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 18
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 18
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "E",
+            "from": 1,
+            "to": 20
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 20
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 20
+          },
+          {
+            "id": "H",
+            "from": 1,
+            "to": 20
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_theater_balcony",
+    "name": "Indoor Theater – Balcony",
+    "priceTiers": {
+      "VIP": 400000,
+      "A": 260000,
+      "B": 160000,
+      "C": 120000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 10
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "D",
+            "from": 1,
+            "to": 14
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 14
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "rows": [
+          {
+            "id": "F",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM",
+    "meta": {
+      "balcony": true
+    }
+  },
+  {
+    "id": "map_arena_oval",
+    "name": "Multi-purpose Arena – Oval",
+    "priceTiers": {
+      "VIP": 900000,
+      "A": 600000,
+      "B": 350000,
+      "C": 200000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 18
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 20
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 20
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "D",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 22
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "rows": [
+          {
+            "id": "F",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 24
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_convention_flat",
+    "name": "Convention Hall – Flat",
+    "priceTiers": {
+      "VIP": 500000,
+      "A": 300000,
+      "B": 180000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 20
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "D",
+            "from": 1,
+            "to": 22
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "E",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "F",
+            "from": 1,
+            "to": 22
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 22
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_square_compact",
+    "name": "Square – Compact",
+    "priceTiers": {
+      "VIP": 350000,
+      "A": 220000,
+      "B": 140000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "D",
+            "from": 1,
+            "to": 12
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 12
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  },
+  {
+    "id": "map_festival_field",
+    "name": "Festival Field – Deep",
+    "priceTiers": {
+      "VIP": 700000,
+      "A": 400000,
+      "B": 250000,
+      "C": 150000
+    },
+    "zones": [
+      {
+        "id": "VIP",
+        "rows": [
+          {
+            "id": "A",
+            "from": 1,
+            "to": 22
+          }
+        ]
+      },
+      {
+        "id": "A",
+        "rows": [
+          {
+            "id": "B",
+            "from": 1,
+            "to": 24
+          },
+          {
+            "id": "C",
+            "from": 1,
+            "to": 24
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "rows": [
+          {
+            "id": "D",
+            "from": 1,
+            "to": 26
+          },
+          {
+            "id": "E",
+            "from": 1,
+            "to": 26
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "rows": [
+          {
+            "id": "F",
+            "from": 1,
+            "to": 26
+          },
+          {
+            "id": "G",
+            "from": 1,
+            "to": 26
+          }
+        ]
+      }
+    ],
+    "format": "ROW_NUM"
+  }
+]

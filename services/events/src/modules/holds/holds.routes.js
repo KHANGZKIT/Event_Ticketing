@@ -4,7 +4,7 @@ import { authGuard } from "../../middlewares/authGuard.js";
 
 const r = Router();
 
-r.post('/', authGuard, ctrl.createHold);
-r.delete('/:id', authGuard, ctrl.releaseHold);
+r.post('/', authGuard, ctrl.createHold);    //Tao hold  
+r.delete('/:id', authGuard, ctrl.releaseHold);  // Bo Hold
 
 export default r;
