@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as ctrl from "./holds.controller.js";
+import * as ctrl from "./holds.redis.controller.js";
 import { authGuard } from "../../middlewares/authGuard.js";
 
 const r = Router();

@@ -38,6 +38,7 @@
     "helmet": "^8.1.0",
     "http": "^0.0.1-security",
     "https": "^1.0.0",
+    "ioredis": "^5.8.2",
     "nodemon": "^3.1.10",
     "qrcode": "^1.5.4",
     "url": "^0.11.4",

@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import fssync from "node:fs"; // thêm dòng này
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { getHeldSeatByShow } from "../holds/holds.service.js";
+import { getHeldSeatByShow } from "../holds/holds.redis.service.js";
 
 /* --------- utils --------- */
 const __filename = fileURLToPath(import.meta.url);
@@ -172,7 +172,6 @@ export async function loadSeatMapTemplate(seatMapId) {
     throw e;
 }
 
-
 export async function expandSeatsFromTemplate(tpl) {
     const seats = [];
     for (const z of tpl.zones) {
@@ -210,42 +209,41 @@ export async function getSeatMap(showId) {
 
 /* --------- Availability (sold/held) --------- */
 
-export async function getAvailability(showId, redis) {
-    // Check show
+export async function getAvailability(showId) {
+    // 1) Validate show
     const show = await prisma.show.findFirst({
         where: { id: showId, deletedAt: null },
         select: { id: true, seatMapId: true },
     });
-    if (!show || !show.seatMapId) {
-        const e = new Error("SeatMap Not Found");
-        e.status = 404;
-        throw e;
+    if (!show?.seatMapId) {
+        const e = new Error('SeatMap Not Found'); e.status = 404; throw e;
     }
 
-    // All seats from template
+    // 2) All seats from template
     const tpl = await loadSeatMapTemplate(show.seatMapId);
-    const allSeats = new Set(expandSeatsFromTemplate(tpl).map((s) => s.seatId));
+    const allSeatsArr = expandSeatsFromTemplate(tpl).map(s => s.seatId);
+    const allSeats = new Set(allSeatsArr);
 
-    // SOLD = ticket có orderId != null
+    // 3) SOLD (vì bạn chỉ tạo ticket khi order paid ⇒ có orderId)
     const soldTickets = await prisma.ticket.findMany({
         where: { showId, orderId: { not: null } },
         select: { seatId: true },
     });
-    const sold = new Set(soldTickets.map((t) => t.seatId));
+    const sold = new Set(soldTickets.map(t => t.seatId));
 
-    // HELD = đang giữ chỗ trong Redis (tuỳ triển khai)
-    const heldFromCache = await getHeldSeatByShow(showId, redis); // <- nhớ await + truyền redis
-    const held = new Set(
-        Array.isArray(heldFromCache) ? heldFromCache : [...(heldFromCache || [])]
-    );
+    // 4) HELD (Redis)
+    // Khuyến nghị: getHeldSeatByShow trả luôn Set<string>
+    const held = await getHeldSeatByShow(showId); // Set<seatId>
 
+    // 5) Merge
     const availability = [];
     for (const seatId of allSeats) {
-        let state = "available";
-        if (sold.has(seatId)) state = "sold";
-        else if (held.has(seatId)) state = "held";
+        let state = 'available';
+        if (sold.has(seatId)) state = 'sold';
+        else if (held.has(seatId)) state = 'held';
         availability.push({ seatId, state });
     }
 
     return { showId, availability };
 }
+
