@@ -1,0 +1,422 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* ====== Reset & Base ====== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+}
+body {
+  background: var(--color-background);
+  font-family: "Montserrat", sans-serif;
+  color: #2b2b2b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ====== Theme Variables ====== */
+:root{
+  --seatVip-color: #f9b533;
+  --seatNormal-color: #05ce91;
+  --bookedSet-color: #9abbb9;
+  --selectedSet-color: #0b8cff;
+  --purchasingSet-color: rgb(249, 48, 84);
+
+  --panel-color: #f5f9f8;
+  --color-background: #edefee;
+
+  --seat-size: 38px;
+  --seat-gap: 6px;
+  --aisle-width: 24px;
+
+  --panel-radius: 12px;
+  --shadow-1: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* ====== Layout ====== */
+.container{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Stage / Screen */
+.stagePanel{
+  display: flex;
+  justify-content: center;
+}
+.screen{
+text-align: center;
+  background: #b6c1d7;
+  color: #333;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  box-shadow: var(--shadow-1);
+  user-select: none;
+  width: 100vh;
+}
+
+/* Map Panel */
+.map{
+  background: var(--panel-color);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-radius: var(--panel-radius);
+  box-shadow: var(--shadow-1);
+}
+
+/* ====== Seat Grid (14 columns with aisle after 7) ====== */
+.seat-map{
+  display: grid;
+  grid-template-columns: repeat(7, var(--seat-size)) var(--aisle-width) repeat(7, var(--seat-size));
+  gap: var(--seat-gap);
+  justify-content: center;
+}
+
+/* Aisle cell (empty spacer) */
+.aisle{
+  width: var(--aisle-width);
+  height: var(--seat-size);
+  pointer-events: none;
+  background: transparent;
+}
+
+/* ====== Seat Styles ====== */
+.seat{
+  width: var(--seat-size);
+  height: var(--seat-size);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+  font-size: 12px;
+  color: #ffffff;
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.seat.vip{ background: var(--seatVip-color); }
+.seat.normal{ background: var(--seatNormal-color); }
+.seat.booked{
+  background: var(--bookedSet-color);
+  color: #fff;
+  cursor: not-allowed;
+  filter: saturate(.8);
+  box-shadow: none;
+}
+.seat.selected{
+  background: var(--selectedSet-color);
+}
+
+.seat.purchasing{
+  background: var(--purchasingSet-color);
+}
+
+.seat:hover:not(.booked){
+  transform: translateY(-1px) scale(1.04);
+  filter: brightness(.96);
+}
+
+/* ====== Legend ====== */
+.legend{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.legend-item{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+}
+.legend-box{
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  
+}
+.legend-box.vip{ background: var(--seatVip-color); }
+.legend-box.normal{ background: var(--seatNormal-color); }
+.legend-box.booked{ background: var(--bookedSet-color); }
+.legend-box.selected{ background: var(--selectedSet-color); }
+.legend-box.purchasing{ background: var(--purchasingSet-color);}
+
+.legend-info{
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.legend-type {
+  font-weight: 600;
+}
+
+.legend-price {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ====== Helpers ====== */
+.hidden{ display: none !important; }
+
+/* ====== Responsive ====== */
+@media (max-width: 768px){
+  :root{
+    --seat-size: 34px;
+    --seat-gap: 6px;
+    --aisle-width: 18px;
+  }
+  .container{
+    padding: 16px 10px 28px;
+  }
+  .screen{
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 520px){
+  :root{
+    --seat-size: 30px;
+    --seat-gap: 5px;
+    --aisle-width: 14px;
+  }
+  .seat{ font-size: 11px; }
+}
+
+/* ========== Layout 2 cột ========== */
+.layout{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+/* ========== Sidebar ========== */
+.sidebar{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-card, .cart{
+  background: var(--panel-color);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--shadow-1);
+  padding: 16px;
+}
+
+.event-title{
+  font-size: 20px;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.event-meta{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.event-row{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ========== Cart ========== */
+.cart-head{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.cart h3{
+  font-size: 18px;
+}
+
+.prices{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+.price-line{
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+}
+
+.cart-body{
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.cart-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.cart-table thead{
+  background: #f1f5f9;
+}
+.cart-table th, .cart-table td{
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef2f7;
+  text-align: left;
+  vertical-align: middle;
+}
+.cart-table tbody tr:last-child td{
+  border-bottom: none;
+}
+.cart-table .remove{
+  text-align: center;
+  width: 36px;
+}
+.btn-remove{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Footer */
+.cart-foot{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.total-line{
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.total-line strong{
+  font-size: 18px;
+}
+
+/* Button primary */
+.btn-primary{
+  background: #0b8cff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter .15s ease, transform .15s ease;
+}
+.btn-primary:hover{
+  filter: brightness(.96);
+  transform: translateY(-1px);
+}
+
+/* Main column tweaks */
+.main{
+  min-width: 0; /* fix overflow grid */
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  .layout{
+    grid-template-columns: 1fr;
+  }
+  .sidebar{
+    order: 2;
+  }
+  .main{
+    order: 1;
+  }
+}
+
+/* 1) Sửa thanh SÂN KHẤU để không tràn ngang */
+.screen{
+  text-align: center;
+  background: #b6c1d7;
+  color: #333;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  box-shadow: var(--shadow-1);
+  user-select: none;
+  /* width: 100vh;  <-- GỠ DÒNG NÀY */
+  width: 100%;          /* NEW */
+  max-width: 720px;     /* NEW: giới hạn bề ngang hợp lý */
+  margin-inline: auto;  /* NEW: căn giữa */
+}
+
+/* 2) Mặc định desktop: giữ 14 cột + 1 cột lối đi như cũ */
+.seat-map{
+  display: grid;
+  grid-template-columns: repeat(7, var(--seat-size)) var(--aisle-width) repeat(7, var(--seat-size));
+  gap: var(--seat-gap);
+  justify-content: center;
+}
+
+/* 3) Tablet dọc ~ < 768px: thu nhỏ ghế, giảm khoảng cách */
+@media (max-width: 768px){
+  :root{
+    --seat-size: 32px;
+    --seat-gap: 6px;
+    --aisle-width: 16px;
+  }
+  /* vẫn 7+aisle+7 để bố cục quen mắt trên tablet */
+}
+
+/* 4) Điện thoại ~ < 640px: ẩn lối đi và giảm số cột để vừa màn */
+@media (max-width: 640px){
+  :root{
+    --seat-size: 28px;
+    --seat-gap: 5px;
+  }
+  .aisle{ display: none; }                   /* NEW: ẩn cột lối đi */
+  .seat-map{ grid-template-columns: repeat(8, var(--seat-size)); } /* NEW: hiển thị 8 cột */
+  .seat{ font-size: 11px; }                  /* NEW: chữ ghế nhỏ hơn */
+  .layout{ grid-template-columns: 1fr; }     /* sidebar xuống dưới */
+  .sidebar{ order: 2; }
+  .main{ order: 1; }
+}
+
+/* 5) Điện thoại nhỏ ~ < 420px: tiếp tục giảm cột để không tràn */
+@media (max-width: 420px){
+  :root{
+    --seat-size: 26px;
+    --seat-gap: 4px;
+  }
+  .seat-map{ grid-template-columns: repeat(6, var(--seat-size)); } /* 6 cột */
+  .seat{ font-size: 10px; }
+}
+
+/* 6) Bảng giỏ hàng cuộn ngang khi hẹp */
+.cart-body{ overflow-x: auto; }
+
