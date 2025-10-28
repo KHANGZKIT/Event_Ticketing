@@ -1,0 +1,81 @@
+{
+  "id": "map_qk7_split",
+  "name": "Quận 7 – Split Blocks",
+  "priceTiers": {
+    "VIP": 150000,
+    "A": 120000,
+    "B": 90000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "E",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "north",
+    "splitBlocks": true
+  }
+}

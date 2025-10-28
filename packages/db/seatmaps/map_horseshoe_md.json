@@ -1,0 +1,86 @@
+{
+  "id": "map_horseshoe_md",
+  "name": "Mỹ Đình – Horseshoe",
+  "priceTiers": {
+    "VIP": 1200000,
+    "A": 800000,
+    "B": 500000,
+    "C": 300000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "E",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "I",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "north"
+  }
+}

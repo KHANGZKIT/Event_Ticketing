@@ -1,0 +1,71 @@
+{
+  "id": "map_theater_balcony",
+  "name": "Indoor Theater – Balcony",
+  "priceTiers": {
+    "VIP": 400000,
+    "A": 260000,
+    "B": 160000,
+    "C": 120000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 14
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "balcony": true
+  }
+}

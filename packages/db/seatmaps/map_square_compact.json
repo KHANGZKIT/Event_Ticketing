@@ -1,0 +1,52 @@
+{
+  "id": "map_square_compact",
+  "name": "Square – Compact",
+  "priceTiers": {
+    "VIP": 350000,
+    "A": 220000,
+    "B": 140000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

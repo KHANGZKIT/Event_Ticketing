@@ -1,0 +1,67 @@
+{
+  "id": "map_beach_open",
+  "name": "Beach Open Air – Split",
+  "priceTiers": {
+    "VIP": 600000,
+    "A": 350000,
+    "B": 200000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 16
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "E",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}

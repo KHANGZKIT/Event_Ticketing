@@ -1,18 +1,14 @@
-import { prisma } from "@app/db";
-
-export function requireRole(...roles) {
-    return async (req, res, next) => {
+// middlewares/requireRole.js
+export function requireRole(...allowed) {
+    const allow = new Set(allowed); // ví dụ: new Set(['admin','staff'])
+    return (req, res, next) => {
         if (!req.userId) {
-            return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Missing user' } });
+            return res.status(401).json({ error: { code: 401, message: 'Unauthorized' } });
         }
-
-        const has = await prisma.userRole.findFirst({
-            where: { userId: req.userId, role: { name: { in: roles } } },
-            include: { role: true }
-        })
-
-        if (!has) {
-            return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'No access role' } });
+        const roles = req.userRoles || [];
+        const ok = roles.some(r => allow.has(r));
+        if (!ok) {
+            return res.status(403).json({ error: { code: 403, message: 'Forbidden' } });
         }
         next();
     };
