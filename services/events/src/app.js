@@ -10,8 +10,10 @@ import ordersRouter from './modules/orders/orders.routes.js';
 import ordersRoutes from './modules/orders/orders.query.routes.js'
 import ticketsRouter from './modules/tickets/tickets.routes.js';
 import ticketsQRRouter from './modules/tickets/tickets.qr.routes.js';
-
 import { errorHandler } from './middlewares/error.js';
+import { ensureRedis } from './redis/client.js';
+import { redisRouter } from './redis/helpredis.js';
+import { redisDebugRouter } from './redis/debug.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -29,6 +31,9 @@ app.use('/api/orders', ordersRouter);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/tickets', ticketsQRRouter);
+await ensureRedis();
+app.use(redisRouter);
+app.use(redisDebugRouter);
 app.use(errorHandler);
 
 export default app;
