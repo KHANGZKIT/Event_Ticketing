@@ -1,6 +1,6 @@
 import { prisma } from "@app/db";
 import { CheckoutSchema } from "./orders.schema.js";
-import { consumeHold, getHold } from "../holds/holds.service.js";
+import { consumeHold, getHold } from "../holds/holds.redis.service.js";
 import { getSeatMap } from "../shows/shows.service.js";
 
 export async function checkout(userId, body) {
