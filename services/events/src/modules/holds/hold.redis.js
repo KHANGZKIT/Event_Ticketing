@@ -36,7 +36,7 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
         const ok = await redis.set(lockKey(showId, seatId), lockId, 'PX', LOCK_MS, 'NX');
         if (!ok) {
             await releaseLocks(redis, showId, acquired, lockId);
-            return { ok: false, conflicts: [], reason: 'Lock acquisition failed' };
+            return { ok: false, reason: 'lock-failed', conflicts: [seatId] };
         }
 
         acquired.push(seatId);
@@ -54,7 +54,7 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
         });
         if (conflicts.length) {
             await releaseLocks(redis, showId, acquired, lockId);
-            return { ok: false, conflicts: [seatId], reason: 'lock-failed' };
+            return { ok: false, reason: 'conflict', conflicts };
         }
         const tx = redis.multi();
         tx.set(holdKey(holdId), JSON.stringify({ userId, showId, seats: sorted, expiresAt }), 'EX', ttlSec);

@@ -172,10 +172,10 @@ export async function loadSeatMapTemplate(seatMapId) {
     throw e;
 }
 
-export async function expandSeatsFromTemplate(tpl) {
+export function expandSeatsFromTemplate(tpl) {
     const seats = [];
     for (const z of tpl.zones) {
-        const tier = z.id; // tier = zone id
+        const tier = z.id;
         for (const r of z.rows) {
             const from = Number(r.from);
             const to = Number(r.to);
@@ -194,50 +194,44 @@ export async function getSeatMap(showId) {
         select: { id: true, seatMapId: true },
     });
     if (!show || !show.seatMapId) {
-        const e = new Error("SeatMap Not Found");
-        e.status = 404;
-        throw e;
+        const e = new Error("SeatMap Not Found"); e.status = 404; throw e;
     }
-
     const tpl = await loadSeatMapTemplate(show.seatMapId);
     return {
         showId: show.id,
         template: tpl,
-        seats: expandSeatsFromTemplate(tpl), // nếu FE chỉ cần tiers, có thể bỏ trường này
+        seats: expandSeatsFromTemplate(tpl), // <-- GIỜ trả về mảng thật
     };
 }
 
-/* --------- Availability (sold/held) --------- */
-
 export async function getAvailability(showId) {
-    // 1) Validate show
+    console.log('[avail] in:', { showId });
     const show = await prisma.show.findFirst({
         where: { id: showId, deletedAt: null },
-        select: { id: true, seatMapId: true },
+        select: { id: true, seatMapId: true, seatMapDbId: true },
     });
-    if (!show?.seatMapId) {
-        const e = new Error('SeatMap Not Found'); e.status = 404; throw e;
-    }
+    console.log('[avail] db:', show);
+    if (!show) { const e = new Error('Show Not Found'); e.status = 404; throw e; }
+    const seatMapIdEff = show.seatMapDbId ?? show.seatMapId;
+    if (!seatMapIdEff) { const e = new Error('SeatMap Not Found'); e.status = 404; throw e; }
 
-    // 2) All seats from template
-    const tpl = await loadSeatMapTemplate(show.seatMapId);
+    const tpl = await loadSeatMapTemplate(seatMapIdEff);
+
+    // expandSeatsFromTemplate giờ là hàm sync
     const allSeatsArr = expandSeatsFromTemplate(tpl).map(s => s.seatId);
     const allSeats = new Set(allSeatsArr);
 
-    // 3) SOLD (vì bạn chỉ tạo ticket khi order paid ⇒ có orderId)
     const soldTickets = await prisma.ticket.findMany({
         where: { showId, orderId: { not: null } },
         select: { seatId: true },
     });
     const sold = new Set(soldTickets.map(t => t.seatId));
 
-    // 4) HELD (Redis)
-    // Khuyến nghị: getHeldSeatByShow trả luôn Set<string>
+    // đảm bảo getHeldSeatByShow trả Set<string>
     const held = await getHeldSeatByShow(showId); // Set<seatId>
 
-    // 5) Merge
     const availability = [];
-    for (const seatId of allSeats) {
+    for (const seatId of allSeatsArr) {
         let state = 'available';
         if (sold.has(seatId)) state = 'sold';
         else if (held.has(seatId)) state = 'held';
@@ -246,4 +240,3 @@ export async function getAvailability(showId) {
 
     return { showId, availability };
 }
-

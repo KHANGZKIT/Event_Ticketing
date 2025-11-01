@@ -14,7 +14,6 @@ import { errorHandler } from './middlewares/error.js';
 import { ensureRedis } from './redis/client.js';
 import { redisRouter } from './redis/helpredis.js';
 import { redisDebugRouter } from './redis/debug.routes.js';
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -34,6 +33,7 @@ app.use('/api/tickets', ticketsQRRouter);
 await ensureRedis();
 app.use(redisRouter);
 app.use(redisDebugRouter);
+
 app.use(errorHandler);
 
 export default app;

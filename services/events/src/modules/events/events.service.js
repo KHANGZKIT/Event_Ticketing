@@ -3,18 +3,19 @@ import { prisma } from "@app/db";
 /** GET /events */
 export async function listEvents(query) {
     const { q, city, page = "1", pageSize = "10" } = query;
-    const take = Math.min(parseInt(pageSize) || 10, 50);
-    const skip = (Math.max(parseInt(page) || 1, 1) - 1) * take;
+    const take = Math.min(Number.parseInt(pageSize) || 10, 50);
+    const skip = (Math.max(Number.parseInt(page) || 1, 1) - 1) * take;
 
-    const where = {
+    const whereEvent = {
         deletedAt: null,
         ...(city ? { city } : {}),
         ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
     };
 
-    const [items, total] = await Promise.all([
+    // 1) Lấy page events (chỉ trường cơ bản, không lồng quan hệ để tránh N+1)
+    const [events, total] = await Promise.all([
         prisma.event.findMany({
-            where,
+            where: whereEvent,
             skip,
             take,
             orderBy: { createdAt: "desc" },
@@ -26,39 +27,52 @@ export async function listEvents(query) {
                 startsAt: true,
                 createdAt: true,
                 updatedAt: true,
-                _count: {
-                    select: {
-                        shows: {
-                            where: {
-                                deletedAt: null,
-                                status: "scheduled",
-                                startsAt: { gte: new Date() },
-                            },
-                        },
-                    },
-                },
-                shows: {
-                    where: {
-                        deletedAt: null,
-                        status: "scheduled",
-                        startsAt: { gte: new Date() },
-                    },
-                    orderBy: { startsAt: "asc" },
-                    take: 1,
-                    select: { startsAt: true },
-                },
             },
         }),
-        prisma.event.count({ where }),
+        prisma.event.count({ where: whereEvent }),
     ]);
 
-    const normalized = items.map((e) => ({
+    if (events.length === 0) {
+        return { items: [], total, page: Number(page), pageSize: take };
+    }
+
+    const eventIds = events.map(e => e.id);
+    const now = new Date();
+
+    // 2) Lấy count shows sắp tới theo event (1 query)
+    const counts = await prisma.show.groupBy({
+        by: ["eventId"],
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        _count: { _all: true },
+    });
+
+    // 3) Lấy min(startsAt) cho show sắp tới theo event (1 query)
+    const mins = await prisma.show.groupBy({
+        by: ["eventId"],
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        _min: { startsAt: true },
+    });
+
+    const countMap = new Map(counts.map(c => [c.eventId, c._count._all]));
+    const minMap = new Map(mins.map(m => [m.eventId, m._min.startsAt || null]));
+
+    const items = events.map(e => ({
         ...e,
-        upcomingCount: e._count.shows,
-        minStartsAt: e.shows[0]?.startsAt ?? null,
+        upcomingCount: countMap.get(e.id) ?? 0,
+        minStartsAt: minMap.get(e.id) ?? null,
     }));
 
-    return { items: normalized, total, page: Number(page), pageSize: take };
+    return { items, total, page: Number(page), pageSize: take };
 }
 
 /** GET /events/:id */
