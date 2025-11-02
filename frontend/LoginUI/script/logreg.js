@@ -5,6 +5,97 @@ const API_BASE = 'http://localhost:4000/api';
 const AUTH_BASE = `${API_BASE}/auth`;
 
 /* --------------------------------------------------
+ * Helpers: show/hide form
+ * -------------------------------------------------- */
+function showLogin() {
+  document.querySelector('.form-container')?.classList.remove('hidden');
+  document.querySelector('.regisContainer')?.classList.add('hidden');
+}
+function showRegister() {
+  document.querySelector('.form-container')?.classList.add('hidden');
+  document.querySelector('.regisContainer')?.classList.remove('hidden');
+}
+
+/* --------------------------------------------------
+ * Init: wire navigation links and initial tab
+ * -------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const goregister = document.getElementById('goregister');
+  const goLogin = document.getElementById('goLogin');
+
+  goregister?.addEventListener('click', (e) => { e.preventDefault(); showRegister(); });
+  goLogin?.addEventListener('click', (e) => { e.preventDefault(); showLogin(); });
+
+  // open tab by ?tab=register or ?tab=login
+  const params = new URLSearchParams(window.location.search);
+  const tab = (params.get('tab') || '').toLowerCase();
+  if (tab === 'register') showRegister();
+  else showLogin();
+
+  // handle login submit
+  const loginForm = document.querySelector('.form-container form.form-box');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const res = await fetch(`${AUTH_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => null);
+          alert(j?.message || 'Login failed');
+          return;
+        }
+        // success -> redirect to home
+        window.location.href = '../HomePage/HomePage/source/TrangChu.html';
+      } catch (err) {
+        console.error(err);
+        alert('Network error');
+      }
+    });
+  }
+
+  // handle register submit (second form)
+  const regForms = document.querySelectorAll('.regisContainer form.form-box');
+  if (regForms && regForms[0]) {
+    regForms[0].addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const email = document.getElementById('register-email').value;
+      const fullname = document.getElementById('register-fullname').value;
+      const password = document.getElementById('register-password').value;
+      const repass = document.getElementById('register-repassword').value;
+      if (password !== repass) {
+        document.getElementById('password-error').textContent = 'Mật khẩu không khớp';
+        return;
+      } else {
+        document.getElementById('password-error').textContent = '';
+      }
+      try {
+        const res = await fetch(`${AUTH_BASE}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, fullname, password })
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => null);
+          alert(j?.message || 'Register failed');
+          return;
+        }
+        // success -> redirect to home
+        window.location.href = '../HomePage/HomePage/source/TrangChu.html';
+      } catch (err) {
+        console.error(err);
+        alert('Network error');
+      }
+    });
+  }
+});
+
+/* --------------------------------------------------
  *  SVG MẮT (chuẩn, không có "...")
  * -------------------------------------------------- */
 const eyeSVG = {
@@ -234,6 +325,3 @@ if (registerForm) {
   });
 }
 
-/* --------------------------------------------------
- *  KHÔNG DÙNG TOP-LEVEL await
- * -------------------------------------------------- */

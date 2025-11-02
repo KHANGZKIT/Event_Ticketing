@@ -50,7 +50,9 @@ const VENUES = {
     ],
 };
 
+// Hình ảnh từ các website: Unsplash, Pexels, và các nguồn khác
 const COVERS = [
+    // Unsplash - Concert & Music Events
     "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1600",
     "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600",
     "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1600",
@@ -59,6 +61,95 @@ const COVERS = [
     "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1600",
     "https://images.unsplash.com/photo-1558980664-10ea8d6c1040?w=1600",
     "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1600",
+    "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600",
+    "https://images.unsplash.com/photo-1464362350603-30e6de19a68e?w=1600",
+    "https://images.unsplash.com/photo-1501281668745-f7f57925c5b4?w=1600",
+    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600",
+    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1600",
+    "https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?w=1600",
+    "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=1600",
+    "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=1600",
+    "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600",
+    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1600",
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600",
+    "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&auto=format&fit=crop",
+    
+    // Pexels - Concert & Events
+    "https://images.pexels.com/photos/167491/pexels-photo-167491.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763076/pexels-photo-1763076.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/154147/pexels-photo-154147.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/270366/pexels-photo-270366.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/167446/pexels-photo-167446.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1591373/pexels-photo-1591373.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763077/pexels-photo-1763077.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763078/pexels-photo-1763078.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Theater & Stage
+    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1600",
+    "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=1600",
+    "https://images.unsplash.com/photo-1464362350603-30e6de19a68e?w=1600",
+    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1600",
+    
+    // Pexels - Stage & Theater
+    "https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/2747450/pexels-photo-2747450.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/2747451/pexels-photo-2747451.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Festival & Outdoor Events
+    "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600",
+    "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=1600",
+    "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=1600",
+    "https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?w=1600",
+    
+    // Pexels - Festival Events
+    "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Jazz & Acoustic
+    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=1600",
+    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600",
+    "https://images.unsplash.com/photo-1501281668745-f7f57925c5b4?w=1600",
+    
+    // Pexels - Jazz & Music
+    "https://images.pexels.com/photos/1763079/pexels-photo-1763079.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763080/pexels-photo-1763080.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - EDM & Electronic Music
+    "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=1600",
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80",
+    "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&q=80",
+    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=1600&q=80",
+    
+    // Pexels - Electronic Music
+    "https://images.pexels.com/photos/1190299/pexels-photo-1190299.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1190300/pexels-photo-1190300.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1190301/pexels-photo-1190301.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Stand-up Comedy
+    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1600&q=80",
+    "https://images.unsplash.com/photo-1501281668745-f7f57925c5b4?w=1600&q=80",
+    
+    // Pexels - Comedy Events
+    "https://images.pexels.com/photos/1763073/pexels-photo-1763073.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763074/pexels-photo-1763074.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Sports Events
+    "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1600",
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1600",
+    
+    // Pexels - Sports Events  
+    "https://images.pexels.com/photos/2747447/pexels-photo-2747447.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/2747448/pexels-photo-2747448.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    
+    // Unsplash - Dance & Performance
+    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1600&q=80",
+    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1600&q=80",
+    
+    // Pexels - Dance Events
+    "https://images.pexels.com/photos/1763071/pexels-photo-1763071.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    "https://images.pexels.com/photos/1763072/pexels-photo-1763072.jpeg?auto=compress&cs=tinysrgb&w=1600",
 ];
 
 const TITLES_BY_CITY = {
@@ -166,6 +257,24 @@ function expandSeatsFromTemplate(tpl) {
         );
     }
 
+    // dạng C: rows với name và count (SM_DEMO_1.json)
+    if (Array.isArray(tpl.rows)) {
+        const seats = [];
+        for (const row of tpl.rows) {
+            const rowName = row.name || row.id;
+            const count = Number(row.count);
+            if (!rowName || Number.isNaN(count) || count <= 0) continue;
+            for (let n = 1; n <= count; n++) {
+                seats.push({
+                    seatId: `${rowName}${n}`,
+                    zone: "Default",
+                    tier: "Default",
+                });
+            }
+        }
+        return seats;
+    }
+
     throw new Error("Unsupported seatmap template structure");
 }
 
@@ -199,6 +308,25 @@ function deriveTiersFromTemplate(tpl) {
         }));
     }
 
+    // dạng C: rows với name và count (SM_DEMO_1.json)
+    if (Array.isArray(tpl.rows)) {
+        let totalCapacity = 0;
+        for (const row of tpl.rows) {
+            const count = Number(row.count);
+            if (!Number.isNaN(count) && count > 0) {
+                totalCapacity += count;
+            }
+        }
+        const priceByTier = tpl.priceTiers || {};
+        const defaultPrice = priceByTier["Default"] || priceByTier["STANDARD"] || 100000;
+        
+        return [{
+            name: "Default",
+            price: defaultPrice,
+            capacity: totalCapacity || 20, // fallback nếu không tính được
+        }];
+    }
+
     throw new Error("Unsupported seatmap template structure");
 }
 
@@ -206,6 +334,14 @@ function deriveTiersFromTemplate(tpl) {
 async function createShowWithTicketsFromTpl(eventId, city, baseStartsAt, seatmap) {
     const seatMapId = seatmap.id;
     const tpl = seatmap.data;
+
+    // Validate seatmap template trước khi sử dụng
+    try {
+        expandSeatsFromTemplate(tpl); // Test xem có parse được không
+    } catch (e) {
+        console.warn(`⚠️  Skip invalid seatmap ${seatMapId}: ${e.message}`);
+        return null; // Bỏ qua seatmap không hợp lệ
+    }
 
     const show = await prisma.show.create({
         data: {
@@ -333,13 +469,20 @@ async function seedUsers(count = 400) {
 async function seedEventsBundle() {
     const seatmaps = await readSeatmapFiles(SEATMAP_DIR);
 
+    // Tăng số lượng events để đủ cho tất cả sections (7 sections * 4 events = 28+ events)
+    const TOTAL_EVENTS = 30; // Đảm bảo có đủ events
+
+    // Phân bố events cho các thành phố
+    const eventsPerCity = Math.ceil(TOTAL_EVENTS / CITIES.length);
+
     for (const city of CITIES) {
         const titles = TITLES_BY_CITY[city];
-        const count = rand(6, 10);
-
-        for (let i = 0; i < count; i++) {
-            const name =
-                titles[i % titles.length] + (i >= titles.length ? ` #${i + 1}` : "");
+        
+        for (let i = 0; i < eventsPerCity; i++) {
+            const titleIndex = i % titles.length;
+            const name = i >= titles.length 
+                ? `${titles[titleIndex]} #${Math.floor(i / titles.length) + 1}`
+                : titles[titleIndex];
             const startsAt = ensureFuture(null);
 
             const event = await prisma.event.create({
@@ -347,12 +490,27 @@ async function seedEventsBundle() {
                 select: { id: true, name: true },
             });
 
+            // Mỗi event có 2-3 shows
             const showCount = rand(2, 3);
             for (let s = 0; s < showCount; s++) {
                 const dt = new Date(startsAt);
                 dt.setDate(dt.getDate() + s * rand(1, 3));
-                const seatmap = pick(seatmaps);
-                await createShowWithTicketsFromTpl(event.id, city, dt, seatmap);
+                let seatmap = pick(seatmaps);
+                let result = await createShowWithTicketsFromTpl(event.id, city, dt, seatmap);
+                
+                // Nếu seatmap không hợp lệ, thử lại với seatmap khác (tối đa 3 lần)
+                if (!result) {
+                    let retries = 0;
+                    while (!result && retries < 3) {
+                        seatmap = pick(seatmaps);
+                        result = await createShowWithTicketsFromTpl(event.id, city, dt, seatmap);
+                        if (result) break;
+                        retries++;
+                    }
+                    if (!result) {
+                        console.warn(`⚠️  Could not create show for ${event.name} - skipping`);
+                    }
+                }
             }
 
             console.log(`✓ ${city} :: ${event.name}`);
@@ -383,14 +541,58 @@ async function seedSeatMapTableIfEmpty() {
 }
 
 
+/** ====== Update existing events without cover ====== */
+async function updateEventsWithoutCover() {
+    const eventsWithoutCover = await prisma.event.findMany({
+        where: {
+            OR: [
+                { cover: null },
+                { cover: "" },
+            ],
+            deletedAt: null,
+        },
+        select: { id: true, name: true },
+    });
+
+    if (eventsWithoutCover.length === 0) {
+        console.log("✓ All events have cover images");
+        return;
+    }
+
+    console.log(`📸 Updating ${eventsWithoutCover.length} events without cover...`);
+    
+    for (const event of eventsWithoutCover) {
+        await prisma.event.update({
+            where: { id: event.id },
+            data: { cover: pick(COVERS) },
+        });
+    }
+    
+    console.log(`✓ Updated ${eventsWithoutCover.length} events with cover images`);
+}
+
 /** ====== Entry ====== */
 async function main() {
     console.log("[seatmap] dir =", SEATMAP_DIR);
     console.time("seed");
+    
+    // Xóa events cũ (optional - chỉ khi muốn reset)
+    const deleteOld = process.env.RESET_EVENTS === 'true';
+    if (deleteOld) {
+        await prisma.show.deleteMany({});
+        await prisma.event.deleteMany({});
+        console.log("✓ Deleted old events & shows");
+    }
+    
     await seedUsers(400);
     await seedSeatMapTableIfEmpty();
+    
+    // Update events hiện có không có cover
+    await updateEventsWithoutCover();
+    
     await seedEventsBundle();
     console.timeEnd("seed");
+    console.log(`\n✓ Seeding completed! You can now view events on the homepage.`);
 }
 
 main()
