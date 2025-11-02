@@ -8,7 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:clean": "node packages/db/prisma/cleanup_dev.js",
     "seed:auto": "node packages/db/prisma/seed_auto.js",
-    "seed:users": "node packages/db/prisma/seed_users.js"
+    "seed:users": "node packages/db/prisma/seed_users.js",
+    "scrape:ticketbox": "node scripts/scrape_ticketbox.js",
+    "scrape:single": "node scripts/scrape_single_event.js",
+    "scrape:cookie": "node scripts/scrape_with_cookie.js"
   },
   "private": true,
   "workspaces": [
