@@ -17,12 +17,12 @@ function parseArg(name, def = null) {
 
 const showId = argv[2];
 if (!showId) {
-    console.error('Usage: node scripts\\race_holds.js <SHOW_ID> [--n=10] [--seats=A1,A2] [--token="Bearer ..."] [--idemPrefix=race] [--consume]');
+    console.error('Usage: node scripts\\race_holds.js <SHOW_ID> [--n=10] [--seats=A5,A6] [--token="Bearer ..."] [--idemPrefix=race] [--consume]');
     process.exit(1);
 }
 
 const N = Number(parseArg('n', '10'));
-const seatsArg = parseArg('seats', 'A1,A2');
+const seatsArg = parseArg('seats', 'A5,A6');
 const seats = seatsArg.split(',').map(s => s.trim()).filter(Boolean);
 const token = parseArg('token', null);
 const idemPrefix = parseArg('idemPrefix', 'race');

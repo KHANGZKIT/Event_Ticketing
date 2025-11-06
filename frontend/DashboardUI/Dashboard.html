@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Event Ticketing</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="brand">Event Admin</div>
+    <nav class="nav">
+      <a href="#" class="active" data-page="overview">📊 Overview</a>
+      <a href="#" data-page="events">🗂️ Events</a>
+      <a href="#" data-page="tickets">🎟️ Tickets</a>
+      <a href="#" data-page="users">👤 Users</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <h2>🎨 Dashboard</h2>
+      <div class="actions">
+        <label for="time-filter">Khoảng thời gian</label>
+        <select id="time-filter">
+          <option value="all" selected>Tất cả</option>
+          <option value="7">7 ngày</option>
+          <option value="30">30 ngày</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- ===== Overview (Dashboard) ===== -->
+      <section id="page-overview" data-page="overview">
+        <!-- KPI row -->
+        <div id="kpis" class="kpi-grid"></div>
+
+        <!-- Charts -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">Tỉ lệ thanh toán</div>
+            <div class="card-body"><canvas id="payment-chart" height="260"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head">Doanh thu theo ngày</div>
+            <div class="card-body"><canvas id="revenue-chart" height="260"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Top events table -->
+        <div class="card" style="margin-top:16px">
+          <div class="card-head">Top Events by Revenue</div>
+          <div class="card-body">
+            <table id="top-events-table" class="table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Revenue</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Events ===== -->
+      <section id="page-events" class="hidden" data-page="events">
+        <div class="section-title">
+          <h3>🗂️ Events</h3>
+          <div><button id="ev-refresh" class="btn">Refresh</button></div>
+        </div>
+        <div class="card">
+          <div class="card-head">Danh sách sự kiện mới nhất</div>
+          <div class="card-body">
+            <table class="table" id="events-table">
+              <thead>
+                <tr>
+                  <th>Tên sự kiện</th>
+                  <th>Số suất chiếu</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Tickets ===== -->
+      <section id="page-tickets" class="hidden" data-page="tickets">
+        <div class="section-title">
+          <h3>🎟️ Tickets</h3>
+          <div><button id="tk-refresh" class="btn">Refresh</button></div>
+        </div>
+        <div class="card">
+          <div class="card-head">Vé gần đây</div>
+          <div class="card-body">
+            <table class="table" id="tickets-table">
+              <thead>
+                <tr>
+                  <th>Mã vé</th>
+                  <th>Sự kiện / Suất</th>
+                  <th>Ghế</th>
+                  <th>Trạng thái</th>
+                  <th>Đã check-in</th>
+                  <th>Ngày tạo</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="tickets-pager" class="pager" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Users ===== -->
+      <section id="page-users" class="hidden" data-page="users">
+        <div class="section-title">
+          <h3>👤 Users</h3>
+          <div><button id="us-refresh" class="btn">Refresh</button></div>
+        </div>
+        <div class="card">
+          <div class="card-head">Người dùng gần đây</div>
+          <div class="card-body">
+            <table class="table" id="users-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Họ tên</th>
+                  <th>Đơn hàng</th>
+                  <th>Ngày tạo</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="users-pager" class="pager" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+
+</html>

@@ -337,8 +337,27 @@ body {
 
 .event-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 28px;
+}
+
+/* Responsive cho màn hình vừa */
+@media (max-width: 1400px) {
+  .event-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .event-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .event-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .event-card {

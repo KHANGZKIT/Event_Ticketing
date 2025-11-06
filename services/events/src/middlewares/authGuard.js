@@ -12,10 +12,14 @@ export async function authGuard(req, res, next) {
         const token = authHeader.slice(7);
         const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
         console.log('[authGuard] payload =', payload);
-        req.userId = payload.sub;
+        const sub = payload.sub || payload.userId || payload.id; // linh hoạt claim
+        if (!sub) {
+            return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Token missing subject' } });
+        }
         // Lấy user + roles từ DB (RBAC theo dữ liệu thật)
+        // NOTE: dùng 'sub' (đã resolve) thay vì payload.sub
         const user = await prisma.user.findUnique({
-            where: { id: payload.sub },
+            where: { id: sub },
             select: {
                 id: true,
                 roles: {
@@ -28,8 +32,13 @@ export async function authGuard(req, res, next) {
             return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not found' } });
         }
 
+        // Gán req.user theo shape controller kỳ vọng
+        req.user = {
+            id: user.id,
+            roles: (user.roles || []).map(ur => ur.role.name) // ['admin','staff',...]
+        };
         req.userId = user.id;
-        req.userRoles = (user.roles || []).map(ur => ur.role.name); // ['admin','staff',...]
+        req.userRoles = req.user.roles;
         return next();
     } catch (error) {
         console.error('[authGuard] verify error:', error);
