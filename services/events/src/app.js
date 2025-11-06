@@ -14,6 +14,9 @@ import { errorHandler } from './middlewares/error.js';
 import { ensureRedis } from './redis/client.js';
 import { redisRouter } from './redis/helpredis.js';
 import { redisDebugRouter } from './redis/debug.routes.js';
+import { holdsMetricsRouter } from './modules/holds/holds.metrics.routes.js';
+import { holdsConsumeRouter } from './modules/holds/holds.consume.routes.js';
+import { dashboardRouter } from './modules/dashboard/dashboard.router.js';
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -25,15 +28,16 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'events' }))
 app.use('/api/events', eventsRouter);
 app.use('/api/shows', showsRouter);
 app.use('/api/shows', showsStatsRouter);
-app.use('/api/holds', holdsRouter);
+app.use('/api/holds', holdsRouter, holdsConsumeRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/tickets', ticketsQRRouter);
+app.use(holdsMetricsRouter)
 await ensureRedis();
 app.use(redisRouter);
 app.use(redisDebugRouter);
-
+app.use('/api/dashboard', dashboardRouter)
 app.use(errorHandler);
 
 export default app;

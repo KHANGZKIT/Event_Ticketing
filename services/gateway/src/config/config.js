@@ -14,6 +14,7 @@ export const routes = [
 
     // Ví dụ các service khác (giữ nguyên hoặc thêm rewrite nếu backend không có /api/...):
     { prefix: '/api/events', target: ensureUrl('EVENT_SVC_URL'),   /* rewrite: '/events' */ },
+    { prefix: "/api/dashboard", target: ensureUrl("EVENT_SVC_URL", "http://localhost:4102") },
     { prefix: '/api/shows', target: ensureUrl('SHOW_SVC_URL'),    /* rewrite: '/shows'  */ },
     { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL') },
     { prefix: '/api/orders', target: ensureUrl('ORDER_SVC_URL') },
