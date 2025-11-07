@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chi tiết sự kiện - TicketBox</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    :root {
+      --green: rgb(45, 194, 117);
+      --black: rgb(42, 45, 52);
+      --white: #ffffff;
+      --gray: rgb(230, 230, 230);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      height: 76px;
+      background-color: var(--green);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .search-box {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      background-color: var(--white);
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      padding: 10px 15px;
+      flex: 1;
+      font-size: 1rem;
+    }
+
+    .search-box button {
+      background-color: var(--green);
+      border: none;
+      color: var(--white);
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .create-event-btn {
+      background-color: transparent;
+      border: 2px solid var(--white);
+      color: var(--white);
+      padding: 10px 24px;     
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .create-event-btn:hover {
+      background-color: var(--white);
+      color: var(--green);
+    }
+
+    .auth-links a {
+      color: var(--white);
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: 500;
+    }
+
+    /* ===== BANNER ===== */
+    .banner {
+      background-color: var(--black);
+      margin: 5% 10%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ticket-frame {
+      position: relative;
+      width: 100%;
+      background-color: var(--white);
+      color: var(--black);
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Lỗ khuyết trái phải */
+    .ticket-frame::before,
+    .ticket-frame::after {
+      content: "";
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: var(--black);
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    .ticket-frame::before { left: -15px; }
+    .ticket-frame::after { right: -15px; }
+
+    /* Đường chấm giữa */
+    .divider {
+      position: absolute;
+      top: 0%;
+      bottom: 0%;
+      left: 40%;
+      width: 6px;
+      border-right: 6px dotted rgb(0, 0, 0);
+      z-index: 1;
+    }
+
+    .ticket-left {
+  width: 40%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+  color: var(--black);
+}
+
+.ticket-left h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.event-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.event-detail svg {
+  color: var(--green);
+  flex-shrink: 0;
+  
+}
+
+.event-time, .event-place {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.event-detail p {
+  margin: 0;
+  line-height: 1.4;
+  
+}
+.event-address{
+  font-size: small;
+}
+.divider-line {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.2);
+}
+
+.price-box {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.price-box .price {
+  color: var(--green);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.ticket-left button {
+  background-color: var(--green);
+  border: none;
+  color: var(--white);
+  padding: 12px 28px;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.ticket-left button:hover {
+  background-color: rgb(38, 172, 104);
+}
+
+
+    .ticket-right {
+      width: 60%;
+      z-index: 2;
+    }
+
+    .ticket-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-left: 2px solid rgba(0,0,0,0.05);
+    }
+
+    /* ===== DETAIL BODY ===== */
+    .detail-body {
+      background-color: rgb(245, 245, 245);
+      padding: 40px 10%;
+      color: var(--black);
+    }
+
+    .section {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    /* Giới thiệu có hiệu ứng mở rộng */
+    .intro-text {
+      max-height: 120px;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      position: relative;
+    }
+
+    .intro-text.expanded {
+      max-height: 1000px;
+    }
+
+    .fade-overlay {
+      content: "";
+      position: absolute;
+      bottom: 45px;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(to top, white, rgba(255,255,255,0));
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .intro-text.expanded + .fade-overlay {
+      opacity: 0;
+    }
+
+    .read-more {
+      display: inline-block;
+      color: var(--green);
+      cursor: pointer;
+      font-weight: 500;
+      margin-top: 10px;
+      user-select: none;
+    }
+
+    .ticket-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .ticket-type {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 1rem;
+    }
+
+    .ticket-type:last-child {
+      border-bottom: none;
+    }
+
+    .org {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .org img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">TicketBox</div>
+
+    <div class="header-center">
+      <div class="search-box">
+        <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm..." />
+        <button>Tìm kiếm</button>
+      </div>
+      <button class="create-event-btn">Tạo sự kiện</button>
+    </div>
+
+    <div class="auth-links">
+      <a href="#">Đăng ký</a> | 
+      <a href="#">Đăng nhập</a>
+    </div>
+  </header>
+
+  <!-- ===== BANNER ===== -->
+  <div class="banner">
+    <div class="ticket-frame">
+      <div class="divider"></div>
+      <div class="ticket-left">
+  <h1>TOUR ĐÊM VĂN MIẾU</h1>
+
+  <div class="event-detail">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" 
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         class="lucide lucide-calendar">
+      <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+    </svg>
+    <div>
+      <p class="event-time"><b>19:00 - 22:00, 22 Tháng 11, 2025</b></p>
+    </div>
+  </div>
+
+  <div class="event-detail">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         class="lucide lucide-map-pin">
+      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    <div>
+      <p class="event-place"><b>Văn Miếu – Quốc Tử Giám, Hà Nội</b></p>
+      <p class="event-address">số 58 phố Quốc Tử Giám, phường Văn Miếu, quận Đống Đa, thành phố Hà Nội</p>
+    </div>
+  </div>
+
+  <hr class="divider-line">
+
+  <div class="price-box">
+    <p><b>Giá từ</b> <span class="price">1.999.999 đ</span></p>
+  </div>
+
+  <button>Mua vé ngay</button>
+</div>
+
+      <div class="ticket-right">
+        <img src="../asset/concert.png" alt="Ảnh sự kiện" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL BODY ===== -->
+  <div class="detail-body">
+    <div class="section">
+      <h2>Giới thiệu</h2>
+      <p class="intro-text">
+        Đêm nhạc đặc biệt tại Văn Miếu – Quốc Tử Giám với sự góp mặt của nhiều nghệ sĩ hàng đầu Việt Nam. 
+        Sự kiện kết hợp ánh sáng, âm thanh và không gian cổ kính, mang đến trải nghiệm nghệ thuật độc đáo. 
+        <br><br>
+        Chương trình sẽ kéo dài 3 tiếng, bắt đầu từ 19:00 với nhiều tiết mục bất ngờ. 
+        Ngoài phần biểu diễn, khán giả còn có cơ hội tham quan khu trưng bày và thưởng thức ẩm thực truyền thống.
+        <br><br>
+        Hãy sẵn sàng cho một đêm hội ngộ âm nhạc giữa lòng Hà Nội – nơi di sản và hiện đại giao thoa.
+      </p>
+      <div class="fade-overlay"></div>
+      <span class="read-more">Xem thêm ▼</span>
+    </div>
+
+    <div class="section">
+      <div class="ticket-info">
+        <div>
+          <h2>Thông tin vé</h2>
+          <p>Ngày: 12 tháng 10, 2025 – Giờ: 19:00</p>
+        </div>
+        <button style="background-color: var(--green); color: var(--white); border:none; border-radius:25px; padding:10px 25px; cursor:pointer;">Mua vé ngay</button>
+      </div>
+      <div class="ticket-type">
+        <span>Vé VIP</span>
+        <span><b>850.000đ</b></span>
+      </div>
+      <div class="ticket-type">
+        <span>Vé thường</span>
+        <span><b>420.000đ</b></span>
+      </div>
+    </div>
+
+    <div class="section org">
+      <img src="../asset/workshop.png" alt="Logo ban tổ chức">
+      <div>
+        <h2>Ban tổ chức</h2>
+        <p>Văn Miếu Music & Event</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const readMore = document.querySelector('.read-more');
+    const introText = document.querySelector('.intro-text');
+    const fadeOverlay = document.querySelector('.fade-overlay');
+
+    readMore.addEventListener('click', () => {
+      const expanded = introText.classList.toggle('expanded');
+      fadeOverlay.style.display = expanded ? 'none' : 'block';
+      readMore.textContent = expanded ? 'Thu gọn ▲' : 'Xem thêm ▼';
+    });
+  </script>
+</body>
+</html>

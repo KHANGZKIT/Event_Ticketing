@@ -35,28 +35,31 @@
         <span>Vé của tôi</span>
       </a>
     </div>
-    <div class="login">
-      <!-- use anchors so click navigates to LogRegUI with correct tab -->
-      <a href="../../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m10 17 5-5-5-5" />
-          <path d="M15 12H3" />
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-        </svg>
-        Đăng nhập
-      </a>
-      <a href="../../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <line x1="19" x2="19" y1="8" y2="14" />
-          <line x1="22" x2="16" y1="11" y2="11" />
-        </svg>
-        Đăng ký
-      </a>
+    <!-- AUTH AREA: JS sẽ render Login/Register hoặc User Menu -->
+    <div id="authArea" class="auth-area">
+      <div class="login">
+        <a href="../../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m10 17 5-5-5-5" />
+            <path d="M15 12H3" />
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          </svg>
+          Đăng nhập
+        </a>
+        <a href="../../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" x2="19" y1="8" y2="14" />
+            <line x1="22" x2="16" y1="11" y2="11" />
+          </svg>
+          Đăng ký
+        </a>
+      </div>
     </div>
+
   </div>
 
   <!-- MENU & DROPDOWN -->
@@ -868,8 +871,8 @@
       <p>Phương thức thanh toán</p>
     </div>
   </footer>
-
   <script>
+    // ===== Slider =====
     let slideIndex = 0;
     const slides = document.querySelectorAll(".slide");
     const dots = document.querySelectorAll(".dot");
@@ -879,19 +882,16 @@
       dots.forEach((d, i) => d.classList.toggle("active", i === index));
     }
 
-    // NÚT NEXT
     document.querySelector(".next").addEventListener("click", () => {
       slideIndex = (slideIndex + 1) % slides.length;
       showSlide(slideIndex);
     });
 
-    // NÚT PREV
     document.querySelector(".prev").addEventListener("click", () => {
       slideIndex = (slideIndex - 1 + slides.length) % slides.length;
       showSlide(slideIndex);
     });
 
-    // DOTS
     dots.forEach((dot, i) => {
       dot.addEventListener("click", () => {
         slideIndex = i;
@@ -899,7 +899,6 @@
       });
     });
 
-    // TỰ ĐỘNG CHUYỂN MỖI 5 GIÂY
     setInterval(() => {
       slideIndex = (slideIndex + 1) % slides.length;
       showSlide(slideIndex);
@@ -911,13 +910,29 @@
     // Tối ưu slider cho mobile: thêm transition mượt hơn
     const style = document.createElement('style');
     style.innerHTML = `
-  @media (max-width: 768px) {
-    .slide {
-      transition: opacity 0.8s ease !important;
+    @media (max-width: 768px) {
+      .slide { transition: opacity 0.8s ease !important; }
     }
-  }
-`;
+  `;
     document.head.appendChild(style);
+
+    // ===== GỌI renderAuthUI() NGAY LẬP TỨC (nếu đã được định nghĩa trong events.js) =====
+    // Tránh chờ DOMContentLoaded vì lúc này sự kiện có thể đã nổ.
+    if (typeof renderAuthUI === 'function') {
+      renderAuthUI();
+    } else {
+      // Nếu events.js load chậm hơn, thử đợi DOM ready rồi gọi
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderAuthUI === 'function') renderAuthUI();
+      });
+    }
+
+    // Auto cập nhật nếu login ở tab khác
+    window.addEventListener('storage', (e) => {
+      if (['auth', 'accessToken', 'token', 'user', 'profile'].includes(e.key)) {
+        if (typeof renderAuthUI === 'function') renderAuthUI();
+      }
+    });
   </script>
   <script src="../js/events.js"></script>
 </body>
