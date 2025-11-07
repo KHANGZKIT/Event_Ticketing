@@ -188,21 +188,34 @@ export function expandSeatsFromTemplate(tpl) {
     return seats;
 }
 
+// shows.service.js (hoặc nơi bạn định nghĩa getSeatMap)
+
 export async function getSeatMap(showId) {
     const show = await prisma.show.findFirst({
         where: { id: showId, deletedAt: null },
-        select: { id: true, seatMapId: true },
+        select: { id: true, seatMapId: true, seatMapDbId: true },
     });
-    if (!show || !show.seatMapId) {
-        const e = new Error("SeatMap Not Found"); e.status = 404; throw e;
+
+    if (!show) {
+        const e = new Error("Show Not Found");
+        e.status = 404; throw e;
     }
-    const tpl = await loadSeatMapTemplate(show.seatMapId);
+
+    const seatMapIdEff = show.seatMapDbId ?? show.seatMapId;
+    if (!seatMapIdEff) {
+        const e = new Error(`SeatMap Not Found for show ${showId}`);
+        e.status = 404; throw e;
+    }
+
+    // đọc DB > file rời <id>.json > seatmaps_pack.json
+    const tpl = await loadSeatMapTemplate(seatMapIdEff);
+
     return {
         showId: show.id,
-        template: tpl,
-        seats: expandSeatsFromTemplate(tpl), // <-- GIỜ trả về mảng thật
+        template: { ...tpl, seats: expandSeatsFromTemplate(tpl) }
     };
 }
+
 
 export async function getAvailability(showId) {
     console.log('[avail] in:', { showId });

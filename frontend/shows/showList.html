@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Suất chiếu | TicketBook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b1220;
+            --bg-soft: #0e1730;
+            --card: #0b1220cc;
+            --line: #1f2937;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --brand: #2DC275;
+            --brand-2: #1b9156;
+            --danger: #ef4444;
+            --shadow: 0 12px 40px rgba(0, 0, 0, .35);
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial;
+            color: var(--text);
+            background: radial-gradient(1200px 600px at 10% -10%, #14335a 0%, rgba(20, 51, 90, 0) 60%), radial-gradient(1000px 600px at 100% 0%, #092c20 0%, rgba(9, 44, 32, 0) 50%), var(--bg);
+        }
+
+        /* container */
+        .container {
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 0 16px
+        }
+
+        /* top bar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+
+        .back {
+            color: #a7f3d0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600
+        }
+
+        .back svg {
+            transform: translateY(1px)
+        }
+
+        /* hero */
+        .hero {
+            position: sticky;
+            top: 8px;
+            z-index: 5;
+            padding: 18px;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+            border: 1px solid #23324a;
+            border-radius: var(--radius);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-title {
+            margin: 0 0 6px;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: .2px
+        }
+
+        .hero-sub {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px
+        }
+
+        .chip {
+            border: 1px solid #23324a;
+            background: #0e1630;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: #cbd5e1;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .chip strong {
+            color: #fff
+        }
+
+        /* toolbar */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0 16px
+        }
+
+        .tool {
+            background: #0e1630;
+            border: 1px solid #23324a;
+            border-radius: 12px;
+            padding: 8px 10px;
+            color: #cbd5e1;
+        }
+
+        .tool select {
+            background: transparent;
+            border: none;
+            color: #cbd5e1;
+            outline: 0
+        }
+
+        .spacer {
+            flex: 1
+        }
+
+        /* day group */
+        .group {
+            margin-bottom: 18px
+        }
+
+        .group h3 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #cfeadf;
+            letter-spacing: .4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .group h3:before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: var(--brand);
+            box-shadow: 0 0 0 4px rgba(45, 194, 117, .15);
+        }
+
+        /* show row (glass + gradient border) */
+        .show {
+            position: relative;
+            padding: 14px 14px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(11, 18, 32, .6);
+            border: 1px solid #1e2a44;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: transform .18s ease, border-color .18s ease, background .18s ease;
+        }
+
+        .show::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(130deg, rgba(45, 194, 117, .7), rgba(45, 194, 117, 0) 30%, rgba(53, 83, 227, .6) 70%, rgba(53, 83, 227, 0));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: url(mask-image.png) center/contain no-repeat;
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: .35;
+        }
+
+        .show:hover {
+            transform: translateY(-2px);
+            border-color: #28406d;
+            background: rgba(14, 23, 48, .85)
+        }
+
+        .left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            align-items: center
+        }
+
+        .pill {
+            background: #0f172a;
+            border: 1px solid #22324f;
+            padding: 6px 10px;
+            border-radius: 10px;
+            color: #d1d5db;
+            font-size: 14px;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .pill b {
+            color: #fff
+        }
+
+        .status {
+            border-color: #28406d
+        }
+
+        .venue {
+            opacity: .9
+        }
+
+        .price {
+            border-color: #1f3f31
+        }
+
+        .sold {
+            border-color: #5a2530;
+            color: #fecaca;
+            background: #1b0f15
+        }
+
+        .right {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .btn {
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--brand);
+            background: linear-gradient(180deg, var(--brand), var(--brand-2));
+            color: #072418;
+            box-shadow: 0 6px 22px rgba(45, 194, 117, .35);
+            transition: filter .15s ease, transform .1s ease;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05)
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .ghost {
+            border: 1px dashed #334155;
+            background: transparent;
+            color: #cbd5e1;
+            box-shadow: none
+        }
+
+        /* list */
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        /* empty */
+        .empty {
+            padding: 28px;
+            text-align: center;
+            border: 1px dashed #334155;
+            border-radius: 16px;
+            background: #0a1328
+        }
+
+        .empty p {
+            margin: 8px 0 0;
+            color: #9ca3af
+        }
+
+        /* skeleton */
+        .skeleton {
+            height: 58px;
+            border-radius: 16px;
+            background: linear-gradient(90deg, #0f1936 0%, #172448 50%, #0f1936 100%);
+            background-size: 200% 100%;
+            animation: sk 1.2s infinite
+        }
+
+        .skeleton+.skeleton {
+            margin-top: 10px
+        }
+
+        @keyframes sk {
+            0% {
+                background-position: -200px 0
+            }
+
+            100% {
+                background-position: 200px 0
+            }
+        }
+
+        @media (max-width:640px) {
+            .right {
+                width: 100%;
+                justify-content: flex-end
+            }
+
+            .show {
+                align-items: flex-start
+            }
+
+            .btn {
+                width: auto
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topbar">
+            <a class="back" href="../HomePage/source/TrangChu.html" aria-label="Quay lại trang chủ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+                Trang chủ
+            </a>
+        </div>
+
+        <!-- Hero (event info) -->
+        <section class="hero">
+            <h1 id="eventName" class="hero-title">Đang tải sự kiện…</h1>
+            <p id="eventMeta" class="hero-sub"></p>
+            <div class="chips">
+                <span class="chip">🎟 <strong>Chọn suất</strong> để đặt ghế</span>
+                <span class="chip">🕒 Giữ chỗ 5 phút</span>
+                <span class="chip">🔁 Miễn phí đổi ghế trước thanh toán</span>
+            </div>
+            <div class="toolbar">
+                <div class="tool">
+                    <label for="sort">Sắp xếp: </label>
+                    <select id="sort">
+                        <option value="asc">Thời gian ↑</option>
+                        <option value="desc">Thời gian ↓</option>
+                    </select>
+                </div>
+                <div class="spacer"></div>
+                <button id="refresh" class="btn ghost">Làm mới</button>
+            </div>
+        </section>
+
+        <!-- List -->
+        <div id="root">
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
+    </div>
+
+    <script type="module" src="./showList.js"></script>
+</body>
+
+</html>

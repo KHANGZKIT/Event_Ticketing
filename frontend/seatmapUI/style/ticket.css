@@ -1,50 +1,57 @@
 /* ===== Base ===== */
-:root{
-  --paper:#fff;
-  --ink:#1f2937;
-  --muted:#6b7280;
-  --brand:#0b8cff;
-  --accent:#f93054;
-  --edge:#f3f4f6;
-  --shadow:0 10px 30px rgba(0,0,0,.12);
+:root {
+  --paper: #fff;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --brand: #0b8cff;
+  --accent: #f93054;
+  --edge: #f3f4f6;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .12);
 }
 
-*{box-sizing:border-box}
-body{ display:block; padding:0; background: var(--color-background); }
+* {
+  box-sizing: border-box
+}
+
+body {
+  display: block;
+  padding: 0;
+  background: var(--color-background);
+}
 
 
 /* ===== Panel đựng vé + nút ===== */
-.billPanel{
+.billPanel {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  
-  display:flex; 
-  flex-direction:column; 
-  align-items:center; 
-  gap:18px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius:20px; 
-  box-shadow: 0 8px 32px rgba(0,0,0,.15);
-  width:min(720px, 95vw); 
-  padding:22px 18px;
-  
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .15);
+  width: min(720px, 95vw);
+  padding: 22px 18px;
+
   opacity: 1;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.billPanel.hidden{
+.billPanel.hidden {
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.95);
 }
 
-.billPanel::before{
+.billPanel::before {
   content: "";
   position: fixed;
   border-radius: 16px;
@@ -59,26 +66,38 @@ body{ display:block; padding:0; background: var(--color-background); }
 }
 
 /* ===== Ticket ===== */
-.ticket{
-  display:flex; width:min(680px, 92vw); background:var(--paper);
-  border-radius:18px; overflow:hidden; position:relative;
-  box-shadow:0 6px 20px rgba(0,0,0,.08);
-  isolation:isolate;
+.ticket {
+  display: flex;
+  width: min(680px, 92vw);
+  background: var(--paper);
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+  isolation: isolate;
 }
 
 /* Hoa văn nền giấy (guilloché nhẹ) */
-.ticket::after{
-  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+.ticket::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
     radial-gradient(120px 100px at 20% 30%, #f8fafc 0 40%, transparent 41%),
     radial-gradient(140px 110px at 70% 60%, #f8fafc 0 40%, transparent 41%),
     repeating-conic-gradient(from 0deg, #f9fbff 0 10deg, #ffffff 10deg 20deg);
-  opacity:.9;
+  opacity: .9;
 }
 
 /* Lỗ bấm răng cưa 2 bên */
-.ticket::before{
-  content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+.ticket::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
   /* tạo dãy lỗ tròn nhỏ dọc mép trái/phải bằng mask */
   -webkit-mask:
     radial-gradient(12px 12px at -6px 50%, #000 98%, transparent 100%) left / 12px 100% repeat-y,
@@ -90,66 +109,145 @@ body{ display:block; padding:0; background: var(--color-background); }
 }
 
 /* Trái / phải */
-.ticket-left{
-  flex:2; padding:22px 22px 18px; position:relative; z-index:1;
-  display:flex; flex-direction:column; justify-content:center; gap:10px;
+.ticket-left {
+  flex: 2;
+  padding: 22px 22px 18px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
-.ticket-right{
-  flex:1; background:linear-gradient(180deg, #00bf8f, #008261 55%,#002f24 );
-  color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
-  position:relative; z-index:1; min-width:170px;
+
+.ticket-right {
+  flex: 1;
+  background: linear-gradient(180deg, #00bf8f, #008261 55%, #002f24);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  min-width: 170px;
 }
 
 /* Đường đứt ngăn vé */
-.ticket-right::before{
-  content:""; position:absolute; left:0; top:0; width:2px; height:100%;
-  border-left:2px dashed rgba(255,255,255,.8);
-  filter: drop-shadow(0 0 1px rgba(0,0,0,.1));
+.ticket-right::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  border-left: 2px dashed rgba(255, 255, 255, .8);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, .1));
 }
 
 /* Brand nhỏ */
-.brand{
-  font-weight:900; font-size:13px; letter-spacing:.28em; color:var(--brand);
-  text-transform:uppercase; opacity:.9;
+.brand {
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .28em;
+  color: var(--brand);
+  text-transform: uppercase;
+  opacity: .9;
 }
 
 /* Tiêu đề & meta */
-.event{ margin:2px 0 4px; font-size:22px; line-height:1.2; color:#0f172a }
-.meta{ display:flex; flex-direction:column; gap:4px; color:var(--muted); font-weight:600; }
-.serial{ margin-top:8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color:#475569; font-size:12px }
+.event {
+  margin: 2px 0 4px;
+  font-size: 22px;
+  line-height: 1.2;
+  color: #0f172a
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.serial {
+  margin-top: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #475569;
+  font-size: 12px
+}
 
 /* Badge giá */
-.price-badge{
-  position:absolute; top:12px; right:12px; background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.5);
-  padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; letter-spacing:.02em;
+.price-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .5);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .02em;
   backdrop-filter: blur(4px);
 }
 
 /* QR đại diện */
-.qr{
-  width:84px; height:84px; border-radius:10px; background:#fff; border:3px solid rgba(255,255,255,.85);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-  position:relative; overflow:hidden;
+.qr {
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  background: #fff;
+  border: 3px solid rgba(255, 255, 255, .85);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06);
+  position: relative;
+  overflow: hidden;
 }
-.qr::before{
-  content:""; position:absolute; inset:0;
+
+.qr::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background:
     linear-gradient(90deg, #000 0 10%, transparent 10% 20%, #000 20% 30%, transparent 30% 40%, #000 40% 50%, transparent 50% 60%, #000 60% 70%, transparent 70% 80%, #000 80% 90%, transparent 90% 100%),
     linear-gradient(#000 0 8%, transparent 8% 16%, #000 16% 24%, transparent 24% 32%, #000 32% 40%, transparent 40% 48%, #000 48% 56%, transparent 56% 64%, #000 64% 72%, transparent 72% 80%, #000 80% 88%, transparent 88% 100%);
-  mix-blend-mode:multiply; opacity:.5;
+  mix-blend-mode: multiply;
+  opacity: .5;
 }
 
 /* ===== Responsive ===== */
-@media (max-width:560px){
-  .ticket{ flex-direction:column; border-radius:16px }
-  .ticket-right{ min-height:160px; padding:16px 0 }
-  .price-badge{ top:10px; right:10px }
-  .event{ font-size:20px }
+@media (max-width:560px) {
+  .ticket {
+    flex-direction: column;
+    border-radius: 16px
+  }
+
+  .ticket-right {
+    min-height: 160px;
+    padding: 16px 0
+  }
+
+  .price-badge {
+    top: 10px;
+    right: 10px
+  }
+
+  .event {
+    font-size: 20px
+  }
 }
-@media (max-width:380px){
-  .qr{ width:74px; height:74px }
-  .event{ font-size:18px }
+
+@media (max-width:380px) {
+  .qr {
+    width: 74px;
+    height: 74px
+  }
+
+  .event {
+    font-size: 18px
+  }
 }
 
 /* ======= Nút hành động ======= */
@@ -173,8 +271,9 @@ body{ display:block; padding:0; background: var(--color-background); }
 .btn-confirm {
   background: #008261;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(11,140,255,.25);
+  box-shadow: 0 4px 12px rgba(11, 140, 255, .25);
 }
+
 .btn-confirm:hover {
   transform: translateY(-1px);
   filter: brightness(.96);
@@ -183,8 +282,9 @@ body{ display:block; padding:0; background: var(--color-background); }
 .btn-cancel {
   background: #f93054;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(249,48,84,.25);
+  box-shadow: 0 4px 12px rgba(249, 48, 84, .25);
 }
+
 .btn-cancel:hover {
   transform: translateY(-1px);
   filter: brightness(.96);

@@ -12,9 +12,21 @@ function toURL(rel) { return new URL(rel, window.location.href).toString(); }
 
 function storage(remember) { return remember ? localStorage : sessionStorage; }
 function saveAuth(token, me, remember) {
-  const st = storage(remember);
-  st.setItem("accessToken", token);
-  st.setItem("currentUser", JSON.stringify(me || {}));
+  const st = remember ? localStorage : sessionStorage;
+  // Keys cũ của bạn
+  st.setItem('accessToken', token);
+  st.setItem('currentUser', JSON.stringify(me || {}));
+  // Thêm các key mà TrangChu đang đọc
+  st.setItem('user', JSON.stringify(me || {}));
+  st.setItem('profile', JSON.stringify(me || {}));
+  st.setItem('auth', JSON.stringify({ token, user: me || {} }));
+}
+function clearAuthAll() {
+  const keys = ['auth', 'accessToken', 'token', 'user', 'profile', 'currentUser'];
+  keys.forEach(k => {
+    try { localStorage.removeItem(k); } catch { }
+    try { sessionStorage.removeItem(k); } catch { }
+  });
 }
 
 async function fetchJSON(url, opts = {}) {
@@ -149,8 +161,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 2) Lấy thông tin me để biết roles
         const me = await getMe(token);
+        clearAuthAll();
         saveAuth(token, me, !!(rememberCbx && rememberCbx.checked));
+        const params = new URLSearchParams(location.search);
+        const redirect = params.get('redirect');
 
+        if (redirect) {
+          window.location.href = redirect;
+          return;
+        }
         // 3) Redirect theo quyền
         if (isAdminFrom(me)) {
           // admin → Dashboard

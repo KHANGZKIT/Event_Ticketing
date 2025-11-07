@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tạo sự kiện - TicketBox</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    :root {
+      --green: rgb(45, 194, 117);
+      --black: rgb(42, 45, 52);
+      --dark-gray: rgb(50, 53, 60);
+      --white: #ffffff;
+      --red: #ff4d4f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      height: 76px;
+      background-color: var(--green);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .search-box {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  background-color: #fff ; 
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 0 2px #fff inset; 
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  padding: 10px 15px;
+  flex: 1;
+  font-size: 1rem;
+  background-color: #fff !important; 
+  color: #333!important;                       
+}
+.search-box input::placeholder {
+  color: #777;             
+}
+
+    .search-box button {
+      background-color: var(--green);
+      border: none;
+      color: var(--white);
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .create-event-btn {
+      background-color: transparent;
+      border: 2px solid var(--white);
+      color: var(--white);
+      padding: 10px 24px;     
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .create-event-btn:hover {
+      background-color: var(--white);
+      color: var(--green);
+    }
+
+    .auth-links a {
+      color: var(--white);
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: 500;
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      background-color: rgb(35, 38, 45);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      opacity: 0.6;
+      font-weight: 500;
+    }
+
+    .step.active {
+      opacity: 1;
+      color: var(--green);
+    }
+
+    .step-number {
+      border: 2px solid var(--green);
+      color: var(--green);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* MAIN */
+    .content {
+      padding: 40px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .form-section {
+      background-color: var(--dark-gray);
+      border-radius: 10px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .form-group span {
+      color: var(--red);
+      margin-right: 5px;
+    }
+
+    .upload-box {
+      background-color: rgb(80, 80, 90);
+      border: 1px dashed rgba(255,255,255,0.3);
+      border-radius: 10px;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .upload-box:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    input[type="text"], select {
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background-color: rgb(65, 68, 75);
+      color: var(--white);
+      font-size: 1rem;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .radio-group input[type="radio"] {
+      accent-color: var(--green);
+      margin-right: 5px;
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col-2 {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .row span{
+        color: var(--red);
+    }
+    textarea {
+      padding: 12px 15px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background-color: rgb(65, 68, 75);
+      color: var(--white);
+      font-size: 1rem;
+      resize: none; 
+      height: 180px; 
+    }
+
+    textarea::placeholder {
+     color: rgba(255,255,255,0.6);
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">TicketBox</div>
+
+    <div class="header-center">
+      <div class="search-box">
+        <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm..." />
+        <button>Tìm kiếm</button>
+      </div>
+      <button class="create-event-btn">Tạo sự kiện</button>
+    </div>
+
+    <div class="auth-links">
+      <a href="#">Đăng ký</a> | 
+      <a href="#">Đăng nhập</a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar">
+    <div class="step active">
+      <div class="step-number">1</div> Thông tin sự kiện
+    </div>
+    <div class="step">
+      <div class="step-number">2</div> Thời gian & Loại vé
+    </div>
+    <div class="step">
+      <div class="step-number">3</div> Thông tin thanh toán
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    <!-- Upload hình ảnh & Tên sự kiện -->
+    <div class="form-section">
+      <div class="form-group">
+        <label><span>*</span> Upload hình ảnh</label>
+        <div class="upload-box">
+          <p>Thêm ảnh nền sự kiện</p>
+          <small>(1280x720)</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><span>*</span> Tên sự kiện <small style="opacity:0.7;">(tối đa 100 ký tự)</small></label>
+        <input type="text" maxlength="100" placeholder="Nhập tên sự kiện của bạn...">
+      </div>
+    </div>
+
+    <!-- Địa chỉ sự kiện -->
+    <div class="form-section" id="event-address">
+      <div class="form-group">
+        <label><span>*</span> Địa chỉ sự kiện</label>
+        <div class="radio-group">
+          <label><input type="radio" name="type" value="offline" checked> Sự kiện Offline</label>
+          <label><input type="radio" name="type" value="online"> Sự kiện Online</label>
+        </div>
+        </div>
+
+      <div id="offline-fields">
+        <div class="form-group">
+         <label><span>*</span> Tên địa điểm</label>
+         <input type="text" maxlength="80" placeholder="Tên địa điểm">
+        </div>
+
+        <div class="row">
+         <div class="col-2">
+            <label><span>*</span> Tỉnh/Thành</label>
+            <input type="text" maxlength="80" placeholder="Tỉnh/Thành">
+            </div>
+
+         <div class="col-2">
+              <label>Quận/Huyện</label>
+            <input type="text" maxlength="80" placeholder="Quận/Huyện">
+            </div>
+        </div>
+
+         <div class="row">
+         <div class="col-2">
+             <label>Phường/Xã</label>
+             <input type="text" maxlength="80" placeholder="Phường/Xã">
+         </div>
+
+         <div class="col-2">
+             <label><span>*</span> Số nhà, đường</label>
+            <input type="text" maxlength="80" placeholder="Số nhà, đường">
+            </div>
+         </div>
+  </div>
+ </div>
+
+    <!-- Thể loại sự kiện -->
+    <div class="form-section">
+      <div class="form-group">
+        <label><span>*</span> Thể loại sự kiện</label>
+        <select>
+          <option value="">Sân khấu & nghệ thuật</option>
+          <option>Hội thảo</option>
+          <option>Thể thao</option>
+
+          <option>Khác</option>
+        </select>
+      </div>
+    </div>
+    <!-- Thông tin sự kiện -->
+<div class="form-section">
+  <div class="form-group">
+    <label><span>*</span> Giới thiệu sự kiện</label>
+    <textarea id="event-description" rows="8" maxlength="3000" placeholder="Nhập mô tả chi tiết về sự kiện của bạn..."></textarea>
+    <small style="opacity:0.7;">(Bạn có thể nhập nhiều đoạn mô tả, tối đa 3000 ký tự)</small>
+  </div>
+</div>
+
+<!-- Ban tổ chức -->
+<div class="form-section" id="organizer-info">
+  <div class="row" style="align-items: flex-start;">
+    
+    <!-- Khung logo bên trái -->
+    <div class="col-2" style="flex: 0 0 275px;">
+      <div class="upload-box" style="height: 275px; width: 275px;">
+        <p>Thêm logo ban tổ chức</p>
+        <small>(275x275)</small>
+      </div>
+    </div>
+
+    <!-- Thông tin ban tổ chức bên phải -->
+    <div class="col-2" style="flex: 1;">
+      <div class="form-group">
+        <label>
+          <span>*</span> Tên ban tổ chức 
+          <small style="opacity:0.7;">(tối đa 80 ký tự)</small>
+        </label>
+        <input type="text" maxlength="80" placeholder="Tên ban tổ chức">
+      </div>
+
+      <div class="form-group">
+        <label>
+          <span>*</span> Thông tin ban tổ chức 
+          <small style="opacity:0.7;">(tối đa 500 ký tự)</small>
+        </label>
+        <textarea maxlength="500" placeholder="Thông tin ban tổ chức"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </div>
+
+  <script>
+    // Ẩn/hiện địa chỉ khi chọn Online / Offline
+    const offlineFields = document.getElementById('offline-fields');
+    document.querySelectorAll('input[name="type"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'online' && radio.checked) {
+          offlineFields.style.display = 'none';
+        } else {
+          offlineFields.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
