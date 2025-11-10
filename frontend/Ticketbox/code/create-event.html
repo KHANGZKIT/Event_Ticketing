@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tạo sự kiện - TicketBook</title>
+
+  <link rel="stylesheet" href="../../HomePage/css/style.css">
+
+  <style>
+    /* CSS CỤC BỘ (Đã dọn dẹp) */
+    :root {
+      --green: rgb(45, 194, 117);
+      --black: rgb(42, 45, 52);
+      --dark-gray: rgb(50, 53, 60);
+      --white: #ffffff;
+      --red: #ff4d4f;
+    }
+
+    body {
+      background-color: var(--black);
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      background-color: rgb(35, 38, 45);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      opacity: 0.6;
+      font-weight: 500;
+    }
+
+    .step.active {
+      opacity: 1;
+      color: var(--green);
+    }
+
+    .step-number {
+      border: 2px solid var(--green);
+      color: var(--green);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Ghi đè .content của style.css */
+    .content {
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .form-section {
+      background-color: var(--dark-gray);
+      border-radius: 10px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .form-group span,
+    .row span {
+      color: var(--red);
+      margin-right: 5px;
+    }
+
+    .upload-box {
+      background-color: rgb(80, 80, 90);
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.85);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    /* Thêm đoạn này vào bên trong thẻ <style> của file create-event.html */
+
+    .upload-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Đây là chìa khóa: ảnh sẽ tự co dãn và cắt bớt phần thừa */
+      border-radius: 10px;
+      /* Giữ bo góc của hộp */
+    }
+
+    .upload-box:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    input[type="number"],
+    select,
+    textarea {
+      padding: 12px 15px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background-color: rgb(65, 68, 75);
+      color: var(--white);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .radio-group input[type="radio"] {
+      accent-color: var(--green);
+      margin-right: 5px;
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col-2 {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 180px;
+    }
+
+    .ticket-editor .ticket-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 50px;
+      /* Tên | SL | Giá | Nút Xóa */
+      gap: 15px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .btn-add-ticket {
+      background-color: transparent;
+      border: 1px dashed var(--green);
+      color: var(--green);
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-add-ticket:hover {
+      background-color: rgba(45, 194, 117, 0.1);
+    }
+
+    .btn-remove-ticket {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .btn-submit {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <a href="../../HomePage/source/TrangChu.html"><img src="../../HomePage/logo.svg" alt=""></a>
+    <div class="search-bar">
+      <input type="text" placeholder="Bạn tìm gì hôm nay?">
+      <button>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21 21-4.34-4.34" />
+          <circle cx="11" cy="11" r="8" />
+        </svg>
+      </button>
+    </div>
+    <div class="my-ticket">
+      <a href="../../my_ticket/source/my_ticket.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+          <path d="M13 5v2" />
+          <path d="M13 17v2" />
+          <path d="M13 11v2" />
+        </svg>
+        <span>Vé của tôi</span>
+      </a>
+    </div>
+    <div id="authArea" class="auth-area">
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="step active">
+      <div class="step-number">1</div> Thông tin sự kiện
+    </div>
+    <div class="step">
+      <div class="step-number">2</div> Thời gian & Loại vé
+    </div>
+    <div class="step">
+      <div class="step-number">3</div> Thông tin thanh toán
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="form-section">
+      <div class="form-group">
+        <label><span>*</span> Upload hình ảnh</label>
+        <input type="file" id="cover-upload-input" hidden accept="image/*">
+        <div class="upload-box" id="cover-upload-box">
+          <p>Thêm ảnh nền sự kiện</p>
+          <small>(1280x720)</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><span>*</span> Tên sự kiện <small style="opacity:0.7;">(tối đa 100 ký tự)</small></label>
+        <input type="text" maxlength="100" placeholder="Nhập tên sự kiện của bạn...">
+      </div>
+    </div>
+
+    <div class="form-section" id="event-address">
+      <div class="form-group">
+        <label><span>*</span> Địa chỉ sự kiện</label>
+        <div class="radio-group">
+          <label><input type="radio" name="type" value="offline" checked> Sự kiện Offline</label>
+          <label><input type="radio" name="type" value="online"> Sự kiện Online</label>
+        </div>
+      </div>
+      <div id="offline-fields">
+        <div class="form-group">
+          <label><span>*</span> Tên địa điểm</label>
+          <input type="text" maxlength="80" placeholder="Tên địa điểm">
+        </div>
+        <div class="row">
+          <div class="col-2">
+            <label><span>*</span> Tỉnh/Thành</label>
+            <input type="text" maxlength="80" placeholder="Tỉnh/Thành">
+          </div>
+          <div class="col-2">
+            <label>Quận/Huyện</label>
+            <input type="text" maxlength="80" placeholder="Quận/Huyện">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2">
+            <label>Phường/Xã</label>
+            <input type="text" maxlength="80" placeholder="Phường/Xã">
+          </div>
+          <div class="col-2">
+            <label><span>*</span> Số nhà, đường</label>
+            <input type="text" maxlength="80" placeholder="Số nhà, đường">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-group">
+        <label><span>*</span> Thể loại sự kiện</label>
+        <select>
+          <option value="">Sân khấu & nghệ thuật</option>
+          <option>Hội thảo</option>
+          <option>Thể thao</option>
+          <option>Khác</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-group">
+        <label><span>*</span> Giới thiệu sự kiện</label>
+        <textarea id="event-description" rows="8" maxlength="3000"
+          placeholder="Nhập mô tả chi tiết về sự kiện của bạn..."></textarea>
+        <small style="opacity:0.7;">(Bạn có thể nhập nhiều đoạn mô tả, tối đa 3000 ký tự)</small>
+      </div>
+    </div>
+
+    <div class="form-section" id="organizer-info">
+      <div class="row" style="align-items: flex-start;">
+        <div class="col-2" style="flex: 0 0 275px;">
+          <input type="file" id="logo-upload-input" hidden accept="image/*">
+          <div class="upload-box" id="logo-upload-box" style="height: 275px; width: 275px;">
+            <p>Thêm logo ban tổ chức</p>
+            <small>(275x275)</small>
+          </div>
+        </div>
+        <div class="col-2" style="flex: 1;">
+          <div class="form-group">
+            <label>
+              <span>*</span> Tên ban tổ chức
+              <small style="opacity:0.7;">(tối đa 80 ký tự)</small>
+            </label>
+            <input type="text" maxlength="80" placeholder="Tên ban tổ chức">
+          </div>
+          <div class="form-group">
+            <label>
+              <span>*</span> Thông tin ban tổ chức
+              <small style="opacity:0.7;">(tối đa 500 ký tự)</small>
+            </label>
+            <textarea maxlength="500" placeholder="Thông tin ban tổ chức"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" id="event-time">
+      <div class="form-group">
+        <label><span>*</span> Thời gian sự kiện</label>
+        <div class="row">
+          <div class="col-2">
+            <label><span>*</span> Ngày bắt đầu</label>
+            <input type="datetime-local" id="start-date">
+          </div>
+          <div class="col-2">
+            <label><span>*</span> Ngày kết thúc</label>
+            <input type="datetime-local" id="end-date">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" id="ticket-management">
+      <div class="form-group">
+        <label><span>*</span> Quản lý vé</label>
+        <div class="ticket-editor">
+          <div class="ticket-row" style="margin-bottom: 5px; opacity: 0.7;">
+            <label>Tên loại vé</label>
+            <label>Số lượng</label>
+            <label>Giá vé (VNĐ)</label>
+          </div>
+          <div id="ticket-list">
+          </div>
+          <button type="button" class="btn-add-ticket" id="add-ticket-btn">+ Thêm loại vé</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" id="payment-info">
+      <div class="form-group">
+        <label><span>*</span> Thông tin thanh toán</label>
+        <p style="opacity: 0.7; font-size: 0.9rem;">Thông tin này dùng để TicketBook chuyển khoản tiền vé cho bạn sau
+          khi sự kiện kết thúc.</p>
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <label><span>*</span> Tên ngân hàng</label>
+          <input type="text" placeholder="VD: Vietcombank">
+        </div>
+        <div class="col-2">
+          <label><span>*</span> Tên chủ tài khoản</label>
+          <input type="text" placeholder="Tên chủ tài khoản (viết hoa không dấu)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label><span>*</span> Số tài khoản</label>
+        <input type="text" placeholder="Nhập số tài khoản ngân hàng của bạn...">
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">Hoàn tất & Đăng sự kiện</button>
+
+  </div>
+
+  <script src="../../HomePage/js/events.js"></script>
+
+  <script>
+    // Script để ẩn/hiện form (Giữ nguyên)
+    const offlineFields = document.getElementById('offline-fields');
+    document.querySelectorAll('input[name="type"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'online' && radio.checked) {
+          offlineFields.style.display = 'none';
+        } else {
+          offlineFields.style.display = 'block';
+        }
+      });
+    });
+
+    // Script cho Quản lý vé
+    const ticketList = document.getElementById('ticket-list');
+    const addTicketBtn = document.getElementById('add-ticket-btn');
+
+    function createTicketRow() {
+      const row = document.createElement('div');
+      row.className = 'ticket-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Tên loại vé (VD: Vé VIP, Vé thường)" required>
+        <input type="number" placeholder="Số lượng" min="1" required>
+        <input type="number" placeholder="Giá vé (VNĐ)" min="0" required>
+        <button type="button" class="btn-remove-ticket">×</button>
+      `;
+      row.querySelector('.btn-remove-ticket').addEventListener('click', () => {
+        row.remove();
+      });
+      ticketList.appendChild(row);
+    }
+
+    addTicketBtn.addEventListener('click', createTicketRow);
+    createTicketRow(); // Tự động thêm 1 hàng vé
+
+    // === SCRIPT MỚI CHO UPLOAD HÌNH ẢNH ===
+    function setupUploadBox(boxId, inputId) {
+      const uploadBox = document.getElementById(boxId);
+      const fileInput = document.getElementById(inputId);
+
+      if (!uploadBox || !fileInput) return;
+
+      // 1. Mở cửa sổ chọn file khi click vào box
+      uploadBox.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      // 2. Hiển thị ảnh preview
+      fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          // Chỉ chạy nếu file là ảnh
+
+          // Tạo một FileReader để đọc file
+          const reader = new FileReader();
+
+          // Thiết lập sự kiện onload (khi file được đọc xong)
+          reader.onload = function (e) {
+            // e.target.result chứa dữ liệu ảnh (dạng data: URL)
+
+            // Xóa nội dung cũ (chữ "Thêm ảnh...")
+            uploadBox.innerHTML = '';
+
+            // Xóa padding để ảnh fill 100%
+            uploadBox.style.padding = '0';
+
+            // Tạo thẻ <img> mới
+            const img = document.createElement('img');
+            img.src = e.target.result; // Gán nguồn ảnh
+
+            // Thêm ảnh vào trong upload-box
+            uploadBox.appendChild(img);
+          };
+
+          // Bắt đầu đọc file ảnh
+          reader.readAsDataURL(file);
+
+        } else if (file) {
+          // Nếu chọn file nhưng không phải ảnh
+          uploadBox.innerHTML = `
+          <p style="color: var(--red); word-break: break-all; padding: 0 10px;">Lỗi: File không phải ảnh</p>
+          <small>Vui lòng chọn file .png hoặc .jpg. Nhấp để thay đổi.</small>
+      `;
+        }
+      });
+    }
+
+    // === SCRIPT AUTH (Giữ nguyên) ===
+    document.addEventListener('DOMContentLoaded', () => {
+      // Chạy hàm render Auth
+      if (typeof renderAuthUI === 'function') {
+        renderAuthUI();
+      }
+
+      // Gắn sự kiện cho các upload box
+      setupUploadBox('cover-upload-box', 'cover-upload-input');
+      setupUploadBox('logo-upload-box', 'logo-upload-input');
+    });
+  </script>
+</body>
+
+</html>

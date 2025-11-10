@@ -42,14 +42,20 @@ export async function getOrderDetail(orderId, userId, roles = []) {
             userId: true,
             showId: true,
             amount: true,
-            currency: true,      // ⬅️ lấy trực tiếp từ DB (cách 2)
+            currency: true,
             status: true,
             createdAt: true,
             show: {
                 select: {
                     id: true,
                     startsAt: true,
-                    event: { select: { id: true, name: true, city: true } }
+                    venue: true,
+                    event: {
+                        select: {
+                            id: true, name: true, city: true,
+                            cover: true
+                        }
+                    }
                 }
             },
             tickets: { select: { id: true, seatId: true, checkedInAt: true } }
