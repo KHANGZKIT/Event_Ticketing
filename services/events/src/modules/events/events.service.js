@@ -2,20 +2,32 @@ import { prisma } from "@app/db";
 
 /** GET /events */
 export async function listEvents(query) {
-    const { q, city, page = "1", pageSize = "10" } = query;
+
+    // Đọc tất cả query
+    const { q, city, category, page = "1", pageSize = "10" } = query;
+
     const take = Math.min(Number.parseInt(pageSize) || 10, 50);
     const skip = (Math.max(Number.parseInt(page) || 1, 1) - 1) * take;
 
+    // SỬA: Xây dựng 'whereEvent' KHÔNG CÓ 'q'
     const whereEvent = {
         deletedAt: null,
         ...(city ? { city } : {}),
-        ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
+        ...(category ? { category: category } : {}),
     };
 
-    // 1) Lấy page events (chỉ trường cơ bản, không lồng quan hệ để tránh N+1)
+    if (q) {
+        // Giờ nó sẽ tìm (name HOẶC category) chứa 'q'
+        whereEvent.OR = [
+            { name: { contains: q, mode: "insensitive" } },
+            { category: { contains: q, mode: "insensitive" } },
+        ];
+    }
+
+    // 1) Lấy page events
     const [events, total] = await Promise.all([
         prisma.event.findMany({
-            where: whereEvent,
+            where: whereEvent, // 'whereEvent' giờ đã chính xác
             skip,
             take,
             orderBy: { createdAt: "desc" },
@@ -27,6 +39,7 @@ export async function listEvents(query) {
                 startsAt: true,
                 createdAt: true,
                 updatedAt: true,
+                category: true, // Giờ dòng này đã an toàn
             },
         }),
         prisma.event.count({ where: whereEvent }),
@@ -39,7 +52,7 @@ export async function listEvents(query) {
     const eventIds = events.map(e => e.id);
     const now = new Date();
 
-    // 2) Lấy count shows sắp tới theo event (1 query)
+    // 2) Lấy count shows (Giữ nguyên)
     const counts = await prisma.show.groupBy({
         by: ["eventId"],
         where: {
@@ -51,7 +64,7 @@ export async function listEvents(query) {
         _count: { _all: true },
     });
 
-    // 3) Lấy min(startsAt) cho show sắp tới theo event (1 query)
+    // 3) Lấy min(startsAt) (Giữ nguyên)
     const mins = await prisma.show.groupBy({
         by: ["eventId"],
         where: {
@@ -74,7 +87,6 @@ export async function listEvents(query) {
 
     return { items, total, page: Number(page), pageSize: take };
 }
-
 /** GET /events/:id */
 export async function getEvent(id) {
     const ev = await prisma.event.findFirst({

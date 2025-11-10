@@ -379,6 +379,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.4s ease;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .event-card:hover {
@@ -803,4 +806,56 @@ button,
 
 .user-dropdown .dropdown-item:hover {
   background: #f3f6f8;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-color: #eee;
+  }
+
+  50% {
+    background-color: #e0e0e0;
+  }
+
+  100% {
+    background-color: #eee;
+  }
+}
+
+.skeleton-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+
+}
+
+.skeleton-img {
+  width: 100%;
+  height: 180px;
+  /* Chiều cao giống ảnh thật */
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  height: 20px;
+  margin: 12px;
+  border-radius: 4px;
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+/* Thêm vào file style.css */
+.event-location {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #bdc3c7;
+}
+
+.event-location svg {
+  vertical-align: middle;
+  margin-right: 4px;
 }

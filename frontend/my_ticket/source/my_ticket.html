@@ -4,8 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Vé Của Tôi</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Thêm style này để ẩn/hiện empty state */
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <script>
   // yêu cầu login trước khi xem trang
@@ -17,7 +23,7 @@
 
 <body>
   <div class="header">
-    <h1><a href="#">TicketBook</a></h1>
+    <a href="../../HomePage/source/TrangChu.html"><img src="../../HomePage/logo.svg" alt=""></a>
     <div class="search-bar">
       <input type="text" placeholder="Bạn tìm gì hôm nay?">
       <button>
@@ -49,7 +55,7 @@
           <circle cx="12" cy="10" r="4" />
           <circle cx="12" cy="12" r="10" />
         </svg>
-        <span>VTNAm</span>
+        <span id="headerUserName">...</span>
         <div class="dropdown-arrow">▼</div>
       </a>
     </div>
@@ -59,14 +65,14 @@
     <div class="left">
       <nav>
         <ul>
-          <li><a href="#" class="left-item active">
+          <li><a href="#" class="left-item">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 20a6 6 0 0 0-12 0" />
                 <circle cx="12" cy="10" r="4" />
                 <circle cx="12" cy="12" r="10" />
               </svg>
-              Tài khoản của VTNAm
+              <span id="sidebarTitle">Tài khoản</span>
             </a></li>
           <li><a href="#" class="left-item">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
@@ -87,7 +93,7 @@
               </svg>
               Thông tin tài khoản
             </a></li>
-          <li><a href="#" class="left-item">
+          <li><a href="#" class="left-item active">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -121,8 +127,7 @@
         <button class="tab">Đã hủy</button>
       </div>
 
-      <!-- Empty State -->
-      <!-- <div class="empty-state">
+      <div class="empty-state hidden">
         <div class="illustration">
           <div class="sun"></div>
           <div class="character"></div>
@@ -130,75 +135,364 @@
         </div>
         <h3>Bạn chưa có vé nào</h3>
         <p>Hãy mua vé sự kiện để có thể xem lịch sử vé của bạn ở đây</p>
-        <button class="cta-button">Khám phá sự kiện</button>
-      </div> -->
+        <a class="cta-button" href="/frontend/HomePage/source/TrangChu.html">Khám phá sự kiện</a>
+      </div>
+
       <div class="ticket-list">
-        <!-- Vé 1 -->
-        <div class="ticket-card">
-          <div class="ticket-qr">
-            <img src="..//Asset/qr.jpg" alt="QR Code">
-          </div>
-          <div class="ticket-info">
-            <h3>Concert BlackPink - World Tour 2025</h3>
-            <div class="ticket-details">
-              <p><strong>Giá vé:</strong> <span class="price">1.800.000đ</span></p>
-              <p><strong>Ngày diễn ra:</strong> 15 Tháng 11, 2025</p>
-              <p><strong>Thời gian:</strong> 19:00 - 22:00</p>
-              <p><strong>Địa điểm:</strong> Sân vận động Mỹ Đình, Hà Nội</p>
-            </div>
-            <div class="ticket-status success">
-              <span class="status-dot"></span> Thành công
-            </div>
-          </div>
-          <div class="ticket-actions">
-            <button class="btn-view">Xem chi tiết</button>
-            <button class="btn-download">Tải vé</button>
-          </div>
-        </div>
-        <div class="ticket-card">
-          <div class="ticket-qr">
-            <img src="..//Asset/qr.jpg" alt="QR Code">
-          </div>
-          <div class="ticket-info">
-            <h3>Concert BlackPink - World Tour 2025</h3>
-            <div class="ticket-details">
-              <p><strong>Giá vé:</strong> <span class="price">1.800.000đ</span></p>
-              <p><strong>Ngày diễn ra:</strong> 15 Tháng 11, 2025</p>
-              <p><strong>Thời gian:</strong> 19:00 - 22:00</p>
-              <p><strong>Địa điểm:</strong> Sân vận động Mỹ Đình, Hà Nội</p>
-            </div>
-            <div class="ticket-status success">
-              <span class="status-dot"></span> Thành công
-            </div>
-          </div>
-          <div class="ticket-actions">
-            <button class="btn-view">Xem chi tiết</button>
-            <button class="btn-download">Tải vé</button>
-          </div>
-        </div>
-        <div class="ticket-card">
-          <div class="ticket-qr">
-            <img src="..//Asset/qr.jpg" alt="QR Code">
-          </div>
-          <div class="ticket-info">
-            <h3>Concert BlackPink - World Tour 2025</h3>
-            <div class="ticket-details">
-              <p><strong>Giá vé:</strong> <span class="price">1.800.000đ</span></p>
-              <p><strong>Ngày diễn ra:</strong> 15 Tháng 11, 2025</p>
-              <p><strong>Thời gian:</strong> 19:00 - 22:00</p>
-              <p><strong>Địa điểm:</strong> Sân vận động Mỹ Đình, Hà Nội</p>
-            </div>
-            <div class="ticket-status success">
-              <span class="status-dot"></span> Thành công
-            </div>
-          </div>
-          <div class="ticket-actions">
-            <button class="btn-view">Xem chi tiết</button>
-            <button class="btn-download">Tải vé</button>
-          </div>
-        </div>
       </div>
     </div>
 </body>
+<script>
+  const API_BASE = 'http://localhost:4000/api';
+  const qs = new URLSearchParams(location.search);
+  // ======= Image cache & helpers (no QR) =======
+  const eventCache = new Map();   // eventId -> eventDetail (có image)
+  const imgCache = new Map();   // eventId -> final image url
+
+  // Ưu tiên các key tên thường gặp trong DB cho ảnh
+  function pickEventImage(ev = {}, show = {}) {
+    const keys = [
+      'image', 'imageUrl', 'poster', 'posterUrl', 'banner', 'bannerUrl', 'cover', 'coverUrl', 'thumbnail', 'thumbUrl'
+    ];
+    for (const k of keys) {
+      if (ev && ev[k]) return ev[k];
+      if (show && show[k]) return show[k];
+    }
+    return null;
+  }
+
+  async function fetchEventOnce(eventId) {
+    if (!eventId) return null;
+    if (eventCache.has(eventId)) return eventCache.get(eventId);
+    try {
+      const r = await fetch(`${API_BASE}/events/${eventId}`);
+      if (!r.ok) throw new Error();
+      const ev = await r.json();
+      eventCache.set(eventId, ev);
+      return ev;
+    } catch { return null; }
+  }
+
+  // Lấy url ảnh sự kiện (có cache). Nếu BE chưa trả ảnh trong /orders/:id,
+  // sẽ gọi thêm /events/:id đúng 1 lần cho mỗi event.
+  async function getEventImageUrl(eventId, show, eventFromDetail) {
+    if (imgCache.has(eventId)) return imgCache.get(eventId);
+
+    // 1) Ưu tiên ảnh có sẵn trong payload /orders/:id
+    let url = pickEventImage(eventFromDetail, show);
+
+    // 2) Nếu chưa có, fetch /events/:id một lần
+    if (!url && eventId) {
+      const ev = await fetchEventOnce(eventId);
+      url = pickEventImage(ev, show);
+    }
+
+    // 3) Fallback ảnh tĩnh từ HomePage (bạn có thể đổi path này theo bộ ảnh của bạn)
+    if (!url) url = '/frontend/HomePage/Asset/default_event.jpg';
+
+    imgCache.set(eventId, url);
+    return url;
+  }
+
+  /* ===== Auth helpers ===== */
+  function getToken() {
+    return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  }
+  async function getUser() {
+    const cached = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (cached) return JSON.parse(cached);
+    const token = getToken();
+    if (!token) return null;
+    try {
+      const r = await fetch(`${API_BASE}/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!r.ok) throw new Error();
+      const me = await r.json();
+      localStorage.setItem('user', JSON.stringify(me));
+      return me;
+    } catch { return null; }
+  }
+
+  /* ===== UI helpers ===== */
+  function vnd(n) { return new Intl.NumberFormat('vi-VN').format(n) + 'đ'; }
+  function fmtDateTime(s) {
+    const d = new Date(s); if (isNaN(d)) return '';
+    return d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+  function getFullName(me) {
+    if (!me) return '';
+    // tuỳ BE: dùng field nào có trước
+    return (
+      me.fullName ||
+      [me.firstName, me.lastName].filter(Boolean).join(' ') ||
+      me.name ||
+      me.username ||
+      me.email ||
+      ''
+    );
+  }
+
+  function setUserName(nameOrUser) {
+    const name = typeof nameOrUser === 'string' ? nameOrUser : getFullName(nameOrUser);
+    const h = document.getElementById('headerUserName');
+    const s = document.getElementById('sidebarTitle');
+    if (h) h.textContent = name || 'Tài khoản';
+    if (s) s.textContent = `Tài khoản của ${name || ''}`.trim();
+  }
+
+
+  /* ===== Orders & Tickets ===== */
+  /** /orders/my → { items:[{id, amount, status, createdAt, showId}], total, ... } */
+  async function fetchMyOrders() {
+    const token = getToken();
+    const r = await fetch(`${API_BASE}/orders/my`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (r.status === 401) {
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+      return Promise.reject(new Error('Unauthorized'));
+    }
+    if (!r.ok) throw new Error('Không tải được danh sách đơn hàng');
+    return r.json();
+  }
+
+  async function fetchOrderDetail(orderId) {
+    const token = getToken();
+    const r = await fetch(`${API_BASE}/orders/${orderId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (r.status === 401) {
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+      return Promise.reject(new Error('Unauthorized'));
+    }
+    if (!r.ok) throw new Error('Không tải được chi tiết đơn hàng');
+    return r.json();
+  }
+
+
+  /* FIX 3: Xóa hàm renderEmpty() cũ */
+
+
+  /** Render từng ticket thành thẻ */
+  function makeTicketCard({ ticket, order, show, event, imageUrl }) {
+    const seat = ticket?.seatId || ticket?.seat || '—';
+    const tier = ticket?.tier || ticket?.priceTier || '';
+    const price = ticket?.price || order?.amount || 0;
+
+    // map status -> class/label
+    const raw = (order?.status || '').toLowerCase();
+    const statusMap = {
+      paid: 'success', succeeded: 'success', success: 'success',
+      pending: 'pending', processing: 'pending',
+      canceled: 'cancel', cancelled: 'cancel', failed: 'cancel'
+    };
+    const statusClass = statusMap[raw] || 'success';
+    const statusLabel = statusClass === 'success' ? 'Thành công'
+      : statusClass === 'pending' ? 'Đang xử lý'
+        : 'Đã hủy';
+
+    const showName = (event?.name || show?.name || 'Sự kiện');
+    const venue = (show?.venue || event?.city || '');
+    const timeStr = fmtDateTime(show?.startsAt);
+    const img = imageUrl || '/frontend/HomePage/Asset/default_event.jpg';
+
+    return `
+  <div class="ticket-card" data-status="${statusClass}"> <div class="ticket-qr">
+      <img src="${img}" alt="${showName}" loading="lazy"
+           onerror="this.onerror=null;this.src='/frontend/HomePage/Asset/default_event.jpg'">
+    </div>
+    <div class="ticket-info">
+      <h3>${showName}</h3>
+      <div class="ticket-details">
+        <p><strong>Ghế:</strong> ${seat} ${tier ? `(${tier})` : ''}</p>
+        <p><strong>Giá vé:</strong> <span class="price">${vnd(price)}</span></p>
+        <p><strong>Ngày diễn ra:</strong> ${timeStr}</p>
+        <p><strong>Địa điểm:</strong> ${venue}</p>
+        <p><strong>Mã đơn:</strong> ${order.id}</p>
+      </div>
+      <div class="ticket-status ${statusClass}">
+        <span class="status-dot"></span> ${statusLabel}
+      </div>
+    </div>
+    <div class="ticket-actions">
+      <button class="btn-view" data-order="${order.id}" data-ticket="${ticket.id}">Xem chi tiết</button>
+      </div>
+  </div>`;
+  }
+
+  async function renderMyTickets() {
+    // FIX 3: Lấy tham chiếu đến .empty-state
+    const listEl = document.querySelector('.ticket-list');
+    const emptyEl = document.querySelector('.empty-state');
+
+    emptyEl?.classList.add('hidden'); // Luôn ẩn empty state khi bắt đầu
+    listEl.innerHTML = 'Đang tải vé của bạn...';
+    try {
+      const my = await fetchMyOrders();
+      const items = my?.items || [];
+
+      // FIX 3: Sửa logic
+      if (!items.length) {
+        listEl.innerHTML = ''; // Xóa chữ "Đang tải..."
+        emptyEl?.classList.remove('hidden'); // Hiện empty state
+        return;
+      }
+
+      // lấy chi tiết từng order (tickets + show + event)
+      const details = await Promise.all(items.map(o => fetchOrderDetail(o.id)));
+
+      const cards = [];
+      // Tập hợp eventId duy nhất để lấy ảnh (nếu thiếu)
+      const uniqueEventIds = new Set();
+
+      for (let i = 0; i < items.length; i++) {
+        const order = items[i];
+        const det = details[i] || {};
+        const tickets = det.tickets || [];
+        const show = det.show || det.data?.show || null;
+        const event = show?.event || det.event || det.data?.event || null;
+
+        if (event?.id) uniqueEventIds.add(event.id);
+
+        if (!tickets.length) {
+          // Vẫn render đơn hàng dù không có vé (ví dụ: đơn hàng thất bại)
+          const statusClass = (order.status || 'cancel').toLowerCase();
+          cards.push(`
+      <div class="ticket-card" data-status="${statusClass}">
+        <div class="ticket-info">
+          <h3>${event?.name || 'Sự kiện'}</h3>
+          <div class="ticket-details">
+            <p><strong>Đơn hàng:</strong> ${order.id}</p>
+            <p><strong>Trạng thái:</strong> ${order.status}</p>
+            <p><strong>Ngày tạo:</strong> ${fmtDateTime(order.createdAt)}</p>
+          </div>
+        </div>
+      </div>
+    `);
+          continue;
+        }
+
+        // Lấy url ảnh (cache theo eventId)
+        let imageUrl = '/frontend/HomePage/Asset/default_event.jpg';
+        if (event?.id) imageUrl = await getEventImageUrl(event.id, show, event);
+
+        tickets.forEach(tk => {
+          cards.push(makeTicketCard({ ticket: tk, order, show, event, imageUrl }));
+        });
+      }
+
+      listEl.innerHTML = cards.join('');
+      listEl.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const orderId = btn.getAttribute('data-order');
+          const ticketId = btn.getAttribute('data-ticket');
+          alert(`Order ${orderId}\nTicket ${ticketId}`);
+        });
+      });
+
+      // FIX 4: Gọi lại filterByTab sau khi render xong
+      // để áp dụng tab "Tất cả" cho các card vừa được tạo
+      filterByTab('all');
+
+    } catch (e) {
+      console.error(e);
+      listEl.innerHTML = `<p class="error">Lỗi khi tải vé của bạn. Vui lòng thử lại sau.</p>`;
+    }
+  }
+  /* ===== Filter tabs ===== */
+  function filterByTab(tabKey) {
+    const cards = document.querySelectorAll('.ticket-card');
+    let hasVisibleTickets = false;
+
+    cards.forEach(card => {
+      // Lấy trạng thái từ data-status
+      const st = card.getAttribute('data-status') || 'success';
+
+      const show =
+        tabKey === 'all' ||
+        (tabKey === 'success' && st.includes('success')) ||
+        (tabKey === 'pending' && st.includes('pending')) ||
+        (tabKey === 'cancel' && st.includes('cancel'));
+
+      card.style.display = show ? '' : 'none';
+      if (show) {
+        hasVisibleTickets = true;
+      }
+    });
+
+    // Nếu không có vé nào hiển thị sau khi lọc, CŨNG hiển thị empty state
+    const emptyEl = document.querySelector('.empty-state');
+    const listEl = document.querySelector('.ticket-list');
+
+    // Chỉ hiển thị empty state nếu không có thẻ nào VÀ list không rỗng (tránh trường hợp đang loading)
+    if (!hasVisibleTickets && listEl.innerHTML !== 'Đang tải vé của bạn...') {
+      emptyEl?.classList.remove('hidden');
+    } else {
+      emptyEl?.classList.add('hidden');
+    }
+  }
+
+
+  function wireTabs() {
+    const mapKey = (text) => {
+      const t = text.toLowerCase();
+      if (t.includes('thành công')) return 'success';
+      if (t.includes('đang xử lý')) return 'pending';
+      if (t.includes('đã hủy')) return 'cancel';
+      return 'all';
+    };
+
+    const tabs = document.querySelectorAll('.tabs .tab');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterByTab(mapKey(btn.textContent || ''));
+      });
+    });
+
+    // chọn mặc định “Tất cả”
+    const first = document.querySelector('.tabs .tab');
+    first?.classList.add('active');
+    // filterByTab('all'); // Tạm thời bỏ, để renderMyTickets gọi
+  }
+  wireTabs();
+  /* ===== Boot ===== */
+  // Guard để script chỉ chạy 1 lần
+  if (window.__MYTICKET_INITED__) {
+    console.debug('my_ticket: skip duplicate init');
+  } else {
+    window.__MYTICKET_INITED__ = true;
+  }
+
+  (async function init() {
+    if (window.__MYTNDAY_INITED_RAN__) return;
+    window.__MYTNDAY_INITED_RAN__ = true;
+    // ép login (bạn đã có đoạn redirect ở đầu file — giữ lại vẫn OK)
+    const token = getToken();
+    if (!token) {
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+      return;
+    }
+    const me = await getUser();
+    setUserName(me);
+
+    // đảm bảo link “Vé của tôi” đúng
+    document.querySelectorAll('.my-ticket a').forEach(a => a.href = '/frontend/my_ticket/source/my_ticket.html');
+
+    await renderMyTickets();
+  })();
+  // Tránh reload khi click các link '#'
+  document.querySelectorAll('a[href="#"]').forEach(a => {
+    a.addEventListener('click', e => e.preventDefault());
+  });
+
+  // Set đúng link "Vé của tôi" 1 lần (đã sửa - dùng đường dẫn tuyệt đối)
+  document.querySelectorAll('.my-ticket a').forEach(a => {
+    a.setAttribute('href', '/frontend/my_ticket/source/my_ticket.html');
+  });
+</script>
 
 </html>

@@ -11,16 +11,42 @@ const $ = (s) => document.querySelector(s);
 function toURL(rel) { return new URL(rel, window.location.href).toString(); }
 
 function storage(remember) { return remember ? localStorage : sessionStorage; }
+// logreg.js — patch trong saveAuth(...)
 function saveAuth(token, me, remember) {
   const st = remember ? localStorage : sessionStorage;
-  // Keys cũ của bạn
+
+  const display =
+    me.fullName || me.displayName || me.name || me.username || me.email || "User";
+
   st.setItem('accessToken', token);
   st.setItem('currentUser', JSON.stringify(me || {}));
-  // Thêm các key mà TrangChu đang đọc
-  st.setItem('user', JSON.stringify(me || {}));
+
+  // các key mà TrangChu / header đang đọc:
+  st.setItem('user', JSON.stringify({
+    id: me.id,
+    fullName: me.fullName || null,
+    name: display,           // luôn là tên hiển thị “đẹp”
+    email: me.email || null,
+    avatar: me.avatar || me.avatarUrl || me.photoURL || null,
+    roles: me.roles || me.user?.roles || []
+  }));
+
   st.setItem('profile', JSON.stringify(me || {}));
-  st.setItem('auth', JSON.stringify({ token, user: me || {} }));
+
+  // đồng bộ 'auth' để renderAuthUI dùng đúng trường
+  st.setItem('auth', JSON.stringify({
+    token,
+    user: {
+      id: me.id,
+      fullName: me.fullName || null,
+      name: display,
+      email: me.email || null,
+      avatar: me.avatar || me.avatarUrl || me.photoURL || null,
+      roles: me.roles || me.user?.roles || []
+    }
+  }));
 }
+
 function clearAuthAll() {
   const keys = ['auth', 'accessToken', 'token', 'user', 'profile', 'currentUser'];
   keys.forEach(k => {
