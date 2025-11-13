@@ -16,7 +16,7 @@ export const routes = [
     { prefix: '/api/events', target: ensureUrl('EVENT_SVC_URL'),   /* rewrite: '/events' */ },
     { prefix: "/api/dashboard", target: ensureUrl("EVENT_SVC_URL", "http://localhost:4102") },
     { prefix: '/api/shows', target: ensureUrl('SHOW_SVC_URL'),    /* rewrite: '/shows'  */ },
-    { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL') },
+    { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL'), rewrite: '/api/holds', auth: true },
     { prefix: '/api/orders', target: ensureUrl('ORDER_SVC_URL') },
     { prefix: '/api/payments', target: ensureUrl('PAYMENT_SVC_URL') },
     { prefix: '/api/tickets', target: ensureUrl('TICKET_SVC_URL') },

@@ -26,6 +26,13 @@ async function scrapeEventInfo(url) {
         
         // Set user agent để tránh bị chặn
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+
+        // Nếu có cookie đăng nhập (TICKETBOX_COOKIE), thêm vào để truy cập nội dung yêu cầu login
+        if (process.env.TICKETBOX_COOKIE) {
+            await page.setExtraHTTPHeaders({
+                'Cookie': process.env.TICKETBOX_COOKIE,
+            });
+        }
         
         await page.goto(url, {
             waitUntil: 'networkidle2',
@@ -223,7 +230,9 @@ async function getEventUrls(maxEvents = 20) {
         const page = await browser.newPage();
         // Set headers để giả lập trình duyệt thật
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-        await page.setExtraHTTPHeaders({
+
+        // Nếu có cookie đăng nhập (TICKETBOX_COOKIE) thì thêm vào header để tránh bị chặn
+        const extraHeaders = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -233,16 +242,36 @@ async function getEventUrls(maxEvents = 20) {
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'none',
             'Cache-Control': 'max-age=0'
-        });
+        };
+        if (process.env.TICKETBOX_COOKIE) {
+            extraHeaders['Cookie'] = process.env.TICKETBOX_COOKIE;
+        }
+        await page.setExtraHTTPHeaders(extraHeaders);
 
-        console.log('   Đang truy cập trang chủ...');
-        await page.goto('https://www.ticketbox.vn/', {
-            waitUntil: 'domcontentloaded',
+        const startUrl = process.env.START_URL || 'https://www.ticketbox.vn/';
+        console.log(`   Đang truy cập: ${startUrl}`);
+        await page.goto(startUrl, {
+            waitUntil: 'networkidle2',
             timeout: 30000
         });
 
-        // Đợi một chút để JavaScript render
-        await page.waitForTimeout(3000);
+        // Đợi JS render + auto scroll để lazy-load thêm thẻ
+        await new Promise((r) => setTimeout(r, 1500));
+        try {
+            await page.evaluate(async () => {
+                await new Promise((resolve) => {
+                    let total = 0;
+                    const step = () => {
+                        const { scrollHeight } = document.documentElement;
+                        window.scrollBy(0, 800);
+                        total += 800;
+                        if (total >= scrollHeight || total > 12000) return resolve();
+                        setTimeout(step, 200);
+                    };
+                    step();
+                });
+            });
+        } catch {}
 
         // Kiểm tra xem có bị chặn không
         const pageContent = await page.content();
@@ -254,38 +283,71 @@ async function getEventUrls(maxEvents = 20) {
         
         const urls = await page.evaluate((max) => {
             const links = new Set();
-            
-            // Tìm tất cả links có chứa "event"
-            const allLinks = document.querySelectorAll('a[href]');
-            for (const link of allLinks) {
-                const href = link.getAttribute('href');
-                if (!href) continue;
-                
-                // Kiểm tra các pattern URL phổ biến của ticketbox
-                if (href.includes('/event/') || 
-                    href.includes('/events/') || 
-                    href.includes('/su-kien/') ||
-                    href.match(/\/[^\/]+-\d+\.html/) ||
-                    (href.includes('ticketbox.vn') && href.length > 30)) {
-                    
-                    let fullUrl = href;
-                    if (!href.startsWith('http')) {
-                        if (href.startsWith('/')) {
-                            fullUrl = `https://www.ticketbox.vn${href}`;
-                        } else {
-                            fullUrl = `https://www.ticketbox.vn/${href}`;
-                        }
-                    }
-                    
-                    // Lọc bỏ các URL không phải event (như login, register, etc)
-                    if (!fullUrl.includes('/login') && 
-                        !fullUrl.includes('/register') && 
-                        !fullUrl.includes('/search') &&
-                        !fullUrl.includes('/category') &&
-                        fullUrl.includes('ticketbox.vn')) {
-                        links.add(fullUrl);
-                    }
+
+            const normalizeUrl = (url) => {
+                try {
+                    const u = new URL(url);
+                    u.search = ''; // bỏ UTM và query rác
+                    u.hash = '';
+                    return u.toString();
+                } catch {
+                    return url;
                 }
+            };
+
+            const isEventPath = (p) => {
+                if (!p) return false;
+                const low = p.toLowerCase();
+                // Chấp nhận:
+                //  - /event/... hoặc /su-kien/...
+                //  - slug kết thúc bằng -<id> hoặc .html
+                const slugId = /\/[a-z0-9\-]+-\d+(?:\.html)?$/i.test(low);
+                const hasKnownPrefix = (low.includes('/event/') || low.includes('/su-kien/'));
+                if (!(slugId || hasKnownPrefix)) return false;
+                // Loại trừ các trang policy/terms/organizer/etc
+                const bad = ['terms', 'policy', 'privacy', 'regulations', 'organizer', 'customer', 'login', 'register'];
+                return !bad.some(b => low.includes(b));
+            };
+
+            // Ưu tiên: chọn các thẻ event card phổ biến trước
+            const selectors = [
+                'a[href*="/event/"]',
+                'a[href*="/su-kien/"]',
+            ];
+            for (const sel of selectors) {
+                document.querySelectorAll(sel).forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href) return;
+                    let url = href;
+                    if (!href.startsWith('http')) {
+                        url = href.startsWith('/') ? `https://www.ticketbox.vn${href}` : `https://www.ticketbox.vn/${href}`;
+                    }
+                    try {
+                        const u = new URL(url);
+                        if (u.hostname.includes('ticketbox.vn') && isEventPath(u.pathname)) {
+                            links.add(normalizeUrl(u.toString()));
+                        }
+                    } catch {}
+                });
+            }
+
+            // Fallback: quét tất cả <a> nếu chưa đủ
+            if (links.size < max) {
+                document.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href) return;
+                    let url = href;
+                    if (!href.startsWith('http')) {
+                        url = href.startsWith('/') ? `https://www.ticketbox.vn${href}` : `https://www.ticketbox.vn/${href}`;
+                    }
+                    try {
+                        const u = new URL(url);
+                        if (!u.hostname.includes('ticketbox.vn')) return;
+                        if (isEventPath(u.pathname)) {
+                            links.add(normalizeUrl(u.toString()));
+                        }
+                    } catch {}
+                });
             }
 
             // Nếu không tìm thấy, thử tìm trong các element có class liên quan đến event
@@ -296,12 +358,15 @@ async function getEventUrls(maxEvents = 20) {
                     if (link) {
                         const href = link.getAttribute('href');
                         if (href) {
-                            const fullUrl = href.startsWith('http') 
-                                ? href 
+                            const fullUrl = href.startsWith('http')
+                                ? href
                                 : `https://www.ticketbox.vn${href.startsWith('/') ? href : '/' + href}`;
-                            if (!fullUrl.includes('/login') && fullUrl.includes('ticketbox.vn')) {
-                                links.add(fullUrl);
-                            }
+                            try {
+                                const u = new URL(fullUrl);
+                                if (u.hostname.includes('ticketbox.vn') && isEventPath(u.pathname)) {
+                                    links.add(normalizeUrl(u.toString()));
+                                }
+                            } catch {}
                         }
                     }
                 }

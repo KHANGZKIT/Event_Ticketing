@@ -4,6 +4,24 @@
 const API_BASE = "http://localhost:4000/api";
 const EVENTS_BASE = `${API_BASE}/events`;
 
+// ========================
+// AUTH HELPERS
+// ========================
+function getAuthToken() {
+  const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+  if (authStr) {
+    try {
+      const auth = JSON.parse(authStr);
+      if (auth?.token) return auth.token;
+    } catch {}
+  }
+  return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
+}
+
+function isAuthenticated() {
+  return !!getAuthToken();
+}
+
 // ------------------------
 // Helpers
 // ------------------------
@@ -28,6 +46,7 @@ let priceTiers = {};
 let seats = [];
 let selected = new Map();
 let purchasing = new Set();
+let currentHoldId = null; // Lưu holdId khi tạo hold
 const PRICE_DEFAULT = { vip: 150000, normal: 100000 };
 
 // ------------------------
@@ -238,10 +257,10 @@ async function loadSeatMap(showId) {
       }
     }
   }
-  // 3) Fallback mặc định
+  // 3) Fallback mặc định - giảm số ghế để tránh tràn
   else {
     seats = [];
-    const ROWS = 10, COLS = 14;
+    const ROWS = 8, COLS = 12;
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         seats.push({
@@ -293,8 +312,13 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
   } else {
     seatMapEl.style.display = "grid";
     const maxCol = Math.max(...seatList.map(s => Number(s.col ?? 0))) + 1 || 14;
-    seatMapEl.style.gridTemplateColumns = `repeat(${maxCol}, minmax(36px, 1fr))`;
-    seatMapEl.style.gap = "6px";
+    // Grid không có cột label, chỉ có ghế - layout compact hơn
+    seatMapEl.style.gridTemplateColumns = `repeat(${maxCol}, var(--seat-size))`;
+    seatMapEl.style.gap = "var(--seat-gap)";
+    seatMapEl.style.justifyContent = "center";
+    seatMapEl.style.alignItems = "center";
+    seatMapEl.style.width = "100%";
+    seatMapEl.style.maxWidth = "100%";
 
     const sorted = [...seatList].sort((a, b) => {
       const ra = a.row ?? 9999, rb = b.row ?? 9999;
@@ -304,11 +328,15 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
       return String(a.label).localeCompare(String(b.label), "vi");
     });
 
+    // Render ghế không có nhãn hàng/cột riêng - hiển thị đầy đủ label trên ghế
     sorted.forEach(s => {
       const price = getPriceForTier(s.tier);
       const btn = document.createElement("button");
       btn.className = 'seat ' + tierClass(s.tier);
+      // Hiển thị đầy đủ label ghế (ví dụ: A1, B2, C3...)
       btn.textContent = s.label;
+      btn.setAttribute('aria-label', `Ghế ${s.label}`);
+      btn.setAttribute('title', `Ghế ${s.label} - ${s.tier}`);
       applyStatus(btn, s.label, heldSet, bookedSet);
       btn.addEventListener("click", () => toggleSelect(btn, s.label, s.tier, price));
       seatMapEl.appendChild(btn);
@@ -320,11 +348,16 @@ function applyStatus(el, label, heldSet, bookedSet) {
   else if (heldSet.has(label)) { el.classList.add("held"); el.disabled = true; }
 }
 
-function toggleSelect(btn, label, tier, price) {
+async function toggleSelect(btn, label, tier, price) {
   if (btn.classList.contains("booked") || btn.classList.contains("held")) return;
+  
   const isOn = btn.classList.toggle("selected");
-  if (isOn) selected.set(label, { tier, price });
-  else selected.delete(label);
+  if (isOn) {
+    selected.set(label, { tier, price });
+    // Nếu đã có hold cũ, có thể cần cập nhật (tùy chọn)
+  } else {
+    selected.delete(label);
+  }
   renderCart();
 }
 
@@ -389,16 +422,113 @@ modalClose?.addEventListener('click', closeModal);
 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
 
-modalPay?.addEventListener('click', () => {
-  // demo: đánh dấu booked + reset giỏ
-  document.querySelectorAll('.seat.selected').forEach(el => {
-    el.classList.remove('selected');
-    el.classList.add('booked');
-    el.disabled = true;
-  });
-  selected.clear();
-  renderCart();
-  closeModal();
+// Trạng thái để tránh click nhiều lần
+let isCreatingHold = false;
+
+modalPay?.addEventListener('click', async () => {
+  // Tránh click nhiều lần
+  if (isCreatingHold) {
+    console.log('Hold đang được tạo, vui lòng đợi...');
+    return;
+  }
+
+  if (!isAuthenticated()) {
+    alert('Vui lòng đăng nhập để đặt vé.');
+    const redirectTo = encodeURIComponent(location.href);
+    window.location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${redirectTo}`;
+    return;
+  }
+
+  if (!currentShowId || selected.size === 0) {
+    alert('Vui lòng chọn ghế trước khi đặt vé.');
+    return;
+  }
+
+  const token = getAuthToken();
+  const seatLabels = [...selected.keys()];
+  
+  // Tạo idempotency key để tránh duplicate requests (dùng crypto.randomUUID nếu có, hoặc timestamp + random)
+  const idempotencyKey = `${currentShowId}-${seatLabels.sort().join(',')}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+  
+  // Disable button và set trạng thái
+  isCreatingHold = true;
+  if (modalPay) {
+    modalPay.disabled = true;
+    const originalText = modalPay.textContent;
+    modalPay.textContent = 'Đang xử lý...';
+    
+    try {
+      // Tạo hold với API
+      const holdResponse = await fetchJSON(`${API_BASE}/holds`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Idempotency-Key': idempotencyKey
+        },
+        body: JSON.stringify({
+          showId: currentShowId,
+          seats: seatLabels,
+          ttlSec: 900 // 15 phút
+        })
+      });
+
+      if (holdResponse && holdResponse.ok && holdResponse.holdId) {
+        currentHoldId = holdResponse.holdId;
+        
+        // Chuyển đến trang thanh toán với dữ liệu
+        const purchaseParams = new URLSearchParams({
+          showId: currentShowId,
+          holdId: holdResponse.holdId,
+          seats: seatLabels.join(','),
+          eventId: eventIdParam || ''
+        });
+        
+        // Lưu thông tin vào sessionStorage để purchaseUI có thể dùng
+        sessionStorage.setItem('purchaseData', JSON.stringify({
+          showId: currentShowId,
+          holdId: holdResponse.holdId,
+          eventId: eventIdParam || '',
+          seats: seatLabels,
+          selectedSeats: Object.fromEntries(selected),
+          expiresAt: holdResponse.expiresAt
+        }));
+
+        window.location.href = `/frontend/PurchaseUI/thanhToan.html?${purchaseParams.toString()}`;
+      } else {
+        // Xử lý lỗi conflict rõ ràng hơn
+        let errorMessage = 'Không thể đặt ghế. Vui lòng thử lại.';
+        if (holdResponse?.reason === 'conflict' || holdResponse?.conflicts) {
+          const conflicts = holdResponse.conflicts || [];
+          errorMessage = `Ghế ${conflicts.join(', ')} đã được người khác chọn. Vui lòng chọn ghế khác.`;
+        } else if (holdResponse?.reason) {
+          errorMessage = `Lỗi: ${holdResponse.reason}`;
+        }
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error creating hold:', error);
+      
+      // Xử lý lỗi HTTP 409 Conflict
+      let errorMessage = 'Không thể đặt ghế. Vui lòng thử lại.';
+      if (error.message && error.message.includes('409')) {
+        errorMessage = 'Ghế đã được người khác chọn hoặc đang được giữ. Vui lòng chọn ghế khác.';
+      } else if (error.message && error.message.includes('already held')) {
+        errorMessage = error.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(`Lỗi: ${errorMessage}`);
+      
+      // Reset button
+      modalPay.disabled = false;
+      modalPay.textContent = originalText;
+      isCreatingHold = false;
+    }
+  } else {
+    isCreatingHold = false;
+  }
 });
 
 
@@ -452,4 +582,9 @@ function updateLegendPrices() {
   const norm = document.querySelector('#priceNormal');
   if (vip) vip.textContent = vnd(getPriceForTier('VIP'));
   if (norm) norm.textContent = vnd(getPriceForTier('A') || getPriceForTier('normal'));
+
+  const legVip = document.querySelector('#legendVipPrice');
+  const legNorm = document.querySelector('#legendNormalPrice');
+  if (legVip) legVip.textContent = vnd(getPriceForTier('VIP'));
+  if (legNorm) legNorm.textContent = vnd(getPriceForTier('A') || getPriceForTier('normal'));
 }

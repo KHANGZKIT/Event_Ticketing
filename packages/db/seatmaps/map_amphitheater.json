@@ -1,0 +1,114 @@
+{
+  "id": "map_amphitheater",
+  "name": "Amphitheater – Outdoor",
+  "priceTiers": {
+    "VIP": 800000,
+    "A": 500000,
+    "B": 300000,
+    "C": 180000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 16
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "L",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "M",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "N",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "O",
+          "from": 1,
+          "to": 26
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "center",
+    "type": "outdoor",
+    "semicircle": true
+  }
+}
+

@@ -7,14 +7,26 @@ export async function getIdem(userId, key) {
     if (!key) {
         return null;
     }
-    const r = getRedis();
-    return JSON.parse(await r.get(idemKey(userId, key)) || 'null');
+    try {
+        const r = getRedis();
+        const val = await r.get(idemKey(userId, key));
+        if (!val) return null;
+        return JSON.parse(val);
+    } catch (e) {
+        console.error('[idempotency.getIdem] error:', e);
+        return null;
+    }
 }
 
 export async function setIdem(userId, key, payload) {
     if (!key) {
         return;
     }
-    const r = getRedis();
-    await r.setex(idemKey(userId, key), IDEM_TTL, JSON.stringify(payload));
+    try {
+        const r = getRedis();
+        await r.setex(idemKey(userId, key), IDEM_TTL, JSON.stringify(payload));
+    } catch (e) {
+        console.error('[idempotency.setIdem] error:', e);
+        // Không throw để không làm gián đoạn flow chính
+    }
 }

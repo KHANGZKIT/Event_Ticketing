@@ -32,11 +32,12 @@ function matchRoute(pathname) {
 // Handler chính
 app.use((req, res) => {
     const route = matchRoute(req.path);
-    console.log('route:', route); // debug
+    console.log('[gateway]', req.method, req.path, '→ route:', route?.prefix || 'NO_MATCH'); // debug
 
     if (!route) {
+        console.error('[gateway] No route found for:', req.path);
         return res.status(404).json({
-            error: { code: 'NO_ROUTE', message: 'No matching route' }
+            error: { code: 'NO_ROUTE', message: `No matching route for ${req.path}` }
         });
     }
 

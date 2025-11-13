@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đặt vé sự kiện - Ticketbox</title>
+  <meta name="theme-color" content="#22c55e">
+  <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
+  <link rel="stylesheet" href="thanhToanStyle.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <a href="../HomePage/source/TrangChu.html"><img src="./logo.svg" alt=""></a>
+    <form class="search-bar" action="../Ticketbox/code/events-search.html" method="GET">
+      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off"> 
+      <button type="submit"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21 21-4.34-4.34" />
+          <circle cx="11" cy="11" r="8" />
+        </svg>
+      </button>
+    </form>
+
+    <div class="my-ticket">
+      <a href="../my_ticket/source/my_ticket.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+          <path d="M13 5v2" />
+          <path d="M13 17v2" />
+          <path d="M13 11v2" />
+        </svg>
+        <span>Vé của tôi</span>
+      </a>
+    </div>
+    <a href="../Ticketbox/code/create-event.html" class="btn-create-event"
+      style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.15); color: white; padding: 12px 20px; border-radius: 50px; font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.4s ease; margin-left: 10px;">
+      Tạo sự kiện
+    </a>
+    <div id="authArea" class="auth-area">
+      <div class="login">
+        <a href="../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">...</a>
+        <a href="../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">...</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="event-info">
+        <h1 class="event-title">[DELODELO SHOW] TRẠM YÊU - YÊU LẠI TỪ ĐẦU</h1>
+        <div class="event-details">
+          <div class="event-detail-item">
+            <span aria-hidden="true">📅</span>
+            <span>19:30 - 22:30, 11 Tháng 01, 2026</span>
+          </div>
+          <div class="event-detail-item">
+            <span aria-hidden="true">📍</span>
+            <span>Cung Điền Kinh Mỹ Đình</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="countdown-box" aria-live="polite">
+        <div class="countdown-label">Hoàn tất đặt vé trong</div>
+        <div class="countdown-timer" id="countdown" data-seconds="">
+          <div class="countdown-digit" id="minutes">15</div>
+          <div class="countdown-separator">:</div>
+          <div class="countdown-digit" id="seconds">00</div>
+        </div>
+        <p class="countdown-note" id="countdownNote" hidden>Hết thời gian giữ chỗ. Vui lòng tải lại trang để đặt vé.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container" id="mainContent">
+    <!-- Form Section -->
+    <section aria-labelledby="sectionFormTitle">
+      <h2 class="section-title" id="sectionFormTitle">BẢNG CÂU HỎI</h2>
+
+      <article class="form-card" aria-labelledby="ticket-label-name">
+        <header class="form-header">
+          <h3 id="ticket-label-name">LÃNG MẠN 3 - C</h3>
+          <button class="collapse-btn" type="button" aria-expanded="true" aria-controls="questionnaire">−</button>
+        </header>
+
+        <div id="questionnaire">
+          <div class="agreement-section">
+            <p class="agreement-text">
+              Tôi đồng ý cung cấp thông tin cho Ticketbox và BTC DeloDelo nhằm mục đích vận hành sự kiện.
+            </p>
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="agreeCheckbox" />
+              <span>Tôi đồng ý</span>
+            </label>
+          </div>
+
+          <form id="ticketForm" novalidate autocomplete="on">
+            <div class="form-group">
+              <label class="form-label" for="fullName">
+                Họ và Tên / Full name <span class="required">*</span>
+              </label>
+              <input type="text" class="form-input" id="fullName" placeholder="Điền câu trả lời của bạn" required/>
+              <p class="field-error" id="errorFullName" role="alert" aria-live="polite"></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">
+                Số điện thoại / Phone number <span class="required">*</span>
+              </label>
+              <input type="tel" inputmode="tel" class="form-input" id="phone" placeholder="VD: 0912345678" required/>
+              <p class="field-error" id="errorPhone" role="alert" aria-live="polite"></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">
+                Thư điện tử / Email <span class="required">*</span>
+              </label>
+              <p class="form-hint">Lưu ý: Vui lòng cung cấp chính xác địa chỉ email</p>
+              <input type="email" class="form-input" id="email" placeholder="name@example.com" required/>
+              <p class="field-error" id="errorEmail" role="alert" aria-live="polite"></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="taxInfo">
+                Nếu cần xuất hoá đơn VAT vui lòng cung cấp thông tin đầy đủ (mô tả):
+              </label>
+              <p class="form-hint">Họ & Tên / Email / MST cần nhận hoá đơn VAT</p>
+              <input type="text" class="form-input" id="taxInfo" placeholder="Điền câu trả lời của bạn"/>
+            </div>
+          </form>
+        </div>
+      </article>
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-labelledby="summaryTitle">
+      <div class="ticket-summary" data-unit-price="1390000">
+        <div class="summary-header">
+          <h2 id="summaryTitle">Thông tin đặt vé</h2>
+          <a href="#" class="change-ticket-btn" id="changeTicketBtn" style="text-decoration: none;">Chọn lại vé</a>
+        </div>
+
+        <div>
+          <div class="ticket-row" style="border-top: 1px solid #e5e7eb">
+            <span class="ticket-label">Loại vé</span>
+            <span class="ticket-label">Số lượng</span>
+          </div>
+
+          <div class="ticket-row">
+            <span class="ticket-name" id="ticket-name" style="font-size: .95rem">LÃNG MẠN 3 - C</span>
+            <div class="quantity-controls">
+              <button class="qty-btn" id="btnMinus" type="button" aria-label="Giảm 1 ghế">−</button>
+              <span class="qty-display" id="quantity" aria-live="polite">1</span>
+              <button class="qty-btn" id="btnPlus" type="button" aria-label="Tăng 1 ghế">+</button>
+            </div>
+          </div>
+
+          <div class="ticket-price">
+            <span id="unitPrice" aria-label="Giá một vé">1.390.000 đ</span>
+          </div>
+        </div>
+
+        <div class="voucher">
+          <label for="voucherInput" class="voucher-label">Mã giảm giá (tuỳ chọn)</label>
+          <div class="voucher-row">
+            <input id="voucherInput" class="form-input" placeholder="Nhập mã (VD: DELO10)">
+            <button id="applyVoucher" class="btn-ghost" type="button">Áp dụng</button>
+          </div>
+          <p class="voucher-msg" id="voucherMsg" aria-live="polite"></p>
+        </div>
+
+        <div class="summary-total" aria-live="polite">
+          <div class="total-row">
+            <span class="total-label" id="subtotalLabel">Tạm tính 1 ghế</span>
+            <span class="total-amount" id="totalAmount">1.390.000 đ</span>
+          </div>
+          <div class="total-row save-row" id="saveRow" hidden>
+            <span>Tiết kiệm</span>
+            <span id="saveAmount">0 đ</span>
+          </div>
+          <p class="note" id="noteInstruction">Vui lòng trả lời tất cả câu hỏi để tiếp tục</p>
+          <button class="btn-continue" id="continueBtn" disabled type="button" aria-disabled="true">
+            Next<span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  
+
+  <script>
+    // ===== Auth Helpers =====
+    function getStoredAuth() {
+      try {
+        const authStr =
+          localStorage.getItem('auth') || sessionStorage.getItem('auth');
+        if (authStr) {
+          const auth = JSON.parse(authStr);
+          if (auth?.token && auth?.user) return { token: auth.token, user: auth.user };
+        }
+        const token =
+          localStorage.getItem('accessToken') ||
+          localStorage.getItem('token') ||
+          sessionStorage.getItem('accessToken') ||
+          sessionStorage.getItem('token') ||
+          null;
+        const profileRaw =
+          localStorage.getItem('user') ||
+          localStorage.getItem('profile') ||
+          localStorage.getItem('currentUser') ||
+          sessionStorage.getItem('user') ||
+          sessionStorage.getItem('profile') ||
+          sessionStorage.getItem('currentUser') ||
+          null;
+        const profile = profileRaw ? JSON.parse(profileRaw) : null;
+        if (token && profile) return { token, user: profile };
+        return null;
+      } catch {
+        return null;
+      }
+    }
+
+    function pastelFromString(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (h * 31 + str.charCodeAt(i)) >>> 0;
+      }
+      const hue = h % 360;
+      const sat = 65;
+      const lig = 72;
+      return `hsl(${hue} ${sat}% ${lig}%)`;
+    }
+
+    function getInitials(name = 'U') {
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function buildLoggedOutHTML() {
+      return `
+        <div class="login">
+          <a href="../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m10 17 5-5-5-5" />
+              <path d="M15 12H3" />
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            </svg>
+            Đăng nhập
+          </a>
+          <a href="../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" x2="19" y1="8" y2="14" />
+              <line x1="22" x2="16" y1="11" y2="11" />
+            </svg>
+            Đăng ký
+          </a>
+        </div>
+      `;
+    }
+
+    function buildLoggedInHTML(displayName, avatarUrl, initials = 'U', bg = '#e5e7eb') {
+      return `
+        <div class="user-menu">
+          <button class="user-btn" type="button" aria-haspopup="true" aria-expanded="false">
+            <img src="${avatarUrl || ''}" alt="" class="avatar"
+                 onerror="this.style.display='none';" />
+            <div class="avatar-fallback" title="${displayName}" style="background:${bg};">
+              ${initials}
+            </div>
+            <span class="user-name">${displayName}</span>
+            <svg class="caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="user-dropdown" hidden>
+            <a href="../my_ticket/source/my_ticket.html" class="dropdown-item" id="gotoMyTickets">Vé của tôi</a>
+            <a href="#" class="dropdown-item" id="logoutBtn">Đăng xuất</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function clearAuthStorage() {
+      localStorage.removeItem('auth');
+      sessionStorage.removeItem('auth');
+      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+      localStorage.removeItem('profile');
+      sessionStorage.removeItem('profile');
+    }
+
+    function renderAuthUI() {
+      const host = document.querySelector('#authArea');
+      if (!host) return;
+
+      const auth = getStoredAuth();
+      if (!auth) {
+        host.innerHTML = buildLoggedOutHTML();
+        const mt = document.querySelector('.my-ticket');
+        if (mt) mt.style.display = '';
+        return;
+      }
+
+      const u = auth.user || {};
+      const name = u.fullName || u.name || u.username || u.displayName || 'User';
+      const avatar = u.avatar || u.avatarUrl || u.photoURL || '';
+      const initials = getInitials(name);
+      const bg = pastelFromString(name);
+      host.innerHTML = buildLoggedInHTML(name, avatar, initials, bg);
+
+      const mt = document.querySelector('.my-ticket');
+      if (mt) mt.style.display = 'none';
+
+      const btn = host.querySelector('.user-btn');
+      const dd = host.querySelector('.user-dropdown');
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = dd.hasAttribute('hidden');
+        if (willOpen) dd.removeAttribute('hidden'); else dd.setAttribute('hidden', '');
+        btn.setAttribute('aria-expanded', String(willOpen));
+      });
+      document.addEventListener('click', (e) => {
+        if (!host.contains(e.target)) dd.setAttribute('hidden', '');
+      });
+
+      host.querySelector('#logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        clearAuthStorage();
+        renderAuthUI();
+      });
+    }
+
+    // ===== GỌI renderAuthUI() =====
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderAuthUI);
+    } else {
+      renderAuthUI();
+    }
+
+    // Auto cập nhật nếu login ở tab khác
+    window.addEventListener('storage', (e) => {
+      if (['auth', 'accessToken', 'token', 'user', 'profile'].includes(e.key)) {
+        renderAuthUI();
+      }
+    });
+  </script>
+  <script src="thanhToanJS.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "id": "map_music_club",
+  "name": "Music Club – Standing & Seated",
+  "priceTiers": {
+    "VIP": 400000,
+    "A": 250000,
+    "B": 150000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 6
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 8
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 8
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

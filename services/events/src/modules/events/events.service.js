@@ -13,8 +13,24 @@ export async function listEvents(query) {
     const whereEvent = {
         deletedAt: null,
         ...(city ? { city } : {}),
-        ...(category ? { category: category } : {}),
     };
+
+    // Category handling:
+    // - if category === 'other' → include events with null/empty/'other'
+    // - if category provided and not 'other' and no search 'q' → exact match
+    if (category) {
+        if (category === 'other') {
+            whereEvent.OR = [
+                ...(whereEvent.OR || []),
+                { category: null },
+                { category: '' },
+                { category: 'other' },
+            ];
+        } else if (!q) {
+            // only enforce strict category when not performing a text search
+            whereEvent.category = category;
+        }
+    }
 
     if (q) {
         // Giờ nó sẽ tìm (name HOẶC category) chứa 'q'
@@ -97,7 +113,16 @@ export async function getEvent(id) {
             city: true,
             cover: true,
             startsAt: true,
+            category: true,
             venueId: true,
+            venue: {
+                select: {
+                    id: true,
+                    name: true,
+                    address: true,
+                    city: true,
+                },
+            },
             createdAt: true,
             updatedAt: true,
         },

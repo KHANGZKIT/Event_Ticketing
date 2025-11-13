@@ -1,0 +1,119 @@
+{
+  "id": "map_arena_360",
+  "name": "Arena 360° – Full Circle",
+  "priceTiers": {
+    "VIP": 1500000,
+    "A": 1000000,
+    "B": 650000,
+    "C": 400000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 30
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 30
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 32
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 32
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 32
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 32
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 34
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 34
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 34
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 34
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 34
+        },
+        {
+          "id": "L",
+          "from": 1,
+          "to": 34
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "M",
+          "from": 1,
+          "to": 36
+        },
+        {
+          "id": "N",
+          "from": 1,
+          "to": 36
+        },
+        {
+          "id": "O",
+          "from": 1,
+          "to": 36
+        },
+        {
+          "id": "P",
+          "from": 1,
+          "to": 36
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "center",
+    "type": "arena",
+    "circular": true
+  }
+}
+

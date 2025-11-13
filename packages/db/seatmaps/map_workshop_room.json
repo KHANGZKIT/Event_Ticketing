@@ -1,0 +1,78 @@
+{
+  "id": "map_workshop_room",
+  "name": "Workshop Room – Classroom Style",
+  "priceTiers": {
+    "VIP": 200000,
+    "A": 150000,
+    "B": 100000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 8
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 8
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "north",
+    "type": "workshop",
+    "classroom": true
+  }
+}
+
