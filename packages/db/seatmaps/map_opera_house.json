@@ -1,0 +1,120 @@
+{
+  "id": "map_opera_house",
+  "name": "Opera House – Classic",
+  "priceTiers": {
+    "VIP": 2500000,
+    "A": 1800000,
+    "B": 1200000,
+    "C": 800000,
+    "D": 500000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 16
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "J",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "L",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "rows": [
+        {
+          "id": "M",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "N",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "O",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "stagePosition": "north",
+    "balcony": true,
+    "type": "opera"
+  }
+}
+

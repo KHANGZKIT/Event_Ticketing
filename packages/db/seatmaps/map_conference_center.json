@@ -1,0 +1,73 @@
+{
+  "id": "map_conference_center",
+  "name": "Conference Center – Auditorium",
+  "priceTiers": {
+    "VIP": 600000,
+    "A": 350000,
+    "B": 220000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 16
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

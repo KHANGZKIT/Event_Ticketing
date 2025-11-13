@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const timeFilter = document.getElementById("time-filter");
   const headerTitle = document.querySelector(".header h2");
   const navLinks = document.querySelectorAll(".nav a[data-page]");
+  const themeToggleBtn = document.getElementById("theme-toggle");
+  const sidebarToggleBtn = document.getElementById("sidebar-toggle");
+  const bodyEl = document.body;
 
   // Ưu tiên dùng biến global nếu có (tiện khi build/gateway)
   const BASE_URL =
@@ -13,6 +16,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Nếu các route cần auth thì set token tại đây (hoặc lấy localStorage)
   const AUTH_TOKEN = window.DASHBOARD_TOKEN || null;
+
+  // ====== Theme (Light/Dark) ======
+  (function initTheme() {
+    const saved = localStorage.getItem("dashboard:theme");
+    const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+    const theme = saved || (prefersLight ? "light" : "dark");
+    if (theme === "light") bodyEl.setAttribute("data-theme", "light");
+    else bodyEl.removeAttribute("data-theme");
+    updateThemeButtonIcon();
+  })();
+  function updateThemeButtonIcon() {
+    if (!themeToggleBtn) return;
+    const isLight = bodyEl.getAttribute("data-theme") === "light";
+    themeToggleBtn.textContent = isLight ? "☀️" : "🌙";
+    themeToggleBtn.title = isLight ? "Chuyển sang Dark" : "Chuyển sang Light";
+  }
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const isLight = bodyEl.getAttribute("data-theme") === "light";
+      if (isLight) {
+        bodyEl.removeAttribute("data-theme");
+        localStorage.setItem("dashboard:theme", "dark");
+      } else {
+        bodyEl.setAttribute("data-theme", "light");
+        localStorage.setItem("dashboard:theme", "light");
+      }
+      updateThemeButtonIcon();
+    });
+  }
+
+  // ====== Sidebar collapse (persisted) ======
+  (function initSidebarState() {
+    const collapsed = localStorage.getItem("dashboard:sidebar-collapsed") === "1";
+    if (collapsed) bodyEl.classList.add("sidebar-collapsed");
+  })();
+  if (sidebarToggleBtn) {
+    sidebarToggleBtn.addEventListener("click", () => {
+      const collapsed = bodyEl.classList.toggle("sidebar-collapsed");
+      localStorage.setItem("dashboard:sidebar-collapsed", collapsed ? "1" : "0");
+    });
+  }
 
   // ====== Fetch helper (kèm Authorization nếu có) ======
   async function apiFetch(url, options) {
@@ -98,9 +142,21 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "line",
       data: {
         labels,
-        datasets: [{ label: "Doanh thu", data, tension: 0.4 }],
+        datasets: [{ label: "Doanh thu", data, tension: 0.35, borderWidth: 2, pointRadius: 3 }]
       },
-      options: { scales: { y: { beginAtZero: true } } },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const v = Number(ctx.parsed.y || 0).toLocaleString("vi-VN");
+                return "Doanh thu: " + v + " đ";
+              }
+            }
+          }
+        }
+      },
     });
   }
 
@@ -120,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
       data: { labels, datasets: [{ data }] },
     });
   }
+
 
   function renderTopEvents(rows) {
     const tbody = document.querySelector("#top-events-table tbody");
@@ -143,13 +200,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadOverview(period) {
     const p = period || "all";
+    const revGroup = document.getElementById("rev-granularity")?.value || "day";
 
     const [kRes, rRes, tRes] = await Promise.all([
       apiFetch(
         BASE_URL + "/api/dashboard/kpis?period=" + encodeURIComponent(p)
       ),
       apiFetch(
-        BASE_URL + "/api/dashboard/revenue?period=" + encodeURIComponent(p)
+        BASE_URL + "/api/dashboard/revenue?period=" + encodeURIComponent(p) + "&group=" + encodeURIComponent(revGroup)
       ),
       apiFetch(
         BASE_URL + "/api/dashboard/top-events?period=" + encodeURIComponent(p)
@@ -179,6 +237,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderRevenueChart(revenueSeries || []);
     renderPaymentChart((kpis && kpis.paymentRatios) || {});
     renderTopEvents(topEvents || []);
+
+    // removed category chart
   }
 
   // ====== EVENTS ======
@@ -511,6 +571,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (timeFilter) {
     timeFilter.addEventListener("change", (e) => loadOverview(e.target.value));
   }
+  const revGran = document.getElementById("rev-granularity");
+  if (revGran) revGran.addEventListener("change", () => {
+    const value = timeFilter ? timeFilter.value : "all";
+    loadOverview(value || "all");
+  });
 
   // start
   showPage("overview");

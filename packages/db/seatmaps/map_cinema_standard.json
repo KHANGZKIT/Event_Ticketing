@@ -1,0 +1,98 @@
+{
+  "id": "map_cinema_standard",
+  "name": "Cinema – Standard Layout",
+  "priceTiers": {
+    "VIP": 180000,
+    "A": 120000,
+    "B": 80000,
+    "C": 50000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "J",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "L",
+          "from": 1,
+          "to": 24
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "screenPosition": "north",
+    "type": "cinema"
+  }
+}
+

@@ -29,19 +29,12 @@ async function fetchWithRetry(url, opts = {}, { retries = 3, baseDelay = 400 } =
   }
 }
 
-/** * Điều hướng thông minh: 
- * - Nếu event có `firstShowId` (từ API), đi thẳng đến trang seatmap.
- * - Nếu không, đi đến trang danh sách các suất chiếu (showList).
- */
+/** * Điều hướng khi click event:
+* - Mở trang chi tiết sự kiện để xem info và chọn suất (event-details).
+*/
 function goSmartEvent(event) {
   const eventId = event.id;
-  // Dùng `price.firstShowId` mà backend đã trả về
-  const firstShowId = event?.price?.firstShowId;
-
-  const url = firstShowId
-    ? `/frontend/seatmapUI/seatmapUI.html?eventId=${encodeURIComponent(eventId)}&showId=${encodeURIComponent(firstShowId)}`
-    : `/frontend/shows/showList.html?eventId=${encodeURIComponent(eventId)}`;
-  window.location.href = url;
+  window.location.href = `/frontend/Ticketbox/code/event-details.html?eventId=${encodeURIComponent(eventId)}`;
 }
 
 
@@ -258,41 +251,89 @@ function updateSliderWithEvents(events) {
   slider.innerHTML = '';
   dotsContainer.innerHTML = '';
 
-  const sliderEvents = events.slice(0, 3);
+  // Hiển thị 2 banner trên mỗi slide (giống ảnh mẫu)
+  const sliderEvents = events.slice(0, 6); // tối đa 3 trang * 2 items
+  const pages = [];
+  for (let i = 0; i < sliderEvents.length; i += 2) {
+    const pair = sliderEvents.slice(i, i + 2);
+    // Nếu trang cuối chỉ có 1 event → nhân đôi (hoặc mượn event đầu) để luôn đủ 2 ô
+    if (pair.length === 1) {
+      // Ưu tiên mượn phần tử đầu danh sách để tránh trùng hình ngay trước đó
+      const filler = sliderEvents[0] && sliderEvents[0].id !== pair[0].id ? sliderEvents[0] : pair[0];
+      pair.push(filler);
+    }
+    pages.push(pair);
+  }
 
-  sliderEvents.forEach((event, index) => {
-    let image = event.cover || FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
-    const img = document.createElement('img');
-    img.src = image;
-    img.className = `slide ${index === 0 ? 'active' : ''}`;
-    img.alt = event.name;
-    img.loading = 'lazy';
+  const makeTile = (event) => {
+    const image = event.cover || FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
+    const tile = document.createElement('div');
+    tile.style.position = 'relative';
+    tile.style.flex = '1 1 0';
+    tile.style.borderRadius = '16px';
+    tile.style.overflow = 'hidden';
+    tile.style.backgroundImage = `url('${image}')`;
+    tile.style.backgroundSize = 'cover';
+    tile.style.backgroundPosition = 'center';
+    tile.style.cursor = 'pointer';
+    tile.addEventListener('click', () => goSmartEvent(event));
 
-    // FIX: Gọi goSmartEvent
-    img.addEventListener('click', () => goSmartEvent(event));
-    img.style.cursor = 'pointer';
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.inset = '0';
+    overlay.style.background = 'linear-gradient(180deg, rgba(0,0,0,0.00) 40%, rgba(0,0,0,0.55) 100%)';
+    tile.appendChild(overlay);
 
-    let sliderFallbackAttempts = 0;
-    const maxSliderFallbacks = 3;
+    const cta = document.createElement('button');
+    cta.type = 'button';
+    cta.textContent = 'Xem chi tiết';
+    cta.style.position = 'absolute';
+    cta.style.left = '24px';
+    cta.style.bottom = '24px';
+    cta.style.padding = '12px 18px';
+    cta.style.border = 'none';
+    cta.style.borderRadius = '999px';
+    cta.style.background = '#2ecc71';
+    cta.style.color = '#fff';
+    cta.style.fontWeight = '700';
+    cta.style.boxShadow = '0 10px 30px rgba(46,204,113,0.35)';
+    cta.style.cursor = 'pointer';
+    cta.addEventListener('click', (e) => { e.stopPropagation(); goSmartEvent(event); });
+    tile.appendChild(cta);
 
-    img.onerror = function () {
-      if (sliderFallbackAttempts >= maxSliderFallbacks) {
-        const placeholder = document.createElement('div');
-        placeholder.className = `slide ${index === 0 ? 'active' : ''}`;
-        placeholder.style.cssText = 'width: 100%; height: 100%; background: linear-gradient(135deg, #2DC275 0%, #1f8a53 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 72px; font-weight: bold;';
-        placeholder.textContent = event.name.charAt(0).toUpperCase();
-        this.parentNode.replaceChild(placeholder, this);
-        return;
-      }
-      const randomFallback = FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
-      this.src = randomFallback;
-      sliderFallbackAttempts++;
+    const testImg = new Image();
+    testImg.onerror = () => {
+      tile.style.background = 'linear-gradient(135deg, #2DC275 0%, #1f8a53 100%)';
+      overlay.style.background = 'none';
+      const label = document.createElement('div');
+      label.textContent = (event.name || 'E').charAt(0).toUpperCase();
+      label.style.position = 'absolute';
+      label.style.inset = '0';
+      label.style.display = 'flex';
+      label.style.alignItems = 'center';
+      label.style.justifyContent = 'center';
+      label.style.color = '#fff';
+      label.style.fontSize = '72px';
+      label.style.fontWeight = 'bold';
+      tile.appendChild(label);
     };
+    testImg.src = image;
+    return tile;
+  };
 
-    slider.appendChild(img);
+  pages.forEach((pair, pageIndex) => {
+    const slide = document.createElement('div');
+    slide.className = `slide ${pageIndex === 0 ? 'active' : ''}`;
+    slide.style.display = 'flex';
+    slide.style.gap = '24px';
+    slide.style.alignItems = 'stretch';
+    slide.style.justifyContent = 'space-between';
+
+    pair.forEach(ev => slide.appendChild(makeTile(ev)));
+    slider.appendChild(slide);
 
     const dot = document.createElement('span');
-    dot.className = `dot ${index === 0 ? 'active' : ''}`;
+    dot.className = `dot ${pageIndex === 0 ? 'active' : ''}`;
     dotsContainer.appendChild(dot);
   });
 
@@ -325,11 +366,9 @@ function updateSliderWithEvents(events) {
       };
     }
 
-    dots.forEach((dot, i) => {
-      dot.onclick = () => {
-        slideIndex = i;
-        showSlide(slideIndex);
-      };
+    // gắn click cho dots (đã render theo số trang)
+    document.querySelectorAll('.dot').forEach((dot, i) => {
+      dot.onclick = () => { slideIndex = i; showSlide(slideIndex); };
     });
 
     if (window.sliderInterval) {
@@ -348,6 +387,7 @@ function updateSliderWithEvents(events) {
 // Load events khi trang được tải
 document.addEventListener('DOMContentLoaded', () => {
   loadEvents();
+  initSearchBar();
 });
 
 /* --------------------------------------------------
@@ -551,6 +591,118 @@ function enforceAuthOnPage() {
     guardMyTicketsNavigation();
   }
 })();
+
+// --------------------------------------------------
+// SEARCH AUTOCOMPLETE (Trang chủ)
+// --------------------------------------------------
+function initSearchBar() {
+  const form = document.querySelector('.search-bar');
+  if (!form) return;
+  const input = form.querySelector('input[name="q"]');
+  if (!input) return;
+
+  // Container gợi ý
+  const suggestBox = document.createElement('div');
+  suggestBox.className = 'search-suggest';
+  suggestBox.setAttribute('role', 'listbox');
+  suggestBox.style.position = 'absolute';
+  suggestBox.style.left = '0';
+  suggestBox.style.right = '0';
+  suggestBox.style.top = '100%';
+  suggestBox.style.zIndex = '1000';
+  suggestBox.style.background = '#1F2937';
+  suggestBox.style.border = '1px solid rgba(255,255,255,0.15)';
+  suggestBox.style.borderTop = 'none';
+  suggestBox.style.borderRadius = '0 0 10px 10px';
+  suggestBox.style.display = 'none';
+  suggestBox.style.maxHeight = '280px';
+  suggestBox.style.overflowY = 'auto';
+  suggestBox.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+
+  // Bọc form để position:relative
+  form.style.position = 'relative';
+  form.appendChild(suggestBox);
+
+  let debounceId = null;
+  async function fetchSuggestions(q) {
+    const url = `${EVENTS_BASE}?` + new URLSearchParams({ q, pageSize: '5' }).toString();
+    const res = await fetchWithRetry(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data?.items || [];
+  }
+
+  function renderSuggestions(items) {
+    if (!items || items.length === 0) {
+      suggestBox.style.display = 'none';
+      suggestBox.innerHTML = '';
+      return;
+    }
+    suggestBox.innerHTML = '';
+    items.forEach((ev, idx) => {
+      const row = document.createElement('div');
+      row.setAttribute('role', 'option');
+      row.tabIndex = 0;
+      row.style.display = 'flex';
+      row.style.gap = '10px';
+      row.style.alignItems = 'center';
+      row.style.padding = '10px 12px';
+      row.style.cursor = 'pointer';
+      row.style.borderTop = '1px solid rgba(255,255,255,0.08)';
+      row.addEventListener('mouseover', () => row.style.background = 'rgba(255,255,255,0.06)');
+      row.addEventListener('mouseout', () => row.style.background = 'transparent');
+      row.addEventListener('click', () => {
+        window.location.href = `/frontend/Ticketbox/code/event-details.html?eventId=${encodeURIComponent(ev.id)}`;
+      });
+
+      const img = document.createElement('img');
+      img.src = ev.cover || FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
+      img.alt = '';
+      img.width = 40;
+      img.height = 28;
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '6px';
+
+      const info = document.createElement('div');
+      info.style.display = 'flex';
+      info.style.flexDirection = 'column';
+      info.style.gap = '2px';
+      info.innerHTML = `
+        <div style="font-weight:600; font-size:13px; color:#fff;">${sanitizeHTML(ev.name)}</div>
+        <div style="font-size:12px; color:#a1a1aa;">${sanitizeHTML(ev.city || '')}</div>
+      `;
+
+      row.appendChild(img);
+      row.appendChild(info);
+      suggestBox.appendChild(row);
+    });
+    suggestBox.style.display = 'block';
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    clearTimeout(debounceId);
+    if (!q) {
+      renderSuggestions([]);
+      return;
+    }
+    debounceId = setTimeout(async () => {
+      try {
+        const items = await fetchSuggestions(q);
+        renderSuggestions(items);
+      } catch {
+        renderSuggestions([]);
+      }
+    }, 250);
+  });
+
+  // Ẩn box khi blur/click ngoài
+  document.addEventListener('click', (e) => {
+    if (!form.contains(e.target)) {
+      renderSuggestions([]);
+    }
+  });
+}
 
 function clearAuthStorage() {
   const keys = ['auth', 'accessToken', 'token', 'user', 'profile', 'currentUser'];

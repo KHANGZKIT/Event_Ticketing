@@ -6,7 +6,7 @@ import { getSeatMap } from '../shows/shows.service.js';
 import { incrMetric } from '../../metrics/metrics.js';
 import { logx } from '../../utils/logx.js';
 
-const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 300);
+const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 900); // 15 minutes default
 
 const heldKey = (showId, seatId) => `held:${showId}:${seatId}`;
 const holdKey = (holdId) => `hold:${holdId}`;
@@ -26,18 +26,23 @@ export async function createHold(userId, body, options = {}) {
     const idemRedisKey = idempotencyKey ? `idem:${userId}:${idempotencyKey}` : null;
 
     if (idemRedisKey) {
-        const mapped = await redis.get(idemRedisKey);
-        if (mapped && mapped !== 'PENDING') {
-            const raw = await redis.get(holdKey(mapped));
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    logx('holds.create.idempotent.hit', { userId, showId, holdId: mapped });
-                    return { ok: true, holdId: mapped, expiresAt: parsed.expiresAt, idempotent: true };
-                } catch {
-                    // fallthrough
+        try {
+            const mapped = await redis.get(idemRedisKey);
+            if (mapped && mapped !== 'PENDING') {
+                const raw = await redis.get(holdKey(mapped));
+                if (raw) {
+                    try {
+                        const parsed = JSON.parse(raw);
+                        logx('holds.create.idempotent.hit', { userId, showId, holdId: mapped });
+                        return { ok: true, holdId: mapped, expiresAt: parsed.expiresAt, idempotent: true };
+                    } catch {
+                        // fallthrough
+                    }
                 }
             }
+        } catch (e) {
+            console.error('[holds.create] idempotency check error:', e);
+            // Tiếp tục tạo hold mới nếu idempotency check lỗi
         }
     }
 
@@ -74,19 +79,44 @@ export async function createHold(userId, body, options = {}) {
     }
 
     try {
+        console.log('[holds.create] Fetching seatmap for showId:', showId);
         const seatmap = await getSeatMap(showId);
-        const valid = new Set(seatmap.seats.map(s => s.seatId));
-        for (const s of seats) {
-            if (!valid.has(s)) {
-                const e = new Error(`Seat ${s} not found`);
+        console.log('[holds.create] Seatmap response:', { 
+            hasSeatmap: !!seatmap, 
+            hasTemplate: !!seatmap?.template, 
+            hasSeats: !!seatmap?.template?.seats,
+            seatsCount: seatmap?.template?.seats?.length || 0
+        });
+        
+        // getSeatMap trả về { showId, template: { ...tpl, seats: [...] } }
+        const seatmapSeats = seatmap?.template?.seats || seatmap?.seats || [];
+        if (!seatmap || !Array.isArray(seatmapSeats) || seatmapSeats.length === 0) {
+            const e = new Error(`Seatmap not found or invalid for showId: ${showId}. Show may not have a seatmap assigned.`);
+            e.status = 404;
+            logx('holds.create.seatmap_not_found', { userId, showId, seatmap: !!seatmap, hasTemplate: !!seatmap?.template }, 'error');
+            throw e;
+        }
+        const valid = new Set(seatmapSeats.map(s => s.seatId || s.label || s.id));
+        console.log('[holds.create] Valid seats:', Array.from(valid).slice(0, 10), '... (total:', valid.size, ')');
+        
+        // Normalize request seats: extract seatId if objects, otherwise use as-is
+        const requestSeatIds = seats.map(s => {
+            if (typeof s === 'string') return s;
+            if (typeof s === 'object' && s !== null) return s.seatId || s.label || s.id || String(s);
+            return String(s);
+        });
+        
+        for (const seatId of requestSeatIds) {
+            if (!valid.has(seatId)) {
+                const e = new Error(`Seat ${seatId} not found in seatmap`);
                 e.status = 404;
-                logx('holds.create.invalid_seat', { userId, showId, seat: s }, 'warn');
+                logx('holds.create.invalid_seat', { userId, showId, seat: seatId, validSeats: Array.from(valid).slice(0, 5) }, 'warn');
                 throw e;
             }
         }
 
         const sold = await prisma.ticket.findMany({
-            where: { showId, seatId: { in: seats } },
+            where: { showId, seatId: { in: requestSeatIds } },
             select: { seatId: true }
         });
         if (sold.length) {
@@ -98,31 +128,37 @@ export async function createHold(userId, body, options = {}) {
         }
 
         const existsPipe = redis.pipeline();
-        seats.forEach(seatId => existsPipe.exists(heldKey(showId, seatId)));
+        requestSeatIds.forEach(seatId => existsPipe.exists(heldKey(showId, seatId)));
         const existsRes = await existsPipe.exec();
-        const alreadyHeld = seats.filter((_, i) => (existsRes[i]?.[1] || 0) > 0);
+        const alreadyHeld = requestSeatIds.filter((_, i) => (existsRes[i]?.[1] || 0) > 0);
         if (alreadyHeld.length) {
             await incrMetric('create:conflict');
-            logx('holds.create.conflict', { userId, showId, seats, conflicts: alreadyHeld }, 'warn');
+            logx('holds.create.conflict', { userId, showId, seats: requestSeatIds, conflicts: alreadyHeld }, 'warn');
             const e = new Error(`Seat(s) already held: ${alreadyHeld.join(',')}`);
             e.status = 409;
+            e.conflicts = alreadyHeld; // Thêm conflicts array vào error
             throw e;
         }
 
         const holdId = crypto.randomUUID();
         const expiresAt = Date.now() + HOLD_TTL_SECONDS * 1000;
-        const payload = JSON.stringify({ userId, showId, seats, expiresAt });
+        const payload = JSON.stringify({ userId, showId, seats: requestSeatIds, expiresAt });
 
+        console.log('[holds.create] Creating Redis pipeline for holdId:', holdId);
         const setPipe = redis.pipeline();
         setPipe.set(holdKey(holdId), payload, 'EX', HOLD_TTL_SECONDS);
-        seats.forEach(seatId => {
+        requestSeatIds.forEach(seatId => {
             setPipe.set(heldKey(showId, seatId), holdId, 'EX', HOLD_TTL_SECONDS);
         });
+        console.log('[holds.create] Executing pipeline...');
         const out = await setPipe.exec();
+        console.log('[holds.create] Pipeline result:', out);
         if (!out || out.some(([err]) => err)) {
+            const errors = out?.filter(([err]) => err) || [];
+            console.error('[holds.create] Pipeline errors:', errors);
             await incrMetric('create:tx_failed');
-            logx('holds.create.tx_failed', { userId, showId, seats, out }, 'error');
-            return { ok: false, reason: 'tx-failed', out };
+            logx('holds.create.tx_failed', { userId, showId, seats: requestSeatIds, out, errors }, 'error');
+            return { ok: false, reason: 'tx-failed', out, errors };
         }
 
         if (idemRedisKey) {
@@ -130,13 +166,19 @@ export async function createHold(userId, body, options = {}) {
         }
 
         await incrMetric('create:ok');
-        logx('holds.create.ok', { userId, showId, holdId, seats, expiresAt });
+        logx('holds.create.ok', { userId, showId, holdId, seats: requestSeatIds, expiresAt });
         return { ok: true, holdId, expiresAt };
     } catch (err) {
         if (reserved && idemRedisKey) {
             try { await redis.del(idemRedisKey); } catch { }
         }
-        logx('holds.create.error', { userId, showId, message: err?.message }, 'error');
+        logx('holds.create.error', { userId, showId, message: err?.message, stack: err?.stack }, 'error');
+        // Nếu là lỗi Redis connection, trả về lỗi rõ ràng hơn
+        if (err?.message?.includes('ECONNREFUSED') || err?.message?.includes('connect') || err?.code === 'ECONNREFUSED') {
+            const e = new Error('Redis connection failed. Please ensure Redis is running.');
+            e.status = 503;
+            throw e;
+        }
         throw err;
     }
 }

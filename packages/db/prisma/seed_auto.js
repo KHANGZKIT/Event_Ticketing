@@ -154,25 +154,25 @@ const COVERS = [
 
 const TITLES_BY_CITY = {
     "Hồ Chí Minh": [
-        "Live Concert Saigon",
-        "Stand-up Saigon",
-        "EDM Neon Night",
-        "Jazz by the River",
-        "Acoustic Skyline",
+        "Đêm nhạc Sài Gòn",
+        "Rap Việt Live Sài Gòn",
+        "EDM Rave Night Sài Gòn",
+        "Jazz Bên Sông",
+        "Acoustic Phố Đêm",
     ],
     "Hà Nội": [
-        "Hanoi Symphony Evening",
-        "Old Quarter Rap",
-        "Acoustic Rooftop",
-        "Gala Piano Night",
-        "Indie Winter Fest",
+        "Hòa nhạc Giao hưởng Hà Nội",
+        "Rap Phố Cổ",
+        "Acoustic Rooftop Hà Nội",
+        "Gala Piano Đêm Đông",
+        "Indie Đông Về",
     ],
     "Đà Nẵng": [
-        "Danang Sunset Sessions",
-        "Beach Indie Fest",
-        "Han River Comedy",
-        "Open Air Concert",
-        "Summer Chill Night",
+        "Hoàng hôn Đà Nẵng Sessions",
+        "Lễ hội Indie Biển",
+        "Hài kịch Sông Hàn",
+        "Concert Ngoài Trời Cầu Rồng",
+        "Summer Chill Đà Nẵng",
     ],
 };
 

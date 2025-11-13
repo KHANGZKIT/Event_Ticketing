@@ -9,17 +9,21 @@
   <link rel="stylesheet" href="../../HomePage/css/style.css">
 
   <style>
-    /* CSS CỤC BỘ (Đã dọn dẹp và sửa theme) */
+    /* CSS CỤC BỘ - Ticketbox Style */
     :root {
       --green: rgb(45, 194, 117);
+      --green-dark: rgb(38, 172, 104);
       --black: rgb(42, 45, 52);
       --white: #ffffff;
       --gray: rgb(230, 230, 230);
       --dark-gray: rgb(50, 53, 60);
+      --light-gray: rgba(255, 255, 255, 0.1);
     }
 
     body {
       background-color: var(--black);
+      margin: 0;
+      padding: 0;
     }
 
     /* Ghi đè .content */
@@ -27,191 +31,160 @@
       padding: 0;
     }
 
-    /* ===== BANNER ===== */
-    .banner {
-      margin: 5% 10%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ticket-frame {
+    /* ===== HERO SECTION ===== */
+    .hero-section {
       position: relative;
       width: 100%;
-      background-color: var(--white);
-      color: var(--black);
-      border-radius: 20px;
-      display: flex;
+      height: 500px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin-top: 0;
     }
 
-    .ticket-frame::before,
-    .ticket-frame::after {
-      content: "";
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: var(--black);
-      border-radius: 50%;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 2;
-    }
-
-    .ticket-frame::before {
-      left: -15px;
-    }
-
-    .ticket-frame::after {
-      right: -15px;
-    }
-
-    .divider {
-      position: absolute;
-      top: 5%;
-      bottom: 5%;
-      left: 40%;
-      border-left: 3px dashed rgba(0, 0, 0, 0.3);
-      z-index: 1;
-    }
-
-    .ticket-left {
-      width: 40%;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      z-index: 2;
-      color: var(--black);
-    }
-
-    .ticket-left h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-
-    .event-detail {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .event-detail svg {
-      color: var(--green);
-      flex-shrink: 0;
-    }
-
-    .event-time,
-    .event-place {
-      color: var(--green);
-      font-weight: 600;
-    }
-
-    .event-detail p {
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    .event-address {
-      font-size: small;
-      color: #555;
-    }
-
-    .divider-line {
-      margin: 20px 0;
-      border: none;
-      border-top: 1px solid rgba(0, 0, 0, 0.2);
-    }
-
-    .price-box {
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-
-    .price-box .price {
-      color: var(--green);
-      font-weight: 700;
-      font-size: 1.3rem;
-    }
-
-    .ticket-left button {
-      background-color: var(--green);
-      border: none;
-      color: var(--white);
-      padding: 12px 28px;
-      font-size: 1rem;
-      border-radius: 25px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s ease;
-    }
-
-    .ticket-left button:hover {
-      background-color: rgb(38, 172, 104);
-    }
-
-    .ticket-right {
-      width: 60%;
-      z-index: 2;
-    }
-
-    .ticket-right img {
+    .hero-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-left: 2px solid rgba(0, 0, 0, 0.05);
+      filter: brightness(0.6);
     }
 
-    /* ===== DETAIL BODY (SỬA THEME) ===== */
-    .detail-body {
-      background-color: var(--black);
-      padding: 40px 10%;
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+      display: flex;
+      align-items: flex-end;
+      padding: 60px 10%;
+    }
+
+    .hero-content {
       color: var(--white);
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .hero-content h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      line-height: 1.2;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .hero-meta-item svg {
+      width: 24px;
+      height: 24px;
+      color: var(--green);
+    }
+
+    .hero-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: 20px;
+    }
+
+    .hero-button {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(45, 194, 117, 0.4);
+    }
+
+    .hero-button:hover {
+      background: var(--green-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(45, 194, 117, 0.6);
+    }
+
+    .hero-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 10%;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 40px;
+    }
+
+    /* ===== LEFT COLUMN ===== */
+    .content-left {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
     }
 
     .section {
       background-color: var(--dark-gray);
-      padding: 20px 30px;
-      border-radius: 10px;
-      margin-bottom: 30px;
+      padding: 30px;
+      border-radius: 16px;
       position: relative;
     }
 
     .section h2 {
-      margin-bottom: 15px;
-      font-weight: 600;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.5rem;
       color: var(--white);
+      border-bottom: 2px solid var(--green);
+      padding-bottom: 10px;
     }
 
     .intro-text {
-      max-height: 120px;
+      max-height: 150px;
       overflow: hidden;
       transition: max-height 0.5s ease;
       position: relative;
       color: #e0e6ed;
-      line-height: 1.7;
+      line-height: 1.8;
+      font-size: 1.05rem;
     }
 
     .intro-text.expanded {
-      max-height: 1000px;
+      max-height: 2000px;
     }
 
     .fade-overlay {
-      content: "";
       position: absolute;
-      bottom: 45px;
+      bottom: 0;
       left: 0;
       width: 100%;
-      height: 60px;
+      height: 80px;
       background: linear-gradient(to top, var(--dark-gray), rgba(50, 53, 60, 0));
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
 
-    .intro-text.expanded+.fade-overlay {
+    .intro-text.expanded ~ .fade-overlay {
       opacity: 0;
     }
 
@@ -219,41 +192,195 @@
       display: inline-block;
       color: var(--green);
       cursor: pointer;
-      font-weight: 500;
-      margin-top: 10px;
+      font-weight: 600;
+      margin-top: 15px;
       user-select: none;
+      transition: color 0.2s ease;
     }
 
-    .ticket-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .read-more:hover {
+      color: var(--green-dark);
+    }
+
+    /* Shows List */
+    .shows-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .show-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .show-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--green);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(45, 194, 117, 0.2);
+    }
+
+    .show-date {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .show-venue {
+      color: #b0b8c4;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+
+    .show-button {
+      width: 100%;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .show-button:hover {
+      background: var(--green-dark);
+    }
+
+    /* ===== RIGHT COLUMN (STICKY) ===== */
+    .content-right {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+
+    .info-card {
+      background: var(--dark-gray);
+      border-radius: 16px;
+      padding: 30px;
       margin-bottom: 20px;
     }
 
-    .ticket-type {
+    .info-card h3 {
+      color: var(--white);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--green);
+      padding-bottom: 10px;
+    }
+
+    .info-item {
       display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .info-item svg {
+      width: 20px;
+      height: 20px;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .info-item-content {
+      flex: 1;
+    }
+
+    .info-item-label {
+      color: #b0b8c4;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .info-item-value {
+      color: var(--white);
+      font-weight: 600;
       font-size: 1rem;
     }
 
-    .ticket-type:last-child {
-      border-bottom: none;
-    }
-
-    .org {
+    .org-card {
       display: flex;
       align-items: center;
       gap: 15px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
     }
 
-    .org img {
+    .org-card img {
       width: 60px;
       height: 60px;
-      object-fit: contain;
-      border-radius: 10px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid var(--green);
+    }
+
+    .org-card-content h4 {
+      color: var(--white);
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .org-card-content p {
+      color: #b0b8c4;
+      font-size: 0.9rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 968px) {
+      .main-content {
+        grid-template-columns: 1fr;
+        padding: 40px 5%;
+      }
+
+      .content-right {
+        position: static;
+      }
+
+      .hero-content h1 {
+        font-size: 2rem;
+      }
+
+      .hero-section {
+        height: 400px;
+      }
+
+      .shows-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-content h1 {
+        font-size: 1.5rem;
+      }
+
+      .hero-meta {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .hero-section {
+        height: 350px;
+      }
     }
   </style>
 </head>
@@ -292,77 +419,105 @@
     </div>
   </div>
 
-  <div class="banner">
-    <div class="ticket-frame">
-      <div class="divider"></div>
-      <div class="ticket-left">
-        <h1>TOUR ĐÊM VĂN MIẾU - TRẢI NGHIỆM ĐA GIÁC QUAN</h1>
-        <div class="event-detail">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <img id="evCover" class="hero-image" src="asset/concert.png" alt="Ảnh sự kiện" />
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 id="evTitle">Đang tải...</h1>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+            </svg>
+            <span id="evTime">Đang tải...</span>
+          </div>
+          <div class="hero-meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span id="evPlace">Đang cập nhật</span>
+          </div>
+        </div>
+        <div class="hero-price" id="evPrice">Liên hệ</div>
+        <button id="buyBtn" class="hero-button" disabled>Mua vé ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Left Column -->
+    <div class="content-left">
+      <!-- Giới thiệu sự kiện -->
+      <div class="section">
+        <h2>Giới thiệu sự kiện</h2>
+        <div class="intro-text">
+          <p id="evIntro">Thông tin đang cập nhật.</p>
+        </div>
+        <div class="fade-overlay"></div>
+        <span class="read-more">Xem thêm ▼</span>
+      </div>
+
+      <!-- Các suất diễn -->
+      <div class="section" id="showsSection">
+        <h2>Các suất diễn</h2>
+        <div id="showsList" class="shows-grid"></div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="content-right">
+      <!-- Thông tin sự kiện -->
+      <div class="info-card">
+        <h3>Thông tin sự kiện</h3>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M8 2v4"></path>
             <path d="M16 2v4"></path>
             <rect width="18" height="18" x="3" y="4" rx="2"></rect>
             <path d="M3 10h18"></path>
           </svg>
-          <p><span class="event-time">19:00, Thứ Bảy, 12/10/2025</span></p>
+          <div class="info-item-content">
+            <div class="info-item-label">Thời gian</div>
+            <div class="info-item-value" id="evTimeSidebar">Đang tải...</div>
+          </div>
         </div>
-        <div class="event-detail">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
-          <p>
-            <span class="event-place">Văn Miếu - Quốc Tử Giám</span><br>
-            <span class="event-address">58 P. Quốc Tử Giám, Văn Miếu, Đống Đa, Hà Nội</span>
-          </p>
+          <div class="info-item-content">
+            <div class="info-item-label">Địa điểm</div>
+            <div class="info-item-value" id="evPlaceSidebar">Đang cập nhật</div>
+            <div class="info-item-value" style="font-size: 0.9rem; color: #b0b8c4; font-weight: normal; margin-top: 4px;" id="evAddressSidebar"></div>
+          </div>
         </div>
-        <hr class="divider-line">
-        <div class="price-box">
-          <span>Giá vé từ</span>
-          <p class="price">420.000 VNĐ</p>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path>
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+            <path d="M12 17.5v-11"></path>
+          </svg>
+          <div class="info-item-content">
+            <div class="info-item-label">Giá vé</div>
+            <div class="info-item-value" id="evPriceSidebar">Liên hệ</div>
+          </div>
         </div>
-        <button onclick="window.location.href='../seatmapUI/seatmapUI.html?eventId=EVT_001'">Mua vé ngay</button>
       </div>
-      <div class="ticket-right">
-        <img src="asset/concert.png" alt="Ảnh sự kiện" />
-      </div>
-    </div>
-  </div>
 
-  <div class="detail-body">
-    <div class="section">
-      <h2>Giới thiệu sự kiện</h2>
-      <div class="intro-text">
-        <p>Tour đêm Văn Miếu - Quốc Tử Giám với chủ đề "Tinh hoa đạo học" là một trải nghiệm hoàn toàn mới, kết hợp giữa
-          công nghệ và những giá trị di sản. Du khách sẽ được đắm mình trong không gian cổ kính, huyền ảo và trải nghiệm
-          câu chuyện về đạo học Việt Nam qua các màn trình diễn ánh sáng 3D Mapping đặc sắc.</p>
-        <p>Hãy đến và cảm nhận một Văn Miếu thật khác, thật lung linh và đầy cảm xúc!</p>
-      </div>
-      <div class="fade-overlay"></div>
-      <span class="read-more">Xem thêm ▼</span>
-    </div>
-
-    <div class="section">
-      <h2>Thông tin vé</h2>
-      <div class="ticket-info">
-        <span>Loại vé</span>
-        <span>Giá vé</span>
-      </div>
-      <div class="ticket-type">
-        <span>Vé trải nghiệm 3D Mapping</span>
-        <span>420.000 VNĐ</span>
-      </div>
-      <div class="ticket-type">
-        <span>Vé tham quan chung</span>
-        <span>199.000 VNĐ</span>
-      </div>
-    </div>
-
-    <div class="section org">
-      <img src="asset/workshop.png" alt="Logo ban tổ chức">
-      <div>
-        <h2>Ban tổ chức</h2>
-        <p>Văn Miếu Music & Event</p>
+      <!-- Ban tổ chức -->
+      <div class="org-card">
+        <img src="asset/workshop.png" alt="Logo ban tổ chức" onerror="this.style.display='none'">
+        <div class="org-card-content">
+          <h4>Ban tổ chức</h4>
+          <p>Văn Miếu Music & Event</p>
+        </div>
       </div>
     </div>
   </div>
@@ -387,6 +542,215 @@
         renderAuthUI();
       }
     });
+
+    // ====== Dynamic data (fetch from API) ======
+    // API_BASE đã được khai báo trong events.js (đã load ở trên)
+    // Sử dụng trực tiếp từ events.js, nếu không có thì dùng giá trị mặc định
+    let API_URL = 'http://localhost:4000/api';
+    try {
+      // Thử sử dụng API_BASE từ events.js (đã load trước đó)
+      if (typeof API_BASE !== 'undefined') {
+        API_URL = API_BASE;
+      }
+    } catch (e) {
+      // Nếu có lỗi, dùng giá trị mặc định
+      console.warn('Không thể sử dụng API_BASE từ events.js, dùng giá trị mặc định');
+    }
+    
+    // Lấy eventId từ URL
+    const params = new URLSearchParams(location.search);
+    const eventId = params.get('eventId');
+    
+    console.log('🔍 EventId từ URL:', eventId);
+    console.log('🔍 Full URL:', window.location.href);
+    
+    // Định nghĩa các function trước
+    async function fetchJSON(url) {
+      console.log('📡 Fetching:', url);
+      try {
+        const r = await fetch(url);
+        console.log('📡 Response status:', r.status, r.statusText);
+        
+        if (!r.ok) {
+          const errorText = await r.text();
+          console.error('❌ Response error:', errorText);
+          if (r.status === 404) {
+            throw new Error('Không tìm thấy sự kiện');
+          }
+          throw new Error(`HTTP ${r.status}: ${errorText}`);
+        }
+        
+        const data = await r.json();
+        console.log('✅ Response data:', data);
+        return data;
+      } catch (e) {
+        console.error('❌ Fetch error:', e);
+        throw e;
+      }
+    }
+
+    function formatDateTime(dt) {
+      const d = new Date(dt);
+      if (isNaN(d)) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${hh}:${mi}, ${dd}/${mm}/${yyyy}`;
+    }
+
+    async function loadEvent() {
+      // Đã validate eventId ở trên, nếu đến đây thì eventId đã có
+      console.log('🚀 Bắt đầu load event với ID:', eventId);
+      
+      try {
+        // Hiển thị loading state
+        document.getElementById('evTitle').textContent = 'Đang tải...';
+        document.getElementById('evTime').textContent = '...';
+        document.getElementById('evPlace').textContent = 'Đang cập nhật';
+        
+        // Fetch dữ liệu từ API
+        console.log('📡 Fetching event và shows...');
+        const eventUrl = `${API_URL}/events/${encodeURIComponent(eventId)}`;
+        const showsUrl = `${API_URL}/events/${encodeURIComponent(eventId)}/shows`;
+        
+        const [ev, shows] = await Promise.all([
+          fetchJSON(eventUrl),
+          fetchJSON(showsUrl)
+        ]);
+        
+        console.log('✅ Event data:', ev);
+        console.log('✅ Shows data:', shows);
+
+        // Hero Section - Title
+        document.getElementById('evTitle').textContent = ev.name || 'Sự kiện';
+        if (ev.cover) document.getElementById('evCover').src = ev.cover;
+        
+        // Place: ưu tiên venue name, sau đó city
+        const placeText = ev.venue?.name || ev.city || 'Chưa có địa điểm';
+        document.getElementById('evPlace').textContent = placeText;
+        
+        // Address: hiển thị địa chỉ chi tiết nếu có
+        const addressText = ev.venue?.address || '';
+
+        // Time: min start từ shows hoặc event startsAt
+        let first = null;
+        if (Array.isArray(shows) && shows.length) {
+          first = shows.reduce((a, b) => (!a || new Date(b.startsAt) < new Date(a.startsAt)) ? b : a, null);
+        }
+        const timeText = first ? formatDateTime(first.startsAt) : (ev.startsAt ? formatDateTime(ev.startsAt) : 'Chưa có ngày');
+        document.getElementById('evTime').textContent = timeText;
+
+        // Price: tạm hiện "Liên hệ" (có thể cải thiện sau khi có ticket types)
+        document.getElementById('evPrice').textContent = 'Liên hệ';
+
+        // Buy button
+        const buyBtn = document.getElementById('buyBtn');
+        if (first) {
+          buyBtn.disabled = false;
+          buyBtn.onclick = () => {
+            location.href = `../../seatmapUI/seatmapUI.html?eventId=${encodeURIComponent(eventId)}&showId=${encodeURIComponent(first.id)}`;
+          };
+        }
+
+        // Sidebar updates
+        document.getElementById('evTimeSidebar').textContent = timeText;
+        document.getElementById('evPlaceSidebar').textContent = placeText;
+        const addressSidebar = document.getElementById('evAddressSidebar');
+        if (addressText) {
+          addressSidebar.textContent = addressText;
+        } else {
+          addressSidebar.textContent = '';
+        }
+        document.getElementById('evPriceSidebar').textContent = 'Liên hệ';
+
+        // Giới thiệu sự kiện
+        const introEl = document.getElementById('evIntro');
+        if (ev.category) {
+          introEl.innerHTML = `<p><strong>Thể loại:</strong> ${ev.category}</p>`;
+          if (ev.venue?.name) {
+            introEl.innerHTML += `<p><strong>Địa điểm:</strong> ${ev.venue.name}${ev.venue.address ? ` - ${ev.venue.address}` : ''}</p>`;
+          }
+          introEl.innerHTML += `<p>Thông tin chi tiết về sự kiện sẽ được cập nhật sớm nhất.</p>`;
+        } else {
+          introEl.textContent = 'Thông tin đang cập nhật.';
+        }
+
+        // Shows list - New format
+        const showsList = document.getElementById('showsList');
+        const showsSection = document.getElementById('showsSection');
+        showsList.innerHTML = '';
+        if (Array.isArray(shows) && shows.length) {
+          shows.forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'show-card';
+
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'show-date';
+            dateDiv.textContent = formatDateTime(s.startsAt);
+            card.appendChild(dateDiv);
+
+            const venueDiv = document.createElement('div');
+            venueDiv.className = 'show-venue';
+            venueDiv.textContent = s.venue || 'Địa điểm';
+            card.appendChild(venueDiv);
+
+            const btn = document.createElement('button');
+            btn.className = 'show-button';
+            btn.textContent = 'Chọn suất';
+            btn.onclick = () => {
+              location.href = `../../seatmapUI/seatmapUI.html?eventId=${encodeURIComponent(eventId)}&showId=${encodeURIComponent(s.id)}`;
+            };
+            card.appendChild(btn);
+
+            showsList.appendChild(card);
+          });
+        } else {
+          showsSection.style.display = 'none';
+        }
+
+      } catch (e) {
+        console.error('❌ Lỗi khi tải sự kiện:', e);
+        console.error('❌ Error stack:', e.stack);
+        
+        document.getElementById('evTitle').textContent = 'Không tải được sự kiện';
+        document.getElementById('evTime').textContent = 'Lỗi';
+        document.getElementById('evPlace').textContent = 'Lỗi';
+        
+        let errorMsg = 'Vui lòng thử lại sau.';
+        if (e.message) {
+          errorMsg = e.message;
+        } else if (e.name === 'TypeError' && e.message.includes('fetch')) {
+          errorMsg = 'Không thể kết nối đến server. Vui lòng kiểm tra backend có đang chạy không.';
+        }
+        
+        document.getElementById('evIntro').textContent = errorMsg;
+        
+        // Ẩn các section không cần thiết khi lỗi
+        document.getElementById('showsSection').style.display = 'none';
+      }
+    }
+
+    // Validate eventId từ URL - nếu không có thì redirect và không chạy code phía dưới
+    if (!eventId || eventId.trim() === '') {
+      console.error('❌ Thiếu eventId trong URL');
+      alert('Thiếu thông tin sự kiện. Đang chuyển về trang chủ...');
+      setTimeout(() => {
+        window.location.href = '../../HomePage/source/TrangChu.html';
+      }, 1500);
+    } else {
+      // Chỉ gọi loadEvent nếu eventId hợp lệ (đã validate ở trên)
+      // Đảm bảo DOM đã load xong
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          loadEvent();
+        });
+      } else {
+        // DOM đã sẵn sàng
+        loadEvent();
+      }
+    }
   </script>
 </body>
 

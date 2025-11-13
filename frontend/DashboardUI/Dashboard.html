@@ -14,10 +14,13 @@
   <aside class="sidebar">
     <div class="brand">Event Admin</div>
     <nav class="nav">
-      <a href="#" class="active" data-page="overview">📊 Overview</a>
-      <a href="#" data-page="events">🗂️ Events</a>
-      <a href="#" data-page="tickets">🎟️ Tickets</a>
-      <a href="#" data-page="users">👤 Users</a>
+      <a href="#" class="active" data-page="overview">🏠 Trang chủ</a>
+      <a href="#" data-page="users">👤 Quản lý người dùng</a>
+      <a href="#">🗂️ Quản lý danh mục</a>
+      <a href="#" data-page="events">📅 Quản lý sự kiện</a>
+      <a href="#" data-page="tickets">🎟️ Quản lý vé</a>
+      <a href="#">🖼️ Quản lý trưng bày</a>
+      <a href="#">🏷️ Quản lý mã giảm giá</a>
     </nav>
   </aside>
 
@@ -25,6 +28,8 @@
     <header class="header">
       <h2>🎨 Dashboard</h2>
       <div class="actions">
+        <button id="sidebar-toggle" class="theme-toggle" title="Thu gọn menu" aria-label="Thu gọn menu">☰</button>
+        <button id="theme-toggle" class="theme-toggle" title="Chuyển giao diện" aria-label="Chuyển giao diện">🌙</button>
         <label for="time-filter">Khoảng thời gian</label>
         <select id="time-filter">
           <option value="all" selected>Tất cả</option>
@@ -47,7 +52,14 @@
             <div class="card-body"><canvas id="payment-chart" height="260"></canvas></div>
           </div>
           <div class="card">
-            <div class="card-head">Doanh thu theo ngày</div>
+            <div class="card-head" style="display:flex; align-items:center; justify-content:space-between;">
+              <span>Doanh thu theo thời gian</span>
+              <select id="rev-granularity" class="btn" style="padding:6px 10px;">
+                <option value="day" selected>Theo ngày</option>
+                <option value="week">Theo tuần</option>
+                <option value="month">Theo tháng</option>
+              </select>
+            </div>
             <div class="card-body"><canvas id="revenue-chart" height="260"></canvas></div>
           </div>
         </div>

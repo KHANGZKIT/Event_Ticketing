@@ -110,6 +110,12 @@ async function seedFromDetails(details) {
 }
 
 async function main() {
+    // Tự tạo file nếu chưa tồn tại
+    try {
+        await fs.access("scripts/event_details.json");
+    } catch {
+        await fs.writeFile("scripts/event_details.json", "[]", "utf8");
+    }
     const details = JSON.parse(await fs.readFile("scripts/event_details.json", "utf8"));
     await seedFromDetails(details);
 }

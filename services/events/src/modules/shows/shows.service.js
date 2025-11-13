@@ -131,6 +131,7 @@ export async function deleteShow(id) {
 
 export async function loadSeatMapTemplate(seatMapId) {
     // 0) ƯU TIÊN: đọc từ DB (bảng SeatMap.schema)
+    // Thử tìm theo UUID trước (seatMapDbId)
     try {
         const row = await prisma.seatMap.findUnique({
             where: { id: seatMapId },
@@ -141,7 +142,31 @@ export async function loadSeatMapTemplate(seatMapId) {
             return row.schema;
         }
     } catch (e) {
-        // nếu lỗi DB, bỏ qua để fallback file
+        // nếu lỗi DB, bỏ qua để fallback
+    }
+
+    // Nếu không tìm thấy trong DB theo UUID, thử tìm theo name (cho seatMapId cũ như "map_theater_balcony")
+    // Chỉ thử nếu seatMapId không phải UUID format
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(seatMapId);
+    if (!isUUID) {
+        try {
+            // Tìm SeatMap có name chứa seatMapId hoặc id trùng
+            const row = await prisma.seatMap.findFirst({
+                where: {
+                    OR: [
+                        { id: seatMapId },
+                        { name: { contains: seatMapId, mode: 'insensitive' } },
+                    ],
+                },
+                select: { schema: true },
+            });
+            if (row?.schema) {
+                validateSeatmap(row.schema);
+                return row.schema;
+            }
+        } catch (e) {
+            // bỏ qua, tiếp tục fallback file
+        }
     }
 
     // 1) File lẻ <id>.json
@@ -201,18 +226,65 @@ export async function getSeatMap(showId) {
         e.status = 404; throw e;
     }
 
-    const seatMapIdEff = show.seatMapDbId ?? show.seatMapId;
+    // Ưu tiên seatMapDbId (UUID từ bảng SeatMap), fallback về seatMapId (string cũ)
+    let seatMapIdEff = show.seatMapDbId ?? show.seatMapId;
+    
+    // Nếu có seatMapId nhưng chưa có seatMapDbId, thử tìm trong DB
+    if (!show.seatMapDbId && show.seatMapId) {
+        try {
+            // Tìm SeatMap trong DB theo id hoặc name
+            const seatMap = await prisma.seatMap.findFirst({
+                where: {
+                    OR: [
+                        { id: show.seatMapId },
+                        { name: { contains: show.seatMapId, mode: 'insensitive' } },
+                    ],
+                },
+                select: { id: true },
+            });
+            
+            if (seatMap) {
+                // Tự động migrate: update show với seatMapDbId
+                await prisma.show.update({
+                    where: { id: show.id },
+                    data: { seatMapDbId: seatMap.id },
+                });
+                seatMapIdEff = seatMap.id;
+                console.log(`[getSeatMap] Auto-migrated show ${showId}: ${show.seatMapId} → ${seatMap.id}`);
+            }
+        } catch (e) {
+            // Nếu không tìm thấy trong DB, dùng seatMapId cũ (load từ file)
+            console.warn(`[getSeatMap] Show ${showId} has seatMapId="${show.seatMapId}" but not found in DB, using file fallback`);
+        }
+    }
+    
     if (!seatMapIdEff) {
-        const e = new Error(`SeatMap Not Found for show ${showId}`);
+        const e = new Error(`SeatMap Not Found for show ${showId}. Please assign a seatmap to this show.`);
         e.status = 404; throw e;
     }
 
     // đọc DB > file rời <id>.json > seatmaps_pack.json
     const tpl = await loadSeatMapTemplate(seatMapIdEff);
 
+    // Lấy danh sách ghế đã bán (có orderId)
+    const soldTickets = await prisma.ticket.findMany({
+        where: { 
+            showId: show.id,
+            orderId: { not: null } // Chỉ tính ghế đã bán (có order)
+        },
+        select: { seatId: true },
+    });
+    const booked = soldTickets.map(t => t.seatId);
+
+    // Lấy danh sách ghế đang được hold (từ Redis)
+    const heldSet = await getHeldSeatByShow(show.id).catch(() => new Set());
+    const held = Array.from(heldSet);
+
     return {
         showId: show.id,
-        template: { ...tpl, seats: expandSeatsFromTemplate(tpl) }
+        template: { ...tpl, seats: expandSeatsFromTemplate(tpl) },
+        held,      // Danh sách ghế đang được hold
+        booked     // Danh sách ghế đã được bán
     };
 }
 
