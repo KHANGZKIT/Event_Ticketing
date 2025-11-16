@@ -24,15 +24,15 @@ export function getPaymentConfig(providerName) {
                 storeId: process.env.MOMO_STORE_ID || 'EventTicketingStore',
                 returnUrl: process.env.MOMO_RETURN_URL || `${process.env.API_BASE_URL || 'http://localhost:4000'}/api/payments/return/momo`
             };
-        
+
         case 'vnpay':
             return {
-                tmnCode: process.env.VNPAY_TMN_CODE || '',
-                secretKey: process.env.VNPAY_SECRET_KEY || '',
-                url: process.env.VNPAY_URL || 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
-                returnUrl: process.env.VNPAY_RETURN_URL || `${process.env.API_BASE_URL || 'http://localhost:4000'}/api/payments/return/vnpay`
+                tmnCode: process.env.VNPAY_TMN_CODE,
+                secretKey: process.env.VNPAY_SECRET_KEY,
+                url: process.env.VNPAY_URL,
+                returnUrl: process.env.VNPAY_RETURN_URL,
+                bankCode: process.env.VNPAY_BANK_CODE
             };
-        
         default:
             throw new Error(`Unknown payment provider: ${providerName}`);
     }

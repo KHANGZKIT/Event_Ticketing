@@ -484,6 +484,47 @@
   let isProcessing = false;
   let currentOrderId = null;
 
+  // Hàm kiểm tra order pending từ sessionStorage
+  async function getExistingPendingOrder(token) {
+    if (!showId) return null;
+    
+    try {
+      // Kiểm tra orderId trong sessionStorage (từ lần checkout trước)
+      const orderDataStr = sessionStorage.getItem(`pendingOrder_${showId}`);
+      if (orderDataStr) {
+        try {
+          const orderData = JSON.parse(orderDataStr);
+          const orderId = orderData.orderId;
+          
+          // Kiểm tra order có tồn tại và còn pending không
+          const orderResponse = await fetch(`${API_BASE}/orders/${orderId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (orderResponse.ok) {
+            const order = await orderResponse.json();
+            // Nếu order vẫn pending và cùng showId, dùng lại
+            if (order.status === 'pending' && order.showId === showId) {
+              return orderId;
+            } else {
+              // Order đã không còn pending hoặc không cùng show, xóa khỏi sessionStorage
+              sessionStorage.removeItem(`pendingOrder_${showId}`);
+            }
+          }
+        } catch (e) {
+          console.warn('Error checking existing order:', e);
+          sessionStorage.removeItem(`pendingOrder_${showId}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Error getting existing order:', e);
+    }
+    
+    return null;
+  }
+
   continueBtn?.addEventListener("click", async () => {
     if (!validateForm() || isProcessing) return;
     
@@ -494,42 +535,73 @@
       return;
     }
 
-    if (!holdId) {
-      alert('Không tìm thấy thông tin giữ chỗ. Vui lòng quay lại chọn ghế.');
-      window.location.href = `/frontend/seatmapUI/seatmapUI.html?showId=${showId}`;
-      return;
-    }
-
     isProcessing = true;
     continueBtn.disabled = true;
     continueBtn.textContent = 'Đang xử lý...';
 
     try {
-      // Step 1: Checkout (tạo order với status pending)
-      const checkoutResponse = await fetch(`${API_BASE}/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ holdId })
-      });
+      // Kiểm tra xem có order pending từ lần checkout trước không
+      let existingOrderId = await getExistingPendingOrder(token);
+      
+      if (!existingOrderId) {
+        // Không có order pending, cần checkout mới
+        if (!holdId) {
+          throw new Error('Không tìm thấy thông tin giữ chỗ. Vui lòng quay lại chọn ghế.');
+        }
 
-      if (!checkoutResponse.ok) {
-        const errorData = await checkoutResponse.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.');
+        // Step 1: Checkout (tạo order với status pending)
+        const checkoutResponse = await fetch(`${API_BASE}/orders/checkout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ holdId })
+        });
+
+        if (!checkoutResponse.ok) {
+          const errorData = await checkoutResponse.json().catch(() => ({}));
+          const errorMessage = errorData.error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.';
+          
+          // Nếu lỗi là "Hold is not found" (410), thử tìm order pending theo showId
+          if (checkoutResponse.status === 410 && errorMessage.includes('Hold is not found')) {
+            // Thử tìm order pending theo showId và userId
+            console.log('[Checkout] Hold not found, trying to find existing pending order...');
+            
+            // Kiểm tra lại order pending (có thể đã có nhưng chưa lưu trong sessionStorage)
+            existingOrderId = await getExistingPendingOrder(token);
+            
+            if (!existingOrderId) {
+              throw new Error('Thời gian giữ chỗ đã hết hạn. Vui lòng quay lại chọn ghế mới.');
+            }
+          } else {
+            throw new Error(errorMessage);
+          }
+        } else {
+          // Checkout thành công, lưu orderId vào sessionStorage
+          const checkoutData = await checkoutResponse.json();
+          existingOrderId = checkoutData.order?.id;
+
+          if (!existingOrderId) {
+            throw new Error('Không nhận được thông tin đơn hàng.');
+          }
+
+          // Lưu orderId vào sessionStorage để dùng lại khi quay lại từ payment gateway
+          if (showId) {
+            sessionStorage.setItem(`pendingOrder_${showId}`, JSON.stringify({
+              orderId: existingOrderId,
+              showId: showId,
+              createdAt: new Date().toISOString()
+            }));
+          }
+        }
       }
 
-      const checkoutData = await checkoutResponse.json();
-      currentOrderId = checkoutData.order?.id;
+      currentOrderId = existingOrderId;
 
-      if (!currentOrderId) {
-        throw new Error('Không nhận được thông tin đơn hàng.');
-      }
-
-      // Step 2: Tạo payment
+      // Step 2: Tạo payment với orderId (có thể là order mới hoặc order cũ)
       const returnUrl = `${window.location.origin}/frontend/PurchaseUI/payment-return.html?orderId=${currentOrderId}`;
-      const cancelUrl = `${window.location.origin}/frontend/PurchaseUI/thanhToan.html?showId=${showId}&holdId=${holdId}&eventId=${eventId}`;
+      const cancelUrl = `${window.location.origin}/frontend/PurchaseUI/thanhToan.html?showId=${showId}&holdId=${holdId || ''}&eventId=${eventId}`;
 
       // Lấy payment provider từ radio button đã chọn
       const paymentProvider = paymentMomo?.checked ? 'momo' : (paymentVnpay?.checked ? 'vnpay' : null);

@@ -1,149 +1,234 @@
-import crypto from 'crypto';
-import { BasePaymentProvider } from './base.provider.js';
-import { stringify } from 'querystring';
+import crypto from "crypto";
+import { BasePaymentProvider } from "./base.provider.js";
 
 /**
- * VNPay Payment Provider
- * Documentation: https://sandbox.vnpayment.vn/apis/
+ * sort + encode giống đúng sample NodeJS của VNPAY
+ * - sort theo tên field
+ * - key, value đều encodeURIComponent, space -> "+"
+ * - return object có key/val đã encode sẵn
  */
+function encodeAndSortParams(params) {
+    const filteredKeys = Object.keys(params)
+        .filter((k) => params[k] !== null && params[k] !== undefined && params[k] !== "")
+        .sort();
+
+    const sorted = {};
+    for (const k of filteredKeys) {
+        const encKey = encodeURIComponent(k); // vnp_TmnCode -> vnp_TmnCode (không đổi nhưng đúng form)
+        const encVal = encodeURIComponent(String(params[k])).replace(/%20/g, "+");
+        sorted[encKey] = encVal;
+    }
+    return sorted;
+}
+
 export class VNPayProvider extends BasePaymentProvider {
     constructor(config) {
         super(config);
-        this.tmnCode = config.tmnCode;
-        this.secretKey = config.secretKey;
-        this.baseUrl = config.url || 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
-        this.returnUrl = config.returnUrl || `${process.env.FRONTEND_URL || 'http://localhost:4000'}/payment/return`;
+
+        this.tmnCode = (config.tmnCode || process.env.VNPAY_TMN_CODE || "").trim();
+        this.secretKey = (config.secretKey || process.env.VNPAY_SECRET_KEY || "").trim();
+        this.baseUrl =
+            config.url ||
+            process.env.VNPAY_URL ||
+            "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+
+        this.bankCode = config.bankCode || process.env.VNPAY_BANK_CODE || null;
+
+        this.returnUrl =
+            config.returnUrl ||
+            process.env.VNPAY_RETURN_URL ||
+            `${process.env.FRONTEND_URL || "http://localhost:4000"}/frontend/PurchaseUI/payment-return.html`;
+
+        console.log("[VNPay CONFIG] tmnCode =", this.tmnCode, "len =", this.tmnCode.length);
+        console.log("[VNPay CONFIG] secret len =", this.secretKey.length);
+    }
+
+    // yyyyMMddHHmmss
+    buildDate(date = new Date()) {
+        const pad = (n) => n.toString().padStart(2, "0");
+        const y = date.getFullYear();
+        const M = pad(date.getMonth() + 1);
+        const d = pad(date.getDate());
+        const h = pad(date.getHours());
+        const m = pad(date.getMinutes());
+        const s = pad(date.getSeconds());
+        return `${y}${M}${d}${h}${m}${s}`;
+    }
+
+    // vnp_TxnRef kiểu 6 chữ số (giống sample của VNPAY)
+    buildTxnRef(date = new Date()) {
+        const pad = (n) => n.toString().padStart(2, "0");
+        const h = pad(date.getHours());
+        const m = pad(date.getMinutes());
+        const s = pad(date.getSeconds());
+        return `${h}${m}${s}`; // HHmmss
     }
 
     /**
-     * Generate VNPay signature
+     * Tạo HMAC-SHA512 theo đúng docs:
+     *   signData = querystring.stringify(vnp_Params, { encode: false })
+     *   secureHash = HMAC_SHA512(signData, secretKey)
      */
-    generateSignature(params) {
-        // Sort parameters by key
-        const sortedParams = Object.keys(params)
-            .filter(key => key !== 'vnp_SecureHash' && key !== 'vnp_SecureHashType')
-            .sort()
-            .reduce((result, key) => {
-                result[key] = params[key];
-                return result;
-            }, {});
+    signHmac512(encodedSortedParams) {
+        const signData = Object.keys(encodedSortedParams)
+            .map((key) => `${key}=${encodedSortedParams[key]}`)
+            .join("&");
 
-        // Create query string
-        const queryString = stringify(sortedParams);
+        console.log("[VNPay] Signature query string (unencoded):", signData);
+        console.log("[VNPay] Secret key:", this.secretKey);
 
-        // Create HMAC SHA512
-        const hmac = crypto.createHmac('sha512', this.secretKey);
-        hmac.update(queryString);
-        return hmac.digest('hex');
+        const hmac = crypto.createHmac("sha512", this.secretKey);
+        return hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
     }
 
     /**
-     * Create payment URL
+     * Được gọi từ payments.service -> createPayment
      */
-    async createPaymentUrl({ orderId, amount, orderInfo, returnUrl, cancelUrl }) {
-        const vnp_TxnRef = orderId;
-        const vnp_OrderInfo = orderInfo || `Thanh toan don hang ${orderId}`;
-        const vnp_Amount = amount * 100; // VNPay uses cents
-        const vnp_CreateDate = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + '00';
-        const vnp_ExpireDate = new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
-            .toISOString().replace(/[-:]/g, '').split('.')[0] + '00';
-        const vnp_IpAddr = '127.0.0.1'; // Should get from request
-        const vnp_CurrCode = 'VND';
-        const vnp_Locale = 'vn';
+    async createPaymentUrl({ orderId, amount, orderInfo, returnUrl }) {
+        const orderAmount = Math.round(Number(amount || 0));
+        if (!Number.isFinite(orderAmount) || orderAmount <= 0) {
+            throw new Error(`Invalid VNPay amount: ${amount}`);
+        }
+
+        const now = new Date();
+        const vnp_TxnRef = this.buildTxnRef(now); // theo dạng HHmmss
+        const vnp_Amount = orderAmount * 100;
+        const vnp_OrderInfo = orderInfo || `Thanh toan cho don hang ${orderId}`;
+        const vnp_CreateDate = this.buildDate(now);
+        const vnp_ExpireDate = this.buildDate(new Date(now.getTime() + 15 * 60 * 1000));
         const vnp_ReturnUrl = returnUrl || this.returnUrl;
+        const vnp_IpAddr = "127.0.0.1"; // test local
 
-        const params = {
-            vnp_Version: '2.1.0',
-            vnp_Command: 'pay',
+        // params thô (chưa encode)
+        let rawParams = {
+            vnp_Version: "2.1.0",
+            vnp_Command: "pay",
             vnp_TmnCode: this.tmnCode,
             vnp_Amount: vnp_Amount.toString(),
-            vnp_CurrCode: vnp_CurrCode,
-            vnp_TxnRef: vnp_TxnRef,
-            vnp_OrderInfo: vnp_OrderInfo,
-            vnp_OrderType: 'other',
-            vnp_Locale: vnp_Locale,
+            vnp_CurrCode: "VND",
+            vnp_TxnRef,
+            vnp_OrderInfo,
+            vnp_OrderType: "other",
+            vnp_Locale: "vn",
             vnp_ReturnUrl: vnp_ReturnUrl,
-            vnp_IpAddr: vnp_IpAddr,
-            vnp_CreateDate: vnp_CreateDate,
-            vnp_ExpireDate: vnp_ExpireDate
+            vnp_IpAddr,
+            vnp_CreateDate,
+            vnp_ExpireDate
         };
 
-        // Generate signature
-        params.vnp_SecureHash = this.generateSignature(params);
+        if (this.bankCode) {
+            rawParams.vnp_BankCode = this.bankCode;
+        }
 
-        // Build payment URL
-        const queryString = stringify(params);
+        // 1) Encode + sort giống sample
+        let encodedSorted = encodeAndSortParams(rawParams);
+
+        // 2) Tạo secure hash HMAC-SHA512
+        const secureHash = this.signHmac512(encodedSorted);
+        encodedSorted["vnp_SecureHash"] = secureHash; // 2.1.0: KHÔNG gửi vnp_SecureHashType
+
+        // 3) Build query string gửi cho VNPAY (không encode thêm nữa, vì đã encode ở bước 1)
+        const query = Object.keys(encodedSorted)
+            .map((key) => `${key}=${encodedSorted[key]}`)
+            .join("&");
+
+        const finalUrl = `${this.baseUrl}?${query}`;
+        console.log("[VNPay] Final URL:", finalUrl);
 
         return {
-            paymentUrl: `${this.baseUrl}?${queryString}`,
-            requestId: vnp_TxnRef
+            paymentUrl: finalUrl,
+            provider: "vnpay",
+            transactionId: null,
+            requestId: vnp_TxnRef // mình lưu TxnRef; còn orderId vẫn nằm trong vnp_OrderInfo + returnUrl
         };
     }
 
     /**
-     * Verify webhook signature
+     * Verify chữ ký cho IPN/return (để dùng sau)
      */
     verifySignature(data, signature) {
-        const sortedParams = Object.keys(data)
-            .filter(key => key !== 'vnp_SecureHash' && key !== 'vnp_SecureHashType')
-            .sort()
-            .reduce((result, key) => {
-                result[key] = data[key];
-                return result;
-            }, {});
+        if (!signature) return false;
 
-        const queryString = stringify(sortedParams);
+        const filtered = {};
+        for (const [k, v] of Object.entries(data)) {
+            if (
+                v !== undefined &&
+                v !== null &&
+                v !== "" &&
+                k !== "vnp_SecureHash" &&
+                k !== "vnp_SecureHashType"
+            ) {
+                filtered[k] = v;
+            }
+        }
 
-        const hmac = crypto.createHmac('sha512', this.secretKey);
-        hmac.update(queryString);
-        const expectedSignature = hmac.digest('hex');
-
-        return expectedSignature === signature;
+        const encodedSorted = encodeAndSortParams(filtered);
+        const expected = this.signHmac512(encodedSorted).toUpperCase();
+        return expected === String(signature).toUpperCase();
     }
 
-    /**
-     * Parse webhook data
-     */
+    // parseWebhookData giữ nguyên như bản trước của bạn
     parseWebhookData(data) {
         const {
             vnp_TxnRef,
             vnp_TransactionNo,
             vnp_Amount,
+            vnp_ResponseCode,
+            vnp_TransactionStatus,
             vnp_BankCode,
             vnp_CardType,
             vnp_PayDate,
-            vnp_TransactionStatus,
-            vnp_ResponseCode
+            vnp_OrderInfo
         } = data;
 
-        const amount = parseInt(vnp_Amount) / 100; // Convert from cents
-        const isSuccess = vnp_ResponseCode === '00' && vnp_TransactionStatus === '00';
+        const amount = vnp_Amount ? parseInt(vnp_Amount, 10) / 100 : 0;
 
-        // Parse pay date
-        let paidAt = new Date();
-        if (vnp_PayDate) {
-            // Format: yyyyMMddHHmmss
-            const year = vnp_PayDate.substring(0, 4);
-            const month = vnp_PayDate.substring(4, 6);
-            const day = vnp_PayDate.substring(6, 8);
-            const hour = vnp_PayDate.substring(8, 10);
-            const minute = vnp_PayDate.substring(10, 12);
-            const second = vnp_PayDate.substring(12, 14);
-            paidAt = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+        // Parse đúng orderId (UUID) từ vnp_OrderInfo: "Thanh toan cho don hang <orderId>"
+        let realOrderId = null;
+        if (vnp_OrderInfo) {
+            const m = String(vnp_OrderInfo).match(/don hang\s+([0-9a-fA-F-]{8,})/i);
+            if (m) {
+                realOrderId = m[1]; // chính là orderId trong DB
+            }
         }
 
+        let paidAt = null;
+        if (vnp_PayDate && String(vnp_PayDate).length === 14) {
+            const str = String(vnp_PayDate);
+            const year = Number(str.substring(0, 4));
+            const month = Number(str.substring(4, 6)) - 1;
+            const day = Number(str.substring(6, 8));
+            const hour = Number(str.substring(8, 10));
+            const minute = Number(str.substring(10, 12));
+            const second = Number(str.substring(12, 14));
+            paidAt = new Date(year, month, day, hour, minute, second);
+        }
+
+        const isSuccess =
+            vnp_ResponseCode === "00" && vnp_TransactionStatus === "00";
+
         return {
-            orderId: vnp_TxnRef,
+            // 👉 orderId bây giờ là UUID thật lấy từ OrderInfo
+            orderId: realOrderId,
+
+            // Mã giao dịch của VNPay (trace)
             transactionId: vnp_TransactionNo,
+
             amount,
-            status: isSuccess ? 'succeeded' : 'failed',
-            message: isSuccess ? 'Payment successful' : `Payment failed: ${vnp_ResponseCode}`,
-            provider: 'vnpay',
-            providerRef: vnp_TransactionNo,
+            status: isSuccess ? "succeeded" : "failed",
+            message: isSuccess
+                ? "Payment successful"
+                : `Payment failed: ${vnp_ResponseCode}`,
+            provider: "vnpay",
+
+            // 👉 providerRef để tìm payment: TRÙNG với cái bạn đã lưu khi createPayment
+            // (requestId / vnp_TxnRef)
+            providerRef: vnp_TxnRef,
+
             bankCode: vnp_BankCode,
             cardType: vnp_CardType,
             paidAt
         };
     }
-}
 
+}
