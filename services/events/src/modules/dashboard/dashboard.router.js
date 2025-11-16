@@ -35,9 +35,30 @@ dashboardRouter.get("/kpis", async (req, res, next) => {
         const failed = payments.filter(p => p.status === 'failed').length;
         const refunded = payments.filter(p => p.status === 'refunded').length;
 
+        // Upcoming Today: số shows diễn ra hôm nay
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+        const upcomingToday = await prisma.show.count({
+            where: {
+                startsAt: { gte: todayStart, lte: todayEnd },
+                status: 'scheduled'
+            }
+        });
+
+        // Attendees Today: số người đã check-in hôm nay
+        const attendeesToday = await prisma.ticket.count({
+            where: {
+                checkedInAt: { gte: todayStart, lte: todayEnd }
+            }
+        });
+
         res.json({
             totalRevenue, totalOrders, ticketsSold,
             successRate: (ok / n) * 100,
+            upcomingToday,
+            attendeesToday,
             paymentRatios: {
                 Succeeded: (ok / n) * 100, Failed: (failed / n) * 100, Refunded: (refunded / n) * 100
             }
@@ -104,4 +125,111 @@ dashboardRouter.get("/top-events", async (req, res, next) => {
 dashboardRouter.get("/tickets/summary", ticketsCtrl.getTicketsSummary); // đã có
 dashboardRouter.get("/tickets", ticketsCtrl.listTickets);               // ✦ mới
 dashboardRouter.get("/users", usersCtrl.listUsers);
+
+// Upcoming Shows
+dashboardRouter.get("/upcoming-shows", async (req, res, next) => {
+    try {
+        const limit = Math.min(parseInt(req.query.limit || '5', 10), 20);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const shows = await prisma.show.findMany({
+            where: {
+                startsAt: { gte: today },
+                status: 'scheduled'
+            },
+            take: limit,
+            orderBy: { startsAt: 'asc' },
+            select: {
+                id: true,
+                startsAt: true,
+                event: {
+                    select: { name: true }
+                },
+                _count: {
+                    select: {
+                        tickets: true,
+                        orders: true
+                    }
+                }
+            }
+        });
+
+        const result = shows.map(s => {
+            const totalTickets = s._count?.tickets || 0;
+            const soldTickets = s._count?.orders || 0;
+            const status = soldTickets > 0 ? 'Paid' : 'N/A';
+            
+            return {
+                eventName: s.event?.name || 'N/A',
+                showDate: s.startsAt,
+                ticketsStatus: status,
+                sold: soldTickets,
+                total: totalTickets
+            };
+        });
+
+        res.json(result);
+    } catch (e) { next(e); }
+});
+
+// Ticket Sales Trends (theo thời gian)
+dashboardRouter.get("/ticket-sales", async (req, res, next) => {
+    try {
+        const start = startOf(req.query.period || "all");
+        const group = req.query.group || "day"; // day, week, month
+        
+        const orders = await prisma.order.findMany({
+            where: { 
+                status: "paid", 
+                createdAt: { gte: start } 
+            },
+            select: { 
+                id: true,
+                createdAt: true,
+                showId: true
+            }
+        });
+
+        // Nếu không có orders, trả về mảng rỗng
+        if (orders.length === 0) {
+            return res.json([]);
+        }
+
+        const orderIds = orders.map(o => o.id);
+
+        // Đếm số tickets bán được theo thời gian
+        const tickets = await prisma.ticket.findMany({
+            where: {
+                orderId: { in: orderIds },
+                createdAt: { gte: start }
+            },
+            select: { createdAt: true },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        const m = new Map();
+        for (const t of tickets) {
+            const d = t.createdAt;
+            let key;
+            if (group === 'week') {
+                const weekStart = new Date(d);
+                weekStart.setDate(d.getDate() - d.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                key = weekStart.toISOString().slice(0, 10);
+            } else if (group === 'month') {
+                key = d.toISOString().slice(0, 7); // YYYY-MM
+            } else {
+                key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+            }
+            m.set(key, (m.get(key) || 0) + 1);
+        }
+
+        const result = [...m.entries()]
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => ({ date, count }));
+
+        res.json(result);
+    } catch (e) { next(e); }
+});
 

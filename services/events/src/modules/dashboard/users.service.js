@@ -2,7 +2,12 @@ import { prisma } from "@app/db";
 
 export async function findUsers({ page, size, search }) {
     const where = {};
-    // TODO: if (search) where.OR = [{ email: { contains: search, mode:"insensitive" } }, { fullName: { contains: search, mode:"insensitive" } }]
+    if (search) {
+        where.OR = [
+            { email: { contains: search, mode: "insensitive" } },
+            { fullName: { contains: search, mode: "insensitive" } }
+        ];
+    }
 
     const [raw, total] = await Promise.all([
         prisma.user.findMany({
