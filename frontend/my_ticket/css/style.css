@@ -214,7 +214,6 @@ body {
 
 .account a:hover {
   background: linear-gradient(135deg, #e940ff, #00e0ff);
-
   color: #fff;
   transform: translateY(-3px);
   box-shadow:
