@@ -392,11 +392,16 @@
       renderAuthUI();
     }
 
-    // Auto cập nhật nếu login ở tab khác
+    // Auto cập nhật nếu login ở tab khác hoặc avatar được cập nhật
     window.addEventListener('storage', (e) => {
-      if (['auth', 'accessToken', 'token', 'user', 'profile'].includes(e.key)) {
+      if (['auth', 'accessToken', 'token', 'user', 'profile', 'avatarUpdated'].includes(e.key)) {
         renderAuthUI();
       }
+    });
+
+    // Lắng nghe custom event từ cùng tab (khi cập nhật trong cùng window)
+    window.addEventListener('avatarUpdated', () => {
+      renderAuthUI();
     });
   </script>
   <script src="thanhToanJS.js" defer></script>
