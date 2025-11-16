@@ -116,7 +116,11 @@ export async function createHold(userId, body, options = {}) {
         }
 
         const sold = await prisma.ticket.findMany({
-            where: { showId, seatId: { in: requestSeatIds } },
+            where: { 
+                showId, 
+                seatId: { in: requestSeatIds },
+                orderId: { not: null }
+            },
             select: { seatId: true }
         });
         if (sold.length) {

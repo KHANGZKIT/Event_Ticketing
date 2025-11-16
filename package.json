@@ -17,7 +17,13 @@
     "sync:seatmaps": "node scripts/sync_seatmaps_to_db.js",
     "check:holds": "node scripts/check_redis_holds.js",
     "fix:seatmaps": "node scripts/fix_all_seatmaps.js",
-    "fix:categories": "node scripts/fix_missing_categories.js"
+    "fix:categories": "node scripts/fix_missing_categories.js",
+    "export:data": "node scripts/export_data.js",
+    "import:data": "node scripts/import_data.js",
+    "check:jwt": "node scripts/check_jwt_secret.js",
+    "test:payment": "node scripts/test-payment.js",
+    "cleanup:demo-orders": "node scripts/cleanup_demo_orders.js",
+    "scrape:list": "node scripts/scrape_from_url_file.js"
   },
   "private": true,
   "workspaces": [

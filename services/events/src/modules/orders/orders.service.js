@@ -32,7 +32,15 @@ export async function checkout(userId, body) {
 
     // Lấy seat map
     const sm = await getSeatMap(hold.showId);
-    const tierBySeat = new Map(sm.seats.map(s => [s.seatId, s.tier]));
+    
+    // Kiểm tra seatmap có hợp lệ không
+    if (!sm || !sm.template || !sm.template.seats || !Array.isArray(sm.template.seats)) {
+        const err = new Error("Seatmap not found or invalid for this show");
+        err.status = 404;
+        throw err;
+    }
+    
+    const tierBySeat = new Map(sm.template.seats.map(s => [s.seatId, s.tier]));
     const priceByTier = sm.template?.priceTiers || {}; // {tier: price}
 
     // Tính tiền
@@ -53,7 +61,11 @@ export async function checkout(userId, body) {
         const result = await prisma.$transaction(async (tx) => {
             // Double-check
             const sold = await tx.ticket.findMany({
-                where: { showId: hold.showId, seatId: { in: seatList } },
+                where: { 
+                    showId: hold.showId, 
+                    seatId: { in: seatList },
+                    orderId: { not: null }
+                },
                 select: { seatId: true },
             });
             if (sold.length) {
@@ -62,28 +74,61 @@ export async function checkout(userId, body) {
                 throw err;
             }
 
-            // Tạo order (tuỳ bạn có thể để 'pending' rồi qua payment mới set 'paid')
+            // Tạo order với status 'pending' - sẽ được update thành 'paid' sau khi payment thành công
             const order = await tx.order.create({
                 data: {
                     userId,
                     showId: hold.showId,
                     amount,
                     currency: 'VND',
-                    status: 'paid', // hoặc 'pending'
+                    status: 'pending', // Chờ payment
                 },
                 select: {
                     id: true, userId: true, showId: true, amount: true, currency: true, status: true, createdAt: true
                 },
             });
 
-            // Tạo tickets
+            // Update tickets đã tồn tại (không tạo mới vì tickets đã được tạo khi tạo show)
+            // Tickets sẽ được "activate" khi payment thành công
             const tickets = await Promise.all(
-                seatList.map(seatId =>
-                    tx.ticket.create({
-                        data: { showId: hold.showId, seatId, orderId: order.id },
+                seatList.map(async (seatId) => {
+                    // Tìm ticket đã tồn tại
+                    const existingTicket = await tx.ticket.findUnique({
+                        where: {
+                            showId_seatId: {
+                                showId: hold.showId,
+                                seatId: seatId,
+                            },
+                        },
+                    });
+
+                    if (!existingTicket) {
+                        // Nếu không tìm thấy, tạo mới (fallback)
+                        return await tx.ticket.create({
+                            data: { showId: hold.showId, seatId, orderId: order.id },
+                            select: { id: true, showId: true, seatId: true, orderId: true },
+                        });
+                    }
+
+                    // Kiểm tra xem ticket đã có orderId chưa (đã được bán)
+                    if (existingTicket.orderId) {
+                        const err = new Error(`Seat ${seatId} already sold`);
+                        err.status = 409;
+                        throw err;
+                    }
+
+                    // Update ticket với orderId
+                    return await tx.ticket.update({
+                        where: {
+                            showId_seatId: {
+                                showId: hold.showId,
+                                seatId: seatId,
+                            },
+                        },
+                        data: { orderId: order.id },
                         select: { id: true, showId: true, seatId: true, orderId: true },
-                    })
-                )
+                    });
+                })
             );
 
             // (Khuyến nghị) cập nhật hold trong chính transaction nếu hold ở DB

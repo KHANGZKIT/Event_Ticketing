@@ -341,20 +341,60 @@
   };
 
   const setError = (el, msgEl, msg) => {
-    msgEl.textContent = msg || "";
-    el.setAttribute("aria-invalid", msg ? "true" : "false");
+    if (msgEl) {
+      msgEl.textContent = msg || "";
+    }
+    if (el) {
+      el.setAttribute("aria-invalid", msg ? "true" : "false");
+    }
   };
+
+  // Payment method selection
+  const paymentMomo = $$("#paymentMomo");
+  const paymentVnpay = $$("#paymentVnpay");
+  const momoInfo = $$("#momoInfo");
+  const vnpayInfo = $$("#vnpayInfo");
+  const errPaymentMethod = $$("#errorPaymentMethod");
+
+  // Hiển thị/ẩn thông tin khi chọn phương thức thanh toán
+  function updatePaymentInfo() {
+    if (paymentMomo?.checked) {
+      momoInfo?.removeAttribute('hidden');
+      vnpayInfo?.setAttribute('hidden', '');
+    } else if (paymentVnpay?.checked) {
+      vnpayInfo?.removeAttribute('hidden');
+      momoInfo?.setAttribute('hidden', '');
+    } else {
+      momoInfo?.setAttribute('hidden', '');
+      vnpayInfo?.setAttribute('hidden', '');
+    }
+  }
+
+  paymentMomo?.addEventListener("change", () => {
+    updatePaymentInfo();
+    validateForm();
+  });
+
+  paymentVnpay?.addEventListener("change", () => {
+    updatePaymentInfo();
+    validateForm();
+  });
 
   function validateForm(){
     const e1 = validators.fullName(fullName.value);
     const e2 = validators.phone(phone.value);
     const e3 = validators.email(email.value);
+    
+    // Kiểm tra đã chọn phương thức thanh toán chưa
+    const paymentSelected = paymentMomo?.checked || paymentVnpay?.checked;
+    const e4 = paymentSelected ? null : 'Vui lòng chọn phương thức thanh toán';
 
     setError(fullName, errFullName, e1);
     setError(phone, errPhone, e2);
     setError(email, errEmail, e3);
+    setError(null, errPaymentMethod, e4);
 
-    const ok = agreeCheckbox.checked && !e1 && !e2 && !e3;
+    const ok = agreeCheckbox.checked && !e1 && !e2 && !e3 && !e4;
     continueBtn.disabled = !ok;
     continueBtn.setAttribute("aria-disabled", String(!ok));
     return ok;
@@ -440,6 +480,101 @@
     releaseHoldOnExit();
   });
   
+  // ====== Checkout & Payment Flow ======
+  let isProcessing = false;
+  let currentOrderId = null;
+
+  continueBtn?.addEventListener("click", async () => {
+    if (!validateForm() || isProcessing) return;
+    
+    const token = getAuthToken();
+    if (!token) {
+      alert('Vui lòng đăng nhập để tiếp tục.');
+      window.location.href = '../LoginUI/LogRegUI.html?tab=login';
+      return;
+    }
+
+    if (!holdId) {
+      alert('Không tìm thấy thông tin giữ chỗ. Vui lòng quay lại chọn ghế.');
+      window.location.href = `/frontend/seatmapUI/seatmapUI.html?showId=${showId}`;
+      return;
+    }
+
+    isProcessing = true;
+    continueBtn.disabled = true;
+    continueBtn.textContent = 'Đang xử lý...';
+
+    try {
+      // Step 1: Checkout (tạo order với status pending)
+      const checkoutResponse = await fetch(`${API_BASE}/orders/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ holdId })
+      });
+
+      if (!checkoutResponse.ok) {
+        const errorData = await checkoutResponse.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.');
+      }
+
+      const checkoutData = await checkoutResponse.json();
+      currentOrderId = checkoutData.order?.id;
+
+      if (!currentOrderId) {
+        throw new Error('Không nhận được thông tin đơn hàng.');
+      }
+
+      // Step 2: Tạo payment
+      const returnUrl = `${window.location.origin}/frontend/PurchaseUI/payment-return.html?orderId=${currentOrderId}`;
+      const cancelUrl = `${window.location.origin}/frontend/PurchaseUI/thanhToan.html?showId=${showId}&holdId=${holdId}&eventId=${eventId}`;
+
+      // Lấy payment provider từ radio button đã chọn
+      const paymentProvider = paymentMomo?.checked ? 'momo' : (paymentVnpay?.checked ? 'vnpay' : null);
+      
+      if (!paymentProvider) {
+        throw new Error('Vui lòng chọn phương thức thanh toán');
+      }
+
+      const paymentResponse = await fetch(`${API_BASE}/payments/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          orderId: currentOrderId,
+          provider: paymentProvider,
+          returnUrl,
+          cancelUrl
+        })
+      });
+
+      if (!paymentResponse.ok) {
+        const errorData = await paymentResponse.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Không thể tạo thanh toán. Vui lòng thử lại.');
+      }
+
+      const paymentData = await paymentResponse.json();
+
+      if (paymentData.paymentUrl) {
+        // Redirect đến payment gateway
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        throw new Error('Không nhận được URL thanh toán.');
+      }
+
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+      isProcessing = false;
+      continueBtn.disabled = false;
+      continueBtn.textContent = 'Next →';
+    }
+  });
+
   // Initialize
   updateEverything();
 })();

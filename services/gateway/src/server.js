@@ -3,10 +3,16 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { routes, serverOptions, config as appConfig } from './config/config.js';
 import { requestID } from './middlewares/requestID.js';
 import { authGuard } from './middlewares/auth.js';
 import { forward } from './proxy.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '../../..');
 
 const app = express();
 app.use(express.json());
@@ -14,6 +20,22 @@ app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
 app.use(rateLimit(serverOptions.rateLimit));
 app.use(requestID);
+
+// Serve static files from frontend directory
+app.use('/frontend', express.static(path.join(projectRoot, 'frontend')));
+
+// Handle browser/system requests silently (no logs)
+app.use((req, res, next) => {
+    // Ignore Chrome DevTools, favicon, and other browser requests
+    if (
+        req.path.startsWith('/.well-known') ||
+        req.path === '/favicon.ico' ||
+        req.path === '/robots.txt'
+    ) {
+        return res.status(404).end();
+    }
+    next();
+});
 
 // Health của gateway
 app.get('/api/health', (_req, res) => {

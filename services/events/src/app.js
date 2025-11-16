@@ -8,6 +8,7 @@ import showsStatsRouter from './modules/shows/shows.stats.routes.js';
 import holdsRouter from './modules/holds/holds.routes.js';
 import ordersRouter from './modules/orders/orders.routes.js';
 import ordersRoutes from './modules/orders/orders.query.routes.js'
+import paymentsRouter from './modules/payments/payments.routes.js';
 import ticketsRouter from './modules/tickets/tickets.routes.js';
 import ticketsQRRouter from './modules/tickets/tickets.qr.routes.js';
 import { errorHandler } from './middlewares/error.js';
@@ -31,6 +32,7 @@ app.use('/api/shows', showsStatsRouter);
 app.use('/api/holds', holdsRouter, holdsConsumeRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/payments', paymentsRouter);
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/tickets', ticketsQRRouter);
 app.use(holdsMetricsRouter)

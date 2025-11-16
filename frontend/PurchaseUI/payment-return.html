@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết quả thanh toán - Ticketbox</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    
+    .icon.success {
+      background: #10b981;
+      color: white;
+    }
+    
+    .icon.failed {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .icon.pending {
+      background: #f59e0b;
+      color: white;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+    
+    .message {
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    .order-info {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    
+    .order-info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .order-info-item:last-child {
+      border-bottom: none;
+    }
+    
+    .order-info-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .order-info-value {
+      color: #1f2937;
+      font-weight: 600;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f4f6;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon" id="statusIcon">
+      <span class="loading"></span>
+    </div>
+    <h1 id="statusTitle">Đang kiểm tra...</h1>
+    <p class="message" id="statusMessage">Vui lòng đợi trong giây lát.</p>
+    <div class="order-info" id="orderInfo" style="display: none;">
+      <div class="order-info-item">
+        <span class="order-info-label">Mã đơn hàng:</span>
+        <span class="order-info-value" id="orderId">-</span>
+      </div>
+      <div class="order-info-item">
+        <span class="order-info-label">Trạng thái:</span>
+        <span class="order-info-value" id="orderStatus">-</span>
+      </div>
+      <div class="order-info-item">
+        <span class="order-info-label">Số tiền:</span>
+        <span class="order-info-value" id="orderAmount">-</span>
+      </div>
+    </div>
+    <div class="actions" id="actions" style="display: none;">
+      <a href="../my_ticket/source/my_ticket.html" class="btn btn-primary" id="viewTicketsBtn">Xem vé của tôi</a>
+      <a href="../HomePage/source/TrangChu.html" class="btn btn-secondary">Về trang chủ</a>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:4000/api';
+    
+    // Get orderId from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let orderId = urlParams.get('orderId');
+    
+    // If no orderId, try to get from VNPay callback params (vnp_TxnRef)
+    if (!orderId) {
+      orderId = urlParams.get('vnp_TxnRef');
+      
+      // If we have VNPay params, process the callback first
+      if (orderId && urlParams.has('vnp_ResponseCode')) {
+        // Call API to process VNPay return callback
+        fetch(`${API_BASE}/payments/return/vnpay?${window.location.search.substring(1)}`)
+          .then(() => {
+            // After processing, reload page with orderId only
+            window.location.href = `${window.location.pathname}?orderId=${orderId}`;
+          })
+          .catch(err => {
+            console.error('Error processing callback:', err);
+            // Continue anyway with orderId
+          });
+      }
+    }
+    
+    const statusIcon = document.getElementById('statusIcon');
+    const statusTitle = document.getElementById('statusTitle');
+    const statusMessage = document.getElementById('statusMessage');
+    const orderInfo = document.getElementById('orderInfo');
+    const orderIdEl = document.getElementById('orderId');
+    const orderStatusEl = document.getElementById('orderStatus');
+    const orderAmountEl = document.getElementById('orderAmount');
+    const actions = document.getElementById('actions');
+    
+    function getAuthToken() {
+      const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+      if (authStr) {
+        try {
+          const auth = JSON.parse(authStr);
+          if (auth?.token) return auth.token;
+        } catch {}
+      }
+      return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
+    }
+    
+    async function checkPaymentStatus() {
+      if (!orderId) {
+        showError('Không tìm thấy mã đơn hàng.');
+        return;
+      }
+      
+      const token = getAuthToken();
+      if (!token) {
+        showError('Vui lòng đăng nhập để xem trạng thái thanh toán.');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/payments/status/${orderId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Không thể lấy trạng thái thanh toán.');
+        }
+        
+        const data = await response.json();
+        
+        // Update UI
+        orderIdEl.textContent = data.orderId || orderId;
+        orderStatusEl.textContent = getStatusText(data.orderStatus);
+        orderAmountEl.textContent = formatCurrency(data.payment?.amount || 0);
+        
+        // Show appropriate status
+        if (data.orderStatus === 'paid' && data.payment?.status === 'succeeded') {
+          showSuccess('Thanh toán thành công!');
+        } else if (data.orderStatus === 'failed' || data.payment?.status === 'failed') {
+          showFailed('Thanh toán thất bại.');
+        } else if (data.orderStatus === 'pending') {
+          showPending('Đang chờ thanh toán...');
+        } else {
+          showPending('Đang xử lý...');
+        }
+        
+        orderInfo.style.display = 'block';
+        actions.style.display = 'flex';
+        
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+        showError('Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại sau.');
+      }
+    }
+    
+    function showSuccess(message) {
+      statusIcon.className = 'icon success';
+      statusIcon.innerHTML = '✓';
+      statusTitle.textContent = 'Thanh toán thành công!';
+      statusMessage.textContent = message;
+    }
+    
+    function showFailed(message) {
+      statusIcon.className = 'icon failed';
+      statusIcon.innerHTML = '✕';
+      statusTitle.textContent = 'Thanh toán thất bại';
+      statusMessage.textContent = message;
+    }
+    
+    function showPending(message) {
+      statusIcon.className = 'icon pending';
+      statusIcon.innerHTML = '⏳';
+      statusTitle.textContent = 'Đang xử lý';
+      statusMessage.textContent = message;
+    }
+    
+    function showError(message) {
+      statusIcon.className = 'icon failed';
+      statusIcon.innerHTML = '✕';
+      statusTitle.textContent = 'Lỗi';
+      statusMessage.textContent = message;
+      actions.style.display = 'flex';
+    }
+    
+    function getStatusText(status) {
+      const statusMap = {
+        'paid': 'Đã thanh toán',
+        'pending': 'Chờ thanh toán',
+        'failed': 'Thanh toán thất bại',
+        'cancelled': 'Đã hủy'
+      };
+      return statusMap[status] || status;
+    }
+    
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(amount);
+    }
+    
+    // Check payment status on load
+    checkPaymentStatus();
+    
+    // Poll for status update (every 2 seconds, max 10 times)
+    let pollCount = 0;
+    const maxPolls = 10;
+    const pollInterval = setInterval(() => {
+      pollCount++;
+      if (pollCount >= maxPolls) {
+        clearInterval(pollInterval);
+        return;
+      }
+      checkPaymentStatus();
+    }, 2000);
+  </script>
+</body>
+</html>
+
