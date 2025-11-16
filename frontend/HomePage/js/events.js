@@ -142,7 +142,8 @@ function renderEventsToSection(events, sectionIndex = 0) {
       ? event.cover
       : FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
 
-    const location = event.city || 'Chưa có địa điểm';
+    // Ưu tiên venue từ show, sau đó mới đến city
+    const location = event.venue || event.city || 'Chưa có địa điểm';
 
     // Dùng thông tin giá từ API đã tối ưu
     const price = event.price?.display || 'Liên hệ';
@@ -290,13 +291,13 @@ function updateSliderWithEvents(events) {
     cta.style.position = 'absolute';
     cta.style.left = '24px';
     cta.style.bottom = '24px';
-    cta.style.padding = '12px 18px';
+    cta.style.padding = '8px 17px';
     cta.style.border = 'none';
-    cta.style.borderRadius = '999px';
-    cta.style.background = '#2ecc71';
+    cta.style.borderRadius = '5px';
+    cta.style.background = '#1f8a53';
     cta.style.color = '#fff';
     cta.style.fontWeight = '700';
-    cta.style.boxShadow = '0 10px 30px rgba(46,204,113,0.35)';
+    cta.style.boxShadow = '0 20px 30px rgba(46,204,113,0.35)';
     cta.style.cursor = 'pointer';
     cta.addEventListener('click', (e) => { e.stopPropagation(); goSmartEvent(event); });
     tile.appendChild(cta);

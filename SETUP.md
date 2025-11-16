@@ -159,12 +159,55 @@ npm run sync:seatmaps
 # Update seatmaps cho shows chưa có
 npm run update:seatmaps
 
+# Export dữ liệu ra file JSON (để chia sẻ với team)
+npm run export:data
+
+# Import dữ liệu từ file JSON
+npm run import:data <path-to-file.json>
+
 # Xem Prisma Studio (GUI để xem database)
 npm run -w packages/db db
 
 # Cleanup database (xóa tất cả dữ liệu)
 npm run dev:clean
 ```
+
+## 📦 Export/Import Dữ liệu
+
+### Export dữ liệu hiện tại
+
+Để chia sẻ dữ liệu của bạn với team:
+
+```bash
+npm run export:data
+```
+
+File `data_export.json` sẽ được tạo trong thư mục root, chứa:
+- ✅ Roles
+- ✅ Users (không có password, sẽ tạo password mặc định khi import)
+- ✅ Venues
+- ✅ SeatMaps
+- ✅ Events
+- ✅ Shows
+- ✅ Orders
+- ✅ Tickets
+
+### Import dữ liệu
+
+Team có thể import dữ liệu của bạn:
+
+```bash
+# Import từ file mặc định (data_export.json)
+npm run import:data
+
+# Hoặc chỉ định file cụ thể
+npm run import:data path/to/your/export.json
+```
+
+> ⚠️ **Lưu ý**: 
+> - Khi import, tất cả users sẽ có password mặc định: `Password@123`
+> - Dữ liệu sẽ được upsert (update nếu đã tồn tại, tạo mới nếu chưa có)
+> - Nên backup database trước khi import
 
 ## 🐛 Troubleshooting
 

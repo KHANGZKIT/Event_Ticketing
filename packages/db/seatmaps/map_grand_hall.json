@@ -1,0 +1,88 @@
+{
+  "id": "map_grand_hall",
+  "name": "Grand Hall – Premium Event",
+  "priceTiers": {
+    "Diamond": 500000,
+    "Platinum": 350000,
+    "Gold": 250000,
+    "Silver": 150000
+  },
+  "zones": [
+    {
+      "id": "Diamond",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 15
+        }
+      ]
+    },
+    {
+      "id": "Platinum",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 18
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 18
+        }
+      ]
+    },
+    {
+      "id": "Gold",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 20
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 20
+        }
+      ]
+    },
+    {
+      "id": "Silver",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "type": "grand_hall",
+    "capacity": 300
+  }
+}
+

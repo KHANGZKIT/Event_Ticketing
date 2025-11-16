@@ -11,8 +11,8 @@
   <style>
     /* CSS CỤC BỘ (Đã dọn dẹp) */
     :root {
-      --green: rgb(45, 194, 117);
-      --black: rgb(42, 45, 52);
+      --green: rgb(7, 117, 60);
+      --black: rgb(105, 109, 118);
       --dark-gray: rgb(50, 53, 60);
       --white: #ffffff;
       --red: #ff4d4f;
@@ -29,7 +29,7 @@
       justify-content: space-around;
       align-items: center;
       padding: 20px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 0px solid rgba(255, 255, 255, 0.1);
     }
 
     .step {
@@ -59,7 +59,6 @@
       font-size: 0.9rem;
     }
 
-    /* Ghi đè .content của style.css */
     .content {
       padding: 40px 20px;
       display: flex;
@@ -110,15 +109,11 @@
       transition: all 0.3s ease;
     }
 
-    /* Thêm đoạn này vào bên trong thẻ <style> của file create-event.html */
-
     .upload-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      /* Đây là chìa khóa: ảnh sẽ tự co dãn và cắt bớt phần thừa */
       border-radius: 10px;
-      /* Giữ bo góc của hộp */
     }
 
     .upload-box:hover {
@@ -179,7 +174,6 @@
     .ticket-editor .ticket-row {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 50px;
-      /* Tên | SL | Giá | Nút Xóa */
       gap: 15px;
       margin-bottom: 15px;
       align-items: center;

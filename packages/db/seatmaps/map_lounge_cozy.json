@@ -1,0 +1,51 @@
+{
+  "id": "map_lounge_cozy",
+  "name": "Lounge Cozy – Intimate Setting",
+  "priceTiers": {
+    "VIP": 200000,
+    "Regular": 100000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 6
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 6
+        }
+      ]
+    },
+    {
+      "id": "Regular",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 8
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 8
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 8
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "type": "lounge",
+    "capacity": 50
+  }
+}
+

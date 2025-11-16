@@ -8,14 +8,29 @@ const EVENTS_BASE = `${API_BASE}/events`;
 // AUTH HELPERS
 // ========================
 function getAuthToken() {
+  // Thử lấy từ auth object trước
   const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
   if (authStr) {
     try {
       const auth = JSON.parse(authStr);
-      if (auth?.token) return auth.token;
-    } catch {}
+      if (auth?.token) {
+        console.log('[getAuthToken] Found token in auth object');
+        return auth.token;
+      }
+    } catch (e) {
+      console.warn('[getAuthToken] Failed to parse auth:', e);
+    }
   }
-  return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
+  
+  // Fallback: lấy từ accessToken
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  if (token) {
+    console.log('[getAuthToken] Found token in accessToken');
+    return token;
+  }
+  
+  console.warn('[getAuthToken] No token found in storage');
+  return null;
 }
 
 function isAuthenticated() {
@@ -84,19 +99,36 @@ function closeModal() {
 async function fetchJSON(url, opts = {}, tries = 2) {
   try {
     const r = await fetch(url, opts);
-    let data = null; try { data = await r.json(); } catch { }
+    let data = null; 
+    try { 
+      data = await r.json(); 
+    } catch (e) {
+      // Nếu không parse được JSON, lấy text
+      const text = await r.text();
+      console.error('[fetchJSON] Response not JSON:', text);
+    }
+    
     if (!r.ok) {
-      const msg = data?.message || `HTTP ${r.status}`;
+      const msg = data?.error?.message || data?.message || `HTTP ${r.status}`;
+      console.error('[fetchJSON] Error response:', { status: r.status, statusText: r.statusText, data });
+      
       // backoff nhẹ khi 429
       if (r.status === 429 && tries > 0) {
         await new Promise(res => setTimeout(res, 600));
         return fetchJSON(url, opts, tries - 1);
       }
-      throw new Error(msg);
+      
+      // Thêm status code vào error message
+      const error = new Error(msg);
+      error.status = r.status;
+      error.data = data;
+      throw error;
     }
     return data;
   } catch (e) {
-    if (/Failed to fetch/i.test(String(e))) e = new Error("Không kết nối được máy chủ.");
+    if (/Failed to fetch/i.test(String(e))) {
+      e = new Error("Không kết nối được máy chủ.");
+    }
     throw e;
   }
 }
@@ -445,6 +477,17 @@ modalPay?.addEventListener('click', async () => {
   }
 
   const token = getAuthToken();
+  
+  // Kiểm tra token trước khi gửi request
+  if (!token) {
+    alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+    const redirectTo = encodeURIComponent(location.href);
+    window.location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${redirectTo}`;
+    return;
+  }
+  
+  console.log('[seatmap] Token found:', token.substring(0, 20) + '...');
+  
   const seatLabels = [...selected.keys()];
   
   // Tạo idempotency key để tránh duplicate requests (dùng crypto.randomUUID nếu có, hoặc timestamp + random)
@@ -459,6 +502,7 @@ modalPay?.addEventListener('click', async () => {
     
     try {
       // Tạo hold với API
+      console.log('[seatmap] Creating hold with:', { showId: currentShowId, seats: seatLabels, tokenLength: token.length });
       const holdResponse = await fetchJSON(`${API_BASE}/holds`, {
         method: 'POST',
         headers: {
@@ -508,13 +552,28 @@ modalPay?.addEventListener('click', async () => {
       }
     } catch (error) {
       console.error('Error creating hold:', error);
+      console.error('Error details:', { 
+        message: error.message, 
+        status: error.status, 
+        data: error.data 
+      });
       
-      // Xử lý lỗi HTTP 409 Conflict
+      // Xử lý lỗi HTTP 401 Unauthorized
       let errorMessage = 'Không thể đặt ghế. Vui lòng thử lại.';
-      if (error.message && error.message.includes('409')) {
+      
+      if (error.status === 401 || error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+        // Redirect đến trang login
+        const redirectTo = encodeURIComponent(location.href);
+        alert(errorMessage);
+        window.location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${redirectTo}`;
+        return;
+      } else if (error.status === 409 || error.message?.includes('409')) {
         errorMessage = 'Ghế đã được người khác chọn hoặc đang được giữ. Vui lòng chọn ghế khác.';
       } else if (error.message && error.message.includes('already held')) {
         errorMessage = error.message;
+      } else if (error.data?.error?.message) {
+        errorMessage = error.data.error.message;
       } else if (error.message) {
         errorMessage = error.message;
       }

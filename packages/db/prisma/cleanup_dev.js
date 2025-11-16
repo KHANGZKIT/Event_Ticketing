@@ -11,6 +11,7 @@ async function main() {
         prisma.show.deleteMany({}),
         prisma.event.deleteMany({}),
         prisma.idempotencyKey.deleteMany({}),
+        prisma.seatMap.deleteMany({}),
         // giữ admin nếu có
         prisma.userRole.deleteMany({ where: { user: { email: { not: "admin@gmail.com" } } } }),
         prisma.user.deleteMany({ where: { email: { not: "admin@gmail.com" } } }),

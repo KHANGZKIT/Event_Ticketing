@@ -41,6 +41,30 @@ function validateSeatmap(tpl) {
     });
 }
 
+/* --------- Seatmap helpers --------- */
+
+async function cloneSeatMapForShow(showId, sourceSeatMapId) {
+    if (!sourceSeatMapId) return null;
+    const tpl = await loadSeatMapTemplate(sourceSeatMapId);
+    const seatMapName = `show-${showId}-${Date.now()}`;
+    const seatMapRecord = await prisma.seatMap.create({
+        data: {
+            name: seatMapName,
+            schema: tpl,
+        },
+    });
+
+    await prisma.show.update({
+        where: { id: showId },
+        data: {
+            seatMapId: sourceSeatMapId,
+            seatMapDbId: seatMapRecord.id,
+        },
+    });
+
+    return seatMapRecord;
+}
+
 /* --------- Shows --------- */
 
 export async function getShow(id) {
@@ -67,7 +91,9 @@ export async function createShow(data) {
         throw e;
     }
 
-    return prisma.show.create({
+    const seatMapSource = data.seatMapDbId ?? data.seatMapId ?? null;
+
+    const show = await prisma.show.create({
         data: {
             eventId: data.eventId,
             startsAt: safeDate(data.startsAt) ?? new Date(),
@@ -75,10 +101,17 @@ export async function createShow(data) {
             seatMapId: data.seatMapId ?? null,
             // optional nâng cấp dần:
             venueDbId: data.venueDbId ?? null,
-            seatMapDbId: data.seatMapDbId ?? null,
+            seatMapDbId: null, // luôn clone seatmap riêng cho show
             status: data.status ?? "scheduled",
         },
     });
+
+    if (seatMapSource) {
+        await cloneSeatMapForShow(show.id, seatMapSource);
+        return prisma.show.findUnique({ where: { id: show.id } });
+    }
+
+    return show;
 }
 
 export async function updateShow(id, data) {
@@ -92,23 +125,34 @@ export async function updateShow(id, data) {
         throw e;
     }
 
-    return prisma.show.update({
+    const updateData = {
+        ...(data.eventId !== undefined ? { eventId: data.eventId } : {}),
+        ...(data.startsAt !== undefined ? { startsAt: safeDate(data.startsAt) } : {}),
+        ...(data.venue !== undefined ? { venue: data.venue } : {}),
+        ...(data.venueDbId !== undefined ? { venueDbId: data.venueDbId } : {}),
+        ...(data.status !== undefined ? { status: data.status } : {}),
+    };
+
+    const hasSeatMapInput = Object.prototype.hasOwnProperty.call(data, 'seatMapId')
+        || Object.prototype.hasOwnProperty.call(data, 'seatMapDbId');
+    const seatMapSource = data.seatMapDbId ?? data.seatMapId ?? null;
+
+    if (hasSeatMapInput && !seatMapSource) {
+        updateData.seatMapId = null;
+        updateData.seatMapDbId = null;
+    }
+
+    const updated = await prisma.show.update({
         where: { id },
-        data: {
-            ...(data.eventId !== undefined ? { eventId: data.eventId } : {}),
-            ...(data.startsAt !== undefined
-                ? { startsAt: safeDate(data.startsAt) }
-                : {}),
-            ...(data.venue !== undefined ? { venue: data.venue } : {}),
-            ...(data.seatMapId !== undefined ? { seatMapId: data.seatMapId } : {}),
-            ...(data.venueDbId !== undefined ? { venueDbId: data.venueDbId } : {}),
-            ...(data.seatMapDbId !== undefined
-                ? { seatMapDbId: data.seatMapDbId }
-                : {}),
-            ...(data.status !== undefined ? { status: data.status } : {}),
-        },
-        // có thể select tuỳ ý ở đây nếu muốn rút gọn response
+        data: updateData,
     });
+
+    if (seatMapSource) {
+        await cloneSeatMapForShow(id, seatMapSource);
+        return prisma.show.findUnique({ where: { id } });
+    }
+
+    return updated;
 }
 
 export async function deleteShow(id) {

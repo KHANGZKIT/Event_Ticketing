@@ -408,7 +408,7 @@ body {
 .cart {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 18px 20px;
   box-shadow: 0 12px 30px rgba(17, 24, 39, .06);
 }

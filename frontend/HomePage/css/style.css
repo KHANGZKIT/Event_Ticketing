@@ -48,9 +48,9 @@ body {
 .search-bar {
   display: flex;
   width: 380px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.24);
   backdrop-filter: blur(20px);
-  border-radius: 50px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
   transition: all 0.4s ease;
@@ -105,31 +105,30 @@ body {
   backdrop-filter: blur(20px);
   color: white;
   padding: 12px 24px;
-  border-radius: 50px;
+  border-radius: 15px;
   font-weight: 600;
   font-size: 15px;
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.4s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .my-ticket a:hover,
 .btn-login:hover,
 .btn-register:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(63, 93, 103, 0.9);
   color: #2ecc71;
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(46, 204, 113, 0.4);
+  box-shadow: 0 12px 40px rgba(10, 29, 18, 0.4);
 }
 
 .btn-register {
-  background: linear-gradient(135deg, #3498db, #2980b9);
+  background: linear-gradient(135deg, #b22647, #0c3390);
 }
 
 .btn-register:hover {
   color: white;
-  background: linear-gradient(135deg, #5dade2, #3498db);
+  background: linear-gradient(135deg, #b22647, #0c3390);
 }
 
 /* MENU CONTAINER */
@@ -187,11 +186,11 @@ body {
 }
 
 .dropbtn {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(63, 99, 85, 0.396);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 10px 20px;
-  border-radius: 50px;
+  border: 1px solid rgba(42, 40, 40, 0.2);
+  padding: 10px 30px;
+  border-radius: 5px;
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -246,12 +245,11 @@ body {
   transform: rotate(180deg);
 }
 
-/* CONTENT */
+
 .content {
   padding: 40px 60px;
 }
 
-/* SLIDER */
 .slider-container {
   position: relative;
   width: 100%;
@@ -335,12 +333,11 @@ body {
   transform: scale(1.2);
 }
 
-/* EVENT SECTION */
 .event-section h3 {
   font-size: 28px;
   font-weight: 700;
   margin: 50px 0 30px;
-  background: linear-gradient(135deg, #fff, #2ecc71);
+  background: linear-gradient(135deg, #92eabbf6, #4b80dd);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -351,8 +348,6 @@ body {
   grid-template-columns: repeat(5, 1fr);
   gap: 28px;
 }
-
-/* Responsive cho màn hình vừa */
 @media (max-width: 1400px) {
   .event-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -372,9 +367,9 @@ body {
 }
 
 .event-card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(96, 210, 178, 0.076);
   backdrop-filter: blur(15px);
-  border-radius: 20px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.4s ease;
@@ -614,7 +609,7 @@ body {
   }
 
   .event-card {
-    border-radius: 16px;
+    border-radius: 10px;
   }
 
   .event-card img {
@@ -732,10 +727,10 @@ button,
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #e9edf1;
-  background: #fff;
+  border: 1px solid #194f1b;
+  background: #c8b6d57b;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 10px;
   cursor: pointer;
   line-height: 1;
 }
@@ -743,7 +738,7 @@ button,
 .user-btn .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #1f2937;
+  color: #080809;
   max-width: 160px;
   white-space: nowrap;
   overflow: hidden;
@@ -786,12 +781,12 @@ button,
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
-  min-width: 180px;
+  min-width: 165px;
   background: #fff;
   border: 1px solid #e9edf1;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  padding: 8px;
+  border-radius: 5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.088);
+  padding: 5px;
   z-index: 50;
 }
 
@@ -800,8 +795,9 @@ button,
   padding: 8px 10px;
   border-radius: 8px;
   text-decoration: none;
-  color: #111827;
+  color: #0c3d52;
   font-size: 14px;
+  font-weight: bold;
 }
 
 .user-dropdown .dropdown-item:hover {

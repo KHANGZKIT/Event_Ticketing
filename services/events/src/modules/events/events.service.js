@@ -92,14 +92,73 @@ export async function listEvents(query) {
         _min: { startsAt: true },
     });
 
+    // 4) Lấy show đầu tiên của mỗi event để lấy venue và giá
+    const firstShows = await prisma.show.findMany({
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        select: {
+            id: true,
+            eventId: true,
+            venue: true,
+            venueDb: {
+                select: {
+                    name: true,
+                    address: true,
+                },
+            },
+            ticketTypes: {
+                select: {
+                    price: true,
+                },
+                orderBy: {
+                    price: 'asc',
+                },
+                take: 1,
+            },
+        },
+        orderBy: {
+            startsAt: 'asc',
+        },
+    });
+
+    // Map eventId -> firstShow (lấy show đầu tiên của mỗi event)
+    const showToEventMap = new Map();
+    firstShows.forEach(s => {
+        if (!showToEventMap.has(s.eventId)) {
+            showToEventMap.set(s.eventId, s);
+        }
+    });
+
     const countMap = new Map(counts.map(c => [c.eventId, c._count._all]));
     const minMap = new Map(mins.map(m => [m.eventId, m._min.startsAt || null]));
 
-    const items = events.map(e => ({
-        ...e,
-        upcomingCount: countMap.get(e.id) ?? 0,
-        minStartsAt: minMap.get(e.id) ?? null,
-    }));
+    const items = events.map(e => {
+        const firstShow = showToEventMap.get(e.id);
+        const venue = firstShow?.venueDb?.name || firstShow?.venue || null;
+        const venueAddress = firstShow?.venueDb?.address || null;
+        
+        // Tìm giá min từ show đầu tiên
+        let minPrice = null;
+        if (firstShow?.ticketTypes && firstShow.ticketTypes.length > 0) {
+            minPrice = firstShow.ticketTypes[0].price;
+        }
+
+        return {
+            ...e,
+            upcomingCount: countMap.get(e.id) ?? 0,
+            minStartsAt: minMap.get(e.id) ?? null,
+            venue: venue,
+            venueAddress: venueAddress,
+            price: minPrice ? {
+                min: minPrice,
+                display: `${minPrice.toLocaleString('vi-VN')} đ`,
+            } : null,
+        };
+    });
 
     return { items, total, page: Number(page), pageSize: take };
 }

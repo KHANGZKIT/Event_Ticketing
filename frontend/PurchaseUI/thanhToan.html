@@ -81,7 +81,7 @@
   <main class="container" id="mainContent">
     <!-- Form Section -->
     <section aria-labelledby="sectionFormTitle">
-      <h2 class="section-title" id="sectionFormTitle">BẢNG CÂU HỎI</h2>
+      <h2 class="section-title" id="sectionFormTitle">THANH TOÁN</h2>
 
       <article class="form-card" aria-labelledby="ticket-label-name">
         <header class="form-header">
@@ -136,6 +136,44 @@
           </form>
         </div>
       </article>
+
+      <!-- Payment Method Selection -->
+      <article class="form-card" aria-labelledby="payment-method-label">
+        <header class="form-header">
+          <h3 id="payment-method-label">Chọn phương thức thanh toán</h3>
+        </header>
+
+        <div class="payment-methods">
+          <label class="payment-method-option">
+            <input type="radio" name="paymentMethod" value="momo" id="paymentMomo" required>
+            <div class="payment-method-card">
+              <div class="payment-method-header">
+                <img src="./MOMO-Logo-App.png" alt="MoMo Wallet" class="payment-icon">
+                <span class="payment-name">MoMo Wallet</span>
+              </div>
+              <div class="payment-info" id="momoInfo" hidden>
+                <p class="payment-description">Thanh toán qua ví điện tử MoMo</p>
+                <p class="payment-note">Sử dụng ứng dụng MoMo để quét QR code hoặc thanh toán trực tuyến</p>
+              </div>
+            </div>
+          </label>
+
+          <label class="payment-method-option">
+            <input type="radio" name="paymentMethod" value="vnpay" id="paymentVnpay" required>
+            <div class="payment-method-card">
+              <div class="payment-method-header">
+                <img src="vnpay-seeklogo.svg" alt="VNPay" class="payment-icon">
+                <span class="payment-name">VNPay</span>
+              </div>
+              <div class="payment-info" id="vnpayInfo" hidden>
+                <p class="payment-description">Thanh toán qua cổng VNPay</p>
+                <p class="payment-note">Hỗ trợ thẻ ATM, thẻ tín dụng/ghi nợ nội địa và quốc tế</p>
+              </div>
+            </div>
+          </label>
+        </div>
+        <p class="field-error" id="errorPaymentMethod" role="alert" aria-live="polite"></p>
+      </article>
     </section>
 
     <!-- Sidebar -->
@@ -169,7 +207,7 @@
         <div class="voucher">
           <label for="voucherInput" class="voucher-label">Mã giảm giá (tuỳ chọn)</label>
           <div class="voucher-row">
-            <input id="voucherInput" class="form-input" placeholder="Nhập mã (VD: DELO10)">
+            <input id="voucherInput" class="form-input" placeholder="Nhập mã (VD: XINCHAO)">
             <button id="applyVoucher" class="btn-ghost" type="button">Áp dụng</button>
           </div>
           <p class="voucher-msg" id="voucherMsg" aria-live="polite"></p>

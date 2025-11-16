@@ -52,3 +52,5 @@ pgdata/
 # Backup files
 backup.sql
 *.backup
+data_export.json
+data/

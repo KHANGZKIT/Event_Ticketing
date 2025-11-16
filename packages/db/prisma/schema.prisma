@@ -81,6 +81,7 @@ model Event {
   cover    String?
   startsAt DateTime?
   category  String?
+  description String?
   venueId   String?  
   venue   Venue?  @relation(fields: [venueId], references: [id])
   createdAt DateTime  @default(now())
