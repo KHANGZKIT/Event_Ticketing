@@ -21,7 +21,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 60px;
+  padding: 10px 30px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -65,7 +65,7 @@ body {
   flex: 1;
   border: none;
   outline: none;
-  padding: 14px 20px;
+  padding: 10px 20px;
   background: transparent;
   color: #fff;
   font-size: 15px;
@@ -78,7 +78,7 @@ body {
 .search-bar button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  padding: 14px 20px;
+  padding: 10px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -104,8 +104,8 @@ body {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
   color: white;
-  padding: 12px 24px;
-  border-radius: 15px;
+  padding: 10px 24px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 15px;
   text-decoration: none;
@@ -727,18 +727,19 @@ button,
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #194f1b;
-  background: #c8b6d57b;
+  background: linear-gradient(135deg, #e940ff, #00e0ff);
   padding: 6px 10px;
-  border-radius: 10px;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   line-height: 1;
+  box-shadow: 0 8px 25px rgba(233, 64, 255, 0.2), 0 8px 25px rgba(0, 224, 255, 0.2);
 }
 
 .user-btn .user-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: #080809;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
   max-width: 160px;
   white-space: nowrap;
   overflow: hidden;

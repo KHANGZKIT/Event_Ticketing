@@ -518,6 +518,19 @@ function renderAuthUI() {
     guardMyTicketsNavigation();
   });
 }
+
+// Lắng nghe storage event để cập nhật avatar khi có thay đổi từ trang khác
+window.addEventListener('storage', (e) => {
+  if (e.key === 'avatarUpdated' || e.key === 'auth' || e.key === 'user') {
+    // Re-render auth UI để cập nhật avatar
+    renderAuthUI();
+  }
+});
+
+// Lắng nghe custom event từ cùng tab (khi cập nhật trong cùng window)
+window.addEventListener('avatarUpdated', () => {
+  renderAuthUI();
+});
 (function fixMyTicketLinks() {
   const p = location.pathname;
   const i = p.indexOf('/frontend/');
