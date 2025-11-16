@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,7 +21,7 @@
       justify-content: center;
       padding: 20px;
     }
-    
+
     .container {
       background: white;
       border-radius: 16px;
@@ -30,7 +31,7 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       text-align: center;
     }
-    
+
     .icon {
       width: 80px;
       height: 80px;
@@ -41,34 +42,34 @@
       justify-content: center;
       font-size: 40px;
     }
-    
+
     .icon.success {
       background: #10b981;
       color: white;
     }
-    
+
     .icon.failed {
       background: #ef4444;
       color: white;
     }
-    
+
     .icon.pending {
       background: #f59e0b;
       color: white;
     }
-    
+
     h1 {
       font-size: 24px;
       margin-bottom: 12px;
       color: #1f2937;
     }
-    
+
     .message {
       color: #6b7280;
       margin-bottom: 24px;
       line-height: 1.6;
     }
-    
+
     .order-info {
       background: #f9fafb;
       border-radius: 8px;
@@ -76,34 +77,34 @@
       margin-bottom: 24px;
       text-align: left;
     }
-    
+
     .order-info-item {
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
       border-bottom: 1px solid #e5e7eb;
     }
-    
+
     .order-info-item:last-child {
       border-bottom: none;
     }
-    
+
     .order-info-label {
       color: #6b7280;
       font-weight: 500;
     }
-    
+
     .order-info-value {
       color: #1f2937;
       font-weight: 600;
     }
-    
+
     .actions {
       display: flex;
       gap: 12px;
       flex-direction: column;
     }
-    
+
     .btn {
       padding: 12px 24px;
       border-radius: 8px;
@@ -115,25 +116,25 @@
       cursor: pointer;
       font-size: 16px;
     }
-    
+
     .btn-primary {
       background: #667eea;
       color: white;
     }
-    
+
     .btn-primary:hover {
       background: #5568d3;
     }
-    
+
     .btn-secondary {
       background: #f3f4f6;
       color: #1f2937;
     }
-    
+
     .btn-secondary:hover {
       background: #e5e7eb;
     }
-    
+
     .loading {
       display: inline-block;
       width: 20px;
@@ -145,12 +146,15 @@
       margin-right: 8px;
       vertical-align: middle;
     }
-    
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="icon" id="statusIcon">
@@ -180,30 +184,12 @@
 
   <script>
     const API_BASE = 'http://localhost:4000/api';
-    
-    // Get orderId from URL
     const urlParams = new URLSearchParams(window.location.search);
     let orderId = urlParams.get('orderId');
-    
-    // If no orderId, try to get from VNPay callback params (vnp_TxnRef)
-    if (!orderId) {
-      orderId = urlParams.get('vnp_TxnRef');
-      
-      // If we have VNPay params, process the callback first
-      if (orderId && urlParams.has('vnp_ResponseCode')) {
-        // Call API to process VNPay return callback
-        fetch(`${API_BASE}/payments/return/vnpay?${window.location.search.substring(1)}`)
-          .then(() => {
-            // After processing, reload page with orderId only
-            window.location.href = `${window.location.pathname}?orderId=${orderId}`;
-          })
-          .catch(err => {
-            console.error('Error processing callback:', err);
-            // Continue anyway with orderId
-          });
-      }
+    if (urlParams.get('vnp_TxnRef') && urlParams.has('vnp_ResponseCode')) {
+      window.location.href = `${API_BASE}/payments/return/vnpay?${window.location.search.substring(1)}`;
     }
-    
+
     const statusIcon = document.getElementById('statusIcon');
     const statusTitle = document.getElementById('statusTitle');
     const statusMessage = document.getElementById('statusMessage');
@@ -212,48 +198,55 @@
     const orderStatusEl = document.getElementById('orderStatus');
     const orderAmountEl = document.getElementById('orderAmount');
     const actions = document.getElementById('actions');
-    
+
     function getAuthToken() {
       const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
       if (authStr) {
         try {
           const auth = JSON.parse(authStr);
           if (auth?.token) return auth.token;
-        } catch {}
+        } catch { }
       }
       return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
     }
-    
+
     async function checkPaymentStatus() {
       if (!orderId) {
         showError('Không tìm thấy mã đơn hàng.');
         return;
       }
-      
+
       const token = getAuthToken();
       if (!token) {
         showError('Vui lòng đăng nhập để xem trạng thái thanh toán.');
         return;
       }
-      
+
       try {
         const response = await fetch(`${API_BASE}/payments/status/${orderId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!response.ok) {
-          throw new Error('Không thể lấy trạng thái thanh toán.');
+          const text = await response.text();
+          console.error(
+            'payments/status error:',
+            response.status,
+            response.statusText,
+            text
+          );
+          throw new Error('Lỗi khi lấy trạng thái thanh toán.');
         }
-        
+
         const data = await response.json();
-        
+
         // Update UI
         orderIdEl.textContent = data.orderId || orderId;
         orderStatusEl.textContent = getStatusText(data.orderStatus);
         orderAmountEl.textContent = formatCurrency(data.payment?.amount || 0);
-        
+
         // Show appropriate status
         if (data.orderStatus === 'paid' && data.payment?.status === 'succeeded') {
           showSuccess('Thanh toán thành công!');
@@ -264,37 +257,37 @@
         } else {
           showPending('Đang xử lý...');
         }
-        
+
         orderInfo.style.display = 'block';
         actions.style.display = 'flex';
-        
+
       } catch (error) {
         console.error('Error checking payment status:', error);
         showError('Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại sau.');
       }
     }
-    
+
     function showSuccess(message) {
       statusIcon.className = 'icon success';
       statusIcon.innerHTML = '✓';
       statusTitle.textContent = 'Thanh toán thành công!';
       statusMessage.textContent = message;
     }
-    
+
     function showFailed(message) {
       statusIcon.className = 'icon failed';
       statusIcon.innerHTML = '✕';
       statusTitle.textContent = 'Thanh toán thất bại';
       statusMessage.textContent = message;
     }
-    
+
     function showPending(message) {
       statusIcon.className = 'icon pending';
       statusIcon.innerHTML = '⏳';
       statusTitle.textContent = 'Đang xử lý';
       statusMessage.textContent = message;
     }
-    
+
     function showError(message) {
       statusIcon.className = 'icon failed';
       statusIcon.innerHTML = '✕';
@@ -302,7 +295,7 @@
       statusMessage.textContent = message;
       actions.style.display = 'flex';
     }
-    
+
     function getStatusText(status) {
       const statusMap = {
         'paid': 'Đã thanh toán',
@@ -312,17 +305,17 @@
       };
       return statusMap[status] || status;
     }
-    
+
     function formatCurrency(amount) {
       return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
       }).format(amount);
     }
-    
+
     // Check payment status on load
     checkPaymentStatus();
-    
+
     // Poll for status update (every 2 seconds, max 10 times)
     let pollCount = 0;
     const maxPolls = 10;
@@ -336,5 +329,5 @@
     }, 2000);
   </script>
 </body>
-</html>
 
+</html>

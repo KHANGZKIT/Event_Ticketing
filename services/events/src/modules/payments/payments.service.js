@@ -9,7 +9,7 @@ import { getPaymentConfig } from "../../config/payment.config.js";
  */
 function getProvider(providerName) {
     const config = getPaymentConfig(providerName);
-    
+
     switch (providerName) {
         case 'momo':
             return new MoMoProvider(config);
@@ -134,23 +134,27 @@ export async function createPayment(userId, body) {
     });
 
     // Generate payment URL
-    const orderInfo = `Thanh toan ve suat ${order.show.event.name} - ${order.show.startsAt.toLocaleString('vi-VN')}`;
+
+    // Đơn giản hóa orderInfo, không cần xóa gạch ngang
+    // vì vnpay.provider sẽ tự đồng nhất vnp_TxnRef và vnp_OrderInfo
+    const orderInfo = `Thanh toan cho don hang ${orderId}`;
+
     const notifyUrl = `${process.env.API_BASE_URL || 'http://localhost:4000'}/api/payments/webhooks/${provider}`;
 
     const paymentResult = await paymentProvider.createPaymentUrl({
-        orderId,
+        orderId, // Truyền orderId (UUID) gốc
         amount: order.amount,
-        orderInfo,
-        returnUrl,
-        cancelUrl,
+        orderInfo, // Truyền orderInfo (đã đơn giản hóa)
         notifyUrl
+        // Không truyền returnUrl, để vnpay.provider tự lấy
     });
 
     // Update payment with provider reference
     await prisma.payment.update({
         where: { id: payment.id },
         data: {
-            providerRef: paymentResult.requestId || paymentResult.transactionId
+            // Lưu lại vnp_TxnRef (đã xóa gạch ngang)
+            providerRef: paymentResult.requestId
         }
     });
 
@@ -167,10 +171,15 @@ export async function createPayment(userId, body) {
  * Process webhook from payment provider
  */
 export async function processWebhook(providerName, webhookData) {
+    console.log('[processWebhook] Provider:', providerName);
+    console.log('[processWebhook] Webhook data:', JSON.stringify(webhookData, null, 2));
+
     const provider = getProvider(providerName);
-    
+
     // Verify signature
     const signature = webhookData.signature || webhookData.vnp_SecureHash;
+    console.log('[processWebhook] Received signature:', signature);
+
     if (!provider.verifySignature(webhookData, signature)) {
         const err = new Error('Invalid webhook signature');
         err.status = 400;
@@ -179,11 +188,13 @@ export async function processWebhook(providerName, webhookData) {
 
     // Parse webhook data
     const parsedData = provider.parseWebhookData(webhookData);
-    
-    // Find payment by orderId
+
+    // SỬA LỖI 3: Tìm payment bằng providerRef (là vnp_TxnRef)
+    // vì orderId trong CSDL là UUID (có gạch ngang)
+    // còn providerRef/vnp_TxnRef là (không có gạch ngang)
     const payment = await prisma.payment.findFirst({
         where: {
-            orderId: parsedData.orderId,
+            providerRef: parsedData.providerRef, // Tìm bằng providerRef
             provider: providerName
         },
         include: {
@@ -192,7 +203,7 @@ export async function processWebhook(providerName, webhookData) {
     });
 
     if (!payment) {
-        const err = new Error('Payment not found');
+        const err = new Error(`Payment not found for providerRef: ${parsedData.providerRef}`);
         err.status = 404;
         throw err;
     }
@@ -203,10 +214,12 @@ export async function processWebhook(providerName, webhookData) {
     return {
         success: true,
         paymentId: payment.id,
-        orderId: payment.orderId,
+        orderId: payment.orderId, // Trả về orderId GỐC (có gạch ngang)
         status: paymentStatus
     };
 }
+
+// ... (Các hàm còn lại giữ nguyên) ...
 
 export async function syncPaymentStatusFromProvider(providerName, orderId) {
     if (!orderId) throw new Error('orderId is required');
@@ -288,4 +301,3 @@ export async function getPaymentStatus(orderId, userId) {
         } : null
     };
 }
-

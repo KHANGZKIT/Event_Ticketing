@@ -22,9 +22,12 @@ export async function handleWebhook(req, res, next) {
 export async function getPaymentStatus(req, res, next) {
     try {
         const { orderId } = req.params;
+        console.log('[getPaymentStatus] orderId =', orderId, 'userId =', req.userId);
         const result = await svc.getPaymentStatus(orderId, req.userId);
+        console.log('[getPaymentStatus] result =', result);
         res.json(result);
     } catch (e) {
+        console.error('[getPaymentStatus] error:', e.status, e.message);
         next(e);
     }
 }
@@ -37,7 +40,11 @@ export async function handleReturnCallback(req, res, next) {
     try {
         const provider = req.params.provider;
         const callbackData = req.query;
-        
+
+        console.log('[Payment Return] Provider:', provider);
+        console.log('[Payment Return] Callback data keys:', Object.keys(callbackData));
+        console.log('[Payment Return] Callback data:', JSON.stringify(callbackData, null, 2));
+
         // For VNPay: has query params with payment info, process immediately
         // For MoMo: usually no query params, webhook handles it, but we can check status
         if (provider === 'vnpay' && callbackData.vnp_TxnRef) {
@@ -77,6 +84,7 @@ export async function handleReturnCallback(req, res, next) {
         }
     } catch (e) {
         // If error, still redirect but with error info
+        console.error('[Payment Return] Error:', e.message);
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000';
         const orderId = req.query.vnp_TxnRef || req.query.orderId || '';
         res.redirect(`${frontendUrl}/frontend/PurchaseUI/payment-return.html?orderId=${orderId}&error=1`);
