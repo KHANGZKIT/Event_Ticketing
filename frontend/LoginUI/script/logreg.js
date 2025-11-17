@@ -13,19 +13,23 @@ function toURL(rel) { return new URL(rel, window.location.href).toString(); }
 function storage(remember) { return remember ? localStorage : sessionStorage; }
 // logreg.js — patch trong saveAuth(...)
 function saveAuth(token, me, remember) {
-  const st = remember ? localStorage : sessionStorage;
+  // SỬA LỖI: Luôn dùng localStorage để đảm bảo token
+  // tồn tại sau khi quay về từ cổng thanh toán.
+  const st = localStorage;
 
+  // Phần còn lại của hàm giữ nguyên
   const display =
     me.fullName || me.displayName || me.name || me.username || me.email || "User";
 
   st.setItem('accessToken', token);
   st.setItem('currentUser', JSON.stringify(me || {}));
 
-  // các key mà TrangChu / header đang đọc:
+  // ... (tất cả các lệnh st.setItem khác của bạn) ...
+
   st.setItem('user', JSON.stringify({
     id: me.id,
     fullName: me.fullName || null,
-    name: display,           // luôn là tên hiển thị “đẹp”
+    name: display,
     email: me.email || null,
     avatar: me.avatar || me.avatarUrl || me.photoURL || null,
     roles: me.roles || me.user?.roles || []
@@ -33,7 +37,6 @@ function saveAuth(token, me, remember) {
 
   st.setItem('profile', JSON.stringify(me || {}));
 
-  // đồng bộ 'auth' để renderAuthUI dùng đúng trường
   st.setItem('auth', JSON.stringify({
     token,
     user: {
