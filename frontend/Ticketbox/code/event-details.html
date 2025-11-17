@@ -5,7 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Chi tiết sự kiện - TicketBook</title>
-
+  <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               connect-src 'self' http://localhost:4000; 
+               img-src 'self' https://salt.tkbcdn.com data:;
+               style-src 'self' 'unsafe-inline'; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';">
   <link rel="stylesheet" href="../../HomePage/css/style.css">
 
   <style>
@@ -53,7 +58,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
       display: flex;
       align-items: flex-end;
       padding: 60px 10%;
@@ -69,7 +74,7 @@
       font-size: 3rem;
       font-weight: 800;
       margin-bottom: 20px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
       line-height: 1.2;
     }
 
@@ -184,7 +189,7 @@
       transition: opacity 0.3s ease;
     }
 
-    .intro-text.expanded ~ .fade-overlay {
+    .intro-text.expanded~.fade-overlay {
       opacity: 0;
     }
 
@@ -427,7 +432,8 @@
         <h1 id="evTitle">Đang tải...</h1>
         <div class="hero-meta">
           <div class="hero-meta-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
               <path d="M8 2v4"></path>
               <path d="M16 2v4"></path>
               <rect width="18" height="18" x="3" y="4" rx="2"></rect>
@@ -436,7 +442,8 @@
             <span id="evTime">Đang tải...</span>
           </div>
           <div class="hero-meta-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
@@ -476,7 +483,8 @@
       <div class="info-card">
         <h3>Thông tin sự kiện</h3>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
             <path d="M8 2v4"></path>
             <path d="M16 2v4"></path>
             <rect width="18" height="18" x="3" y="4" rx="2"></rect>
@@ -488,18 +496,22 @@
           </div>
         </div>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
           <div class="info-item-content">
             <div class="info-item-label">Địa điểm</div>
             <div class="info-item-value" id="evPlaceSidebar">Đang cập nhật</div>
-            <div class="info-item-value" style="font-size: 0.9rem; color: #b0b8c4; font-weight: normal; margin-top: 4px;" id="evAddressSidebar"></div>
+            <div class="info-item-value"
+              style="font-size: 0.9rem; color: #b0b8c4; font-weight: normal; margin-top: 4px;" id="evAddressSidebar">
+            </div>
           </div>
         </div>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
             <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path>
             <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
             <path d="M12 17.5v-11"></path>
@@ -556,21 +568,21 @@
       // Nếu có lỗi, dùng giá trị mặc định
       console.warn('Không thể sử dụng API_BASE từ events.js, dùng giá trị mặc định');
     }
-    
+
     // Lấy eventId từ URL
     const params = new URLSearchParams(location.search);
     const eventId = params.get('eventId');
-    
+
     console.log('🔍 EventId từ URL:', eventId);
     console.log('🔍 Full URL:', window.location.href);
-    
+
     // Định nghĩa các function trước
     async function fetchJSON(url) {
       console.log('📡 Fetching:', url);
       try {
         const r = await fetch(url);
         console.log('📡 Response status:', r.status, r.statusText);
-        
+
         if (!r.ok) {
           const errorText = await r.text();
           console.error('❌ Response error:', errorText);
@@ -579,7 +591,7 @@
           }
           throw new Error(`HTTP ${r.status}: ${errorText}`);
         }
-        
+
         const data = await r.json();
         console.log('✅ Response data:', data);
         return data;
@@ -603,34 +615,34 @@
     async function loadEvent() {
       // Đã validate eventId ở trên, nếu đến đây thì eventId đã có
       console.log('🚀 Bắt đầu load event với ID:', eventId);
-      
+
       try {
         // Hiển thị loading state
         document.getElementById('evTitle').textContent = 'Đang tải...';
         document.getElementById('evTime').textContent = '...';
         document.getElementById('evPlace').textContent = 'Đang cập nhật';
-        
+
         // Fetch dữ liệu từ API
         console.log('📡 Fetching event và shows...');
         const eventUrl = `${API_URL}/events/${encodeURIComponent(eventId)}`;
         const showsUrl = `${API_URL}/events/${encodeURIComponent(eventId)}/shows`;
-        
+
         const [ev, shows] = await Promise.all([
           fetchJSON(eventUrl),
           fetchJSON(showsUrl)
         ]);
-        
+
         console.log('✅ Event data:', ev);
         console.log('✅ Shows data:', shows);
 
         // Hero Section - Title
         document.getElementById('evTitle').textContent = ev.name || 'Sự kiện';
         if (ev.cover) document.getElementById('evCover').src = ev.cover;
-        
+
         // Place: ưu tiên venue name, sau đó city
         const placeText = ev.venue?.name || ev.city || 'Chưa có địa điểm';
         document.getElementById('evPlace').textContent = placeText;
-        
+
         // Address: hiển thị địa chỉ chi tiết nếu có
         const addressText = ev.venue?.address || '';
 
@@ -713,20 +725,20 @@
       } catch (e) {
         console.error('❌ Lỗi khi tải sự kiện:', e);
         console.error('❌ Error stack:', e.stack);
-        
+
         document.getElementById('evTitle').textContent = 'Không tải được sự kiện';
         document.getElementById('evTime').textContent = 'Lỗi';
         document.getElementById('evPlace').textContent = 'Lỗi';
-        
+
         let errorMsg = 'Vui lòng thử lại sau.';
         if (e.message) {
           errorMsg = e.message;
         } else if (e.name === 'TypeError' && e.message.includes('fetch')) {
           errorMsg = 'Không thể kết nối đến server. Vui lòng kiểm tra backend có đang chạy không.';
         }
-        
+
         document.getElementById('evIntro').textContent = errorMsg;
-        
+
         // Ẩn các section không cần thiết khi lỗi
         document.getElementById('showsSection').style.display = 'none';
       }

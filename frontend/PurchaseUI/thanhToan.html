@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đặt vé sự kiện - Ticketbox</title>
   <meta name="theme-color" content="#22c55e">
   <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
+  <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               connect-src 'self' http://localhost:4000; 
+               img-src 'self' https://salt.tkbcdn.com data:;
+               style-src 'self' 'unsafe-inline'; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';">
   <link rel="stylesheet" href="thanhToanStyle.css">
 </head>
+
 <body>
   <!-- Header -->
   <div class="header">
     <a href="../HomePage/source/TrangChu.html"><img src="./logo.svg" alt=""></a>
     <form class="search-bar" action="../Ticketbox/code/events-search.html" method="GET">
-      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off"> 
-      <button type="submit"> 
+      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off">
+      <button type="submit">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m21 21-4.34-4.34" />
@@ -105,7 +113,7 @@
               <label class="form-label" for="fullName">
                 Họ và Tên / Full name <span class="required">*</span>
               </label>
-              <input type="text" class="form-input" id="fullName" placeholder="Điền câu trả lời của bạn" required/>
+              <input type="text" class="form-input" id="fullName" placeholder="Điền câu trả lời của bạn" required />
               <p class="field-error" id="errorFullName" role="alert" aria-live="polite"></p>
             </div>
 
@@ -113,7 +121,7 @@
               <label class="form-label" for="phone">
                 Số điện thoại / Phone number <span class="required">*</span>
               </label>
-              <input type="tel" inputmode="tel" class="form-input" id="phone" placeholder="VD: 0912345678" required/>
+              <input type="tel" inputmode="tel" class="form-input" id="phone" placeholder="VD: 0912345678" required />
               <p class="field-error" id="errorPhone" role="alert" aria-live="polite"></p>
             </div>
 
@@ -122,7 +130,7 @@
                 Thư điện tử / Email <span class="required">*</span>
               </label>
               <p class="form-hint">Lưu ý: Vui lòng cung cấp chính xác địa chỉ email</p>
-              <input type="email" class="form-input" id="email" placeholder="name@example.com" required/>
+              <input type="email" class="form-input" id="email" placeholder="name@example.com" required />
               <p class="field-error" id="errorEmail" role="alert" aria-live="polite"></p>
             </div>
 
@@ -131,7 +139,7 @@
                 Nếu cần xuất hoá đơn VAT vui lòng cung cấp thông tin đầy đủ (mô tả):
               </label>
               <p class="form-hint">Họ & Tên / Email / MST cần nhận hoá đơn VAT</p>
-              <input type="text" class="form-input" id="taxInfo" placeholder="Điền câu trả lời của bạn"/>
+              <input type="text" class="form-input" id="taxInfo" placeholder="Điền câu trả lời của bạn" />
             </div>
           </form>
         </div>
@@ -231,7 +239,7 @@
     </aside>
   </main>
 
-  
+
 
   <script>
     // ===== Auth Helpers =====
@@ -406,4 +414,5 @@
   </script>
   <script src="thanhToanJS.js" defer></script>
 </body>
+
 </html>

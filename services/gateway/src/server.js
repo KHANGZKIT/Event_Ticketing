@@ -17,7 +17,9 @@ const projectRoot = path.resolve(__dirname, '../../..');
 const app = express();
 app.use(express.json());
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ 
+    origin: true,          
+    credentials: true, }));
 app.use(rateLimit(serverOptions.rateLimit));
 app.use(requestID);
 
