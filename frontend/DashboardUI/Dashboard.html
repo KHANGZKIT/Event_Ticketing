@@ -47,6 +47,9 @@
           <i class="fa-solid fa-search"></i>
           <input type="text" placeholder="Tìm kiếm...">
         </div>
+        <button class="icon-btn" id="theme-toggle" aria-label="Đổi giao diện">
+          <i class="fa-solid fa-moon"></i>
+        </button>
         <button class="icon-btn" aria-label="Thông báo">
           <i class="fa-regular fa-bell"></i>
         </button>
@@ -77,6 +80,29 @@
 
     <main class="content">
       <section id="page-overview" data-page="overview">
+        <div class="overview-filters">
+          <div class="filter-group">
+            <label for="overview-period">Khoảng thời gian</label>
+            <select id="overview-period">
+              <option value="7">7 ngày gần nhất</option>
+              <option value="30" selected>30 ngày</option>
+              <option value="90">90 ngày</option>
+              <option value="all">Tất cả</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="overview-group">Nhóm dữ liệu</label>
+            <select id="overview-group">
+              <option value="day">Theo ngày</option>
+              <option value="week">Theo tuần</option>
+              <option value="month">Theo tháng</option>
+            </select>
+          </div>
+          <button class="btn" id="overview-refresh">
+            <i class="fa-solid fa-rotate"></i>
+            Làm mới
+          </button>
+        </div>
         <div id="kpis" class="kpi-grid">
           <div class="kpi">
             <h4>Tổng số vé đã bán</h4>

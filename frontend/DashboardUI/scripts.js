@@ -41,6 +41,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const AUTH_TOKEN = getAuthToken();
 
+  // ====== Theme handling ======
+  const THEME_KEY = 'dashboardTheme';
+  const themeToggleBtn = document.getElementById('theme-toggle');
+
+  function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    if (themeToggleBtn) {
+      const icon = themeToggleBtn.querySelector('i');
+      if (icon) {
+        icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+      themeToggleBtn.setAttribute(
+        'aria-label',
+        isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'
+      );
+    }
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem(THEME_KEY, nextTheme);
+      applyTheme(nextTheme);
+    });
+  }
+
+  // Lưu trữ bộ lọc overview
+  let overviewPeriod = localStorage.getItem('dashboardOverviewPeriod') || '30';
+  let overviewGroup = localStorage.getItem('dashboardOverviewGroup') || 'day';
+
+  const periodSelect = document.getElementById('overview-period');
+  const groupSelect = document.getElementById('overview-group');
+  const overviewRefreshBtn = document.getElementById('overview-refresh');
+
+  if (periodSelect) {
+    periodSelect.value = overviewPeriod;
+    periodSelect.addEventListener('change', () => {
+      overviewPeriod = periodSelect.value || 'all';
+      localStorage.setItem('dashboardOverviewPeriod', overviewPeriod);
+      loadOverview();
+    });
+  }
+
+  if (groupSelect) {
+    groupSelect.value = overviewGroup;
+    groupSelect.addEventListener('change', () => {
+      overviewGroup = groupSelect.value || 'day';
+      localStorage.setItem('dashboardOverviewGroup', overviewGroup);
+      loadOverview();
+    });
+  }
+
+  if (overviewRefreshBtn) {
+    overviewRefreshBtn.addEventListener('click', () => loadOverview());
+  }
+
   // ====== Fetch helper (kèm Authorization nếu có) ======
   async function apiFetch(url, options) {
     try {
@@ -103,7 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let paymentChart;
   let ticketSalesChart;
 
-  function renderRevenueChart(series) {
+  function getGroupLabel(group) {
+    if (group === 'week') return 'tuần';
+    if (group === 'month') return 'tháng';
+    return 'ngày';
+  }
+
+  function renderRevenueChart(series, group) {
     const el = document.getElementById("revenue-chart");
     if (!el || typeof Chart === "undefined") return;
 
@@ -118,9 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const ctx = el.getContext("2d");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+    gradient.addColorStop(0, 'rgba(124, 93, 250, 0.45)');
+    gradient.addColorStop(1, 'rgba(124, 93, 250, 0.05)');
+
     const arr = safeArray(series);
     const labels = arr.map((x) => x.date);
     const data = arr.map((x) => Number(x.amount || 0));
+    const labelUnit = getGroupLabel(group);
 
     try {
       revenueChart = new Chart(ctx, {
@@ -128,13 +198,13 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
           labels,
           datasets: [{
-            label: "Doanh thu",
+            label: "Doanh thu theo " + labelUnit,
             data,
             tension: 0.35,
             borderWidth: 2,
             pointRadius: 3,
             borderColor: '#7C5DFA',
-            backgroundColor: 'rgba(124, 93, 250, 0.1)',
+            backgroundColor: gradient,
             fill: true,
           }]
         },
@@ -145,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
               callbacks: {
                 label: (ctx) => {
                   const v = Number(ctx.parsed.y || 0).toLocaleString("vi-VN");
-                  return "Doanh thu: " + v + " đ";
+                  return "Doanh thu (" + labelUnit + "): " + v + " đ";
                 }
               }
             }
@@ -197,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderTicketSalesChart(series) {
+  function renderTicketSalesChart(series, group) {
     const el = document.getElementById("ticket-sales-chart");
     if (!el || typeof Chart === "undefined") return;
 
@@ -215,6 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const arr = safeArray(series);
     const labels = arr.map((x) => x.date);
     const data = arr.map((x) => Number(x.count || 0));
+    const unit = getGroupLabel(group);
 
     try {
       ticketSalesChart = new Chart(ctx, {
@@ -222,11 +293,12 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
           labels,
           datasets: [{
-            label: "Số vé bán được",
+            label: "Số vé bán theo " + unit,
             data,
-            backgroundColor: 'rgba(124, 93, 250, 0.6)',
+            backgroundColor: 'rgba(124, 93, 250, 0.65)',
             borderColor: '#7C5DFA',
             borderWidth: 1,
+            borderRadius: 6,
           }]
         },
         options: {
@@ -236,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
               callbacks: {
                 label: (ctx) => {
                   const v = Number(ctx.parsed.y || 0).toLocaleString("vi-VN");
-                  return "Số vé: " + v;
+                  return "Số vé (" + unit + "): " + v;
                 }
               }
             }
@@ -346,9 +418,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function loadOverview(period) {
-    const p = "all"; // Đã xóa timeFilter, luôn tải tất cả
-    const revGroup = "day"; // Đã xóa rev-granularity, luôn tải theo ngày
+  async function loadOverview() {
+    const p = overviewPeriod || "all";
+    const revGroup = overviewGroup || "day";
 
     try {
       // Load các API chính trước
@@ -424,18 +496,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       renderKPIs(kpis || {});
-      renderRevenueChart(revenueSeries || []);
+      renderRevenueChart(revenueSeries || [], revGroup);
       renderPaymentChart((kpis && kpis.paymentRatios) || {});
       renderTopEvents(topEvents || []);
-      renderTicketSalesChart(ticketSalesSeries || []);
+      renderTicketSalesChart(ticketSalesSeries || [], revGroup);
     } catch (e) {
       console.error("loadOverview error:", e);
       // Vẫn render với dữ liệu mặc định để không bị blank screen
       renderKPIs({});
-      renderRevenueChart([]);
+      renderRevenueChart([], overviewGroup);
       renderPaymentChart({});
       renderTopEvents([]);
-      renderTicketSalesChart([]);
+      renderTicketSalesChart([], overviewGroup);
     }
   }
 

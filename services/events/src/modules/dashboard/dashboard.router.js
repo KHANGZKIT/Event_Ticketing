@@ -9,6 +9,7 @@ const startOf = (period) => {
     const now = Date.now();
     if (period === "7") return new Date(now - 7 * DAY);
     if (period === "30") return new Date(now - 30 * DAY);
+    if (period === "90") return new Date(now - 90 * DAY);
     return new Date(0);
 };
 
@@ -70,17 +71,38 @@ dashboardRouter.get("/kpis", async (req, res, next) => {
 dashboardRouter.get("/revenue", async (req, res, next) => {
     try {
         const start = startOf(req.query.period || "all");
+        const group = req.query.group || "day"; // day, week, month
+
         const orders = await prisma.order.findMany({
             where: { status: "paid", createdAt: { gte: start } },
             select: { amount: true, createdAt: true }
         });
+
+        const bucketKey = (date) => {
+            const d = new Date(date);
+            if (group === "week") {
+                const weekStart = new Date(d);
+                weekStart.setDate(d.getDate() - d.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                return weekStart.toISOString().slice(0, 10); // YYYY-MM-DD (Mon)
+            }
+            if (group === "month") {
+                return d.toISOString().slice(0, 7); // YYYY-MM
+            }
+            return d.toISOString().slice(0, 10); // YYYY-MM-DD
+        };
+
         const m = new Map();
         for (const o of orders) {
-            const d = o.createdAt.toISOString().slice(0, 10);
-            m.set(d, (m.get(d) || 0) + (o.amount || 0));
+            const key = bucketKey(o.createdAt);
+            m.set(key, (m.get(key) || 0) + (o.amount || 0));
         }
-        res.json([...m.entries()].sort(([a], [b]) => a.localeCompare(b))
-            .map(([date, amount]) => ({ date, amount })));
+
+        const result = [...m.entries()]
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, amount]) => ({ date, amount }));
+
+        res.json(result);
     } catch (e) { next(e); }
 });
 
