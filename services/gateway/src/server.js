@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import axios from "axios";
 import { fileURLToPath } from 'url';
 import { routes, serverOptions, config as appConfig } from './config/config.js';
 import { requestID } from './middlewares/requestID.js';
@@ -22,7 +23,10 @@ app.use(cors({
     credentials: true, }));
 app.use(rateLimit(serverOptions.rateLimit));
 app.use(requestID);
-
+const eventsClient = axios.create({
+    baseURL: process.env.EVENT_SVC_URL || "http://localhost:4102",
+    timeout: 5000, // ⬅️ chỉ chờ tối đa 5s
+  });
 // Serve static files from frontend directory
 app.use('/frontend', express.static(path.join(projectRoot, 'frontend')));
 
@@ -64,8 +68,6 @@ app.use((req, res) => {
             error: { code: 'NO_ROUTE', message: `No matching route for ${req.path}` }
         });
     }
-
-    // authGuard dạng currying: quyết định có yêu cầu auth dựa trên route (tự bạn define)
     authGuard(route)(req, res, () =>
         forward(req, res, route, serverOptions.timeoutMs)
     );
