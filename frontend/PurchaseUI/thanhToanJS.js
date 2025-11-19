@@ -4,10 +4,10 @@
   const $$$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const fmt = new Intl.NumberFormat("vi-VN");
   const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
-  
+
   // ====== API Config ======
   const API_BASE = "http://localhost:4000/api";
-  
+
   // ====== Auth Helpers ======
   function getAuthToken() {
     const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
@@ -15,11 +15,11 @@
       try {
         const auth = JSON.parse(authStr);
         if (auth?.token) return auth.token;
-      } catch {}
+      } catch { }
     }
     return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
   }
-  
+
   // ====== Load data from URL and sessionStorage ======
   const urlParams = new URLSearchParams(location.search);
   const purchaseDataStr = sessionStorage.getItem('purchaseData');
@@ -31,11 +31,11 @@
       console.error('Error parsing purchaseData:', e);
     }
   }
-  
+
   const showId = urlParams.get('showId') || purchaseData?.showId;
   const holdId = urlParams.get('holdId') || purchaseData?.holdId;
   const eventId = urlParams.get('eventId') || purchaseData?.eventId || '';
-  
+
   // State
   let eventInfo = null;
   let showInfo = null;
@@ -43,6 +43,34 @@
   let holdExpiresAt = purchaseData?.expiresAt ? new Date(purchaseData.expiresAt).getTime() : null;
   let holdReleased = false; // Flag to prevent multiple release calls
 
+  async function releaseHoldOnExpire() {
+    if (!holdId || holdReleased) return;
+    holdReleased = true;
+    const token = getAuthToken();
+    if (!token) {
+      console.warn('Hold ko xac thuc duoc token khi het han');
+      return;
+    }
+
+    try {
+      console.log('Hold: realeasing hold on expire:', holdId);
+      const res = await fetch(`${API_BASE}/holds/${encodeURIComponent(holdId)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.warn('[hold] release-on-expire failed:', res.status, data);
+      } else {
+        console.log('[hold] Released on expire OK');
+      }
+    } catch (e) {
+      console.error('[hold] releaseOnExpire error:', e);
+    }
+  }
   // ====== Elements ======
   const minutesEl = $$("#minutes");
   const secondsEl = $$("#seconds");
@@ -78,7 +106,7 @@
   const modal = $$("#modal");
   const closeModal = $$("#closeModal");
 
-  
+
   // Initialize ticket name if elements exist
   if (ticketName && ticketNameLabel) {
     ticketName.textContent = ticketNameLabel.textContent;
@@ -86,7 +114,7 @@
 
   // ====== Price / Quantity state ======
   let quantity = Object.keys(selectedSeats).length || 1;
-  
+
   // Tính giá từ selectedSeats
   function calculateTotalPrice() {
     let total = 0;
@@ -95,7 +123,7 @@
     });
     return total;
   }
-  
+
   const UNIT_PRICE = calculateTotalPrice() / quantity || Number(sidebar?.dataset?.unitPrice || "1390000");
   if (unitPriceEl) unitPriceEl.textContent = `${fmt.format(UNIT_PRICE)} đ`;
 
@@ -113,15 +141,17 @@
       const secondsLeft = Math.max(0, Math.floor((holdExpiresAt - Date.now()) / 1000));
       return secondsLeft;
     }
-    
+
     const domMin = parseInt(minutesEl?.textContent ?? "15", 10);
     const domSec = parseInt(secondsEl?.textContent ?? "0", 10);
     const m = Number.isFinite(domMin) ? domMin : 15;
     const s = Number.isFinite(domSec) ? domSec : 0;
     const dataS = Number(countdownWrap?.dataset?.seconds || NaN);
     // If author set data-seconds, use it; else use text content; fallback 15:00
-    return Number.isFinite(dataS) ? dataS : (m * 60 + s || 15 * 60);
+    return Number.isFinite(dataS) ? dataS : (m * 60 + s || 1 * 60);
   };
+
+
 
   const startSeconds = parseStartSeconds();
   const endAt = holdExpiresAt || (Date.now() + startSeconds * 1000);
@@ -131,10 +161,24 @@
     if (leftMs <= 0) {
       minutesEl.textContent = "00";
       secondsEl.textContent = "00";
-      noteInstruction.textContent = "Hết thời gian giữ chỗ. Vui lòng tải lại trang.";
+      noteInstruction.textContent = "Hết thời gian giữ chỗ. Đang quay lại trang chọn ghế...";
       countdownNote.hidden = false;
       disableAll(true);
       clearInterval(timerId);
+      releaseHoldOnExpire();
+      const qs = new URLSearchParams(location.search);
+      const eventId = qs.get("eventId");
+      const showId = qs.get("showId");
+      let backUrl = "/frontend/seatmapUI/seatmapUI.html";
+      if (eventId && showId) {
+        backUrl += `?eventId=${encodeURIComponent(eventId)}&showId=${encodeURIComponent(showId)}`;
+      } else if (showId) {
+        backUrl += `?showId=${encodeURIComponent(showId)}`;
+      }
+      //Doi 2 - 3s de chuyen trang
+      setTimeout(() => {
+        window.location.href = backUrl;
+      }, 3000)
       return;
     }
     const left = Math.floor(leftMs / 1000);
@@ -145,14 +189,14 @@
   };
 
   let timerId = null;
-  
+
   // ====== Load Event/Show Info ======
   async function loadEventShowInfo() {
     if (!showId) {
       console.warn('No showId provided');
       return;
     }
-    
+
     try {
       // Load event info trước nếu có eventId (để lấy tên event)
       if (eventId) {
@@ -162,13 +206,13 @@
           console.log('Loaded event info:', eventInfo);
         }
       }
-      
+
       // Load show info
       const showRes = await fetch(`${API_BASE}/shows/${showId}`);
       if (showRes.ok) {
         showInfo = await showRes.json();
         console.log('Loaded show info:', showInfo);
-        
+
         // Update UI với thông tin show và event
         if (showInfo) {
           const eventTitleEl = $$('.event-title');
@@ -180,13 +224,13 @@
               eventTitleEl.textContent = showInfo.name;
             }
           }
-          
+
           // Update ngày giờ
           const eventDetailItems = $$$('.event-detail-item');
           if (eventDetailItems.length > 0 && showInfo.startsAt) {
             const date = new Date(showInfo.startsAt);
-            const dateStr = date.toLocaleString('vi-VN', { 
-              hour: '2-digit', 
+            const dateStr = date.toLocaleString('vi-VN', {
+              hour: '2-digit',
               minute: '2-digit',
               day: '2-digit',
               month: '2-digit',
@@ -197,7 +241,7 @@
               dateSpan.textContent = dateStr;
             }
           }
-          
+
           // Update địa điểm
           if (eventDetailItems.length > 1 && showInfo.venue) {
             const venueSpan = eventDetailItems[1].querySelector('span:last-child');
@@ -207,7 +251,7 @@
           }
         }
       }
-      
+
       // Update seat names và giá
       const seatLabels = Object.keys(selectedSeats).sort();
       if (seatLabels.length > 0) {
@@ -216,26 +260,26 @@
         const seatNames = seatLabels.join(', ');
         if (ticketNameEl) ticketNameEl.textContent = seatNames;
         if (ticketNameDisplay) ticketNameDisplay.textContent = seatNames;
-        
+
         // Update giá từ selectedSeats
         const totalPrice = calculateTotalPrice();
         const avgPrice = totalPrice / seatLabels.length;
         if (unitPriceEl) {
           unitPriceEl.textContent = `${fmt.format(avgPrice)} đ`;
         }
-        
+
         // Update quantity
         quantity = seatLabels.length;
         updateQtyUI();
       }
-      
+
       // Update totals sau khi load xong
       computeTotals();
     } catch (error) {
       console.error('Error loading event/show info:', error);
     }
   }
-  
+
   // Initialize countdown timer
   if (startSeconds > 0) {
     timerId = setInterval(tick, 1000);
@@ -244,7 +288,7 @@
     // Hết thời gian ngay lập tức
     tick();
   }
-  
+
   // Load data on page load
   loadEventShowInfo();
 
@@ -322,18 +366,18 @@
   const errEmail = $$("#errorEmail");
 
   const validators = {
-    fullName(v){
+    fullName(v) {
       if (!v || v.trim().length < 2) return "Vui lòng nhập họ tên hợp lệ.";
       return "";
     },
-    phone(v){
+    phone(v) {
       // VN: 0xxxxxxxxx (10) hoặc +84xxxxxxxxx (>= 9)
       const clean = v.replace(/\s+/g, "");
       const ok = /^(0\d{9,10}|\+84\d{9,10})$/.test(clean);
       if (!ok) return "Số điện thoại Việt Nam không hợp lệ.";
       return "";
     },
-    email(v){
+    email(v) {
       const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
       if (!ok) return "Email không hợp lệ.";
       return "";
@@ -380,11 +424,11 @@
     validateForm();
   });
 
-  function validateForm(){
+  function validateForm() {
     const e1 = validators.fullName(fullName.value);
     const e2 = validators.phone(phone.value);
     const e3 = validators.email(email.value);
-    
+
     // Kiểm tra đã chọn phương thức thanh toán chưa
     const paymentSelected = paymentMomo?.checked || paymentVnpay?.checked;
     const e4 = paymentSelected ? null : 'Vui lòng chọn phương thức thanh toán';
@@ -403,7 +447,7 @@
   [fullName, phone, email].forEach(i => i.addEventListener("input", validateForm));
   agreeCheckbox.addEventListener("change", validateForm);
 
-  
+
   const disableAll = (lock) => {
     [btnMinus, btnPlus, continueBtn, applyVoucherBtn, voucherInput, fullName, phone, email, agreeCheckbox].forEach(el => {
       if (!el) return;
@@ -411,7 +455,7 @@
     });
   };
 
-  
+
   // ====== Change ticket button ======
   const changeTicketBtn = $$("#changeTicketBtn");
   if (changeTicketBtn) {
@@ -432,25 +476,25 @@
       }
     });
   }
-  
+
   // ====== Release Hold Functions ======
   async function releaseHoldOnExit() {
     if (!holdId || holdReleased) {
       return;
     }
-    
+
     holdReleased = true;
     const token = getAuthToken();
-    
+
     if (!token) {
       console.warn('No auth token found, cannot release hold');
       return;
     }
-    
+
     try {
       // Sử dụng fetch với keepalive để đảm bảo request được gửi ngay cả khi trang đang đóng
       const url = `${API_BASE}/holds/${holdId}`;
-      
+
       // fetch với keepalive: true đảm bảo request được gửi ngay cả khi trang đang đóng
       fetch(url, {
         method: 'DELETE',
@@ -462,24 +506,24 @@
       }).catch(err => {
         console.warn('Failed to release hold:', err);
       });
-      
+
       console.log('Hold release requested:', holdId);
     } catch (error) {
       console.error('Error releasing hold:', error);
     }
   }
-  
+
   // Release hold khi người dùng thoát khỏi trang
   // Sử dụng pagehide vì nó đáng tin cậy hơn beforeunload trong một số trường hợp
   window.addEventListener('pagehide', () => {
     releaseHoldOnExit();
   });
-  
+
   // Fallback với beforeunload (có thể không hoạt động trong một số trình duyệt)
   window.addEventListener('beforeunload', () => {
     releaseHoldOnExit();
   });
-  
+
   // ====== Checkout & Payment Flow ======
   let isProcessing = false;
   let currentOrderId = null;
@@ -487,7 +531,7 @@
   // Hàm kiểm tra order pending từ sessionStorage
   async function getExistingPendingOrder(token) {
     if (!showId) return null;
-    
+
     try {
       // Kiểm tra orderId trong sessionStorage (từ lần checkout trước)
       const orderDataStr = sessionStorage.getItem(`pendingOrder_${showId}`);
@@ -495,14 +539,14 @@
         try {
           const orderData = JSON.parse(orderDataStr);
           const orderId = orderData.orderId;
-          
+
           // Kiểm tra order có tồn tại và còn pending không
           const orderResponse = await fetch(`${API_BASE}/orders/${orderId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
-          
+
           if (orderResponse.ok) {
             const order = await orderResponse.json();
             // Nếu order vẫn pending và cùng showId, dùng lại
@@ -521,13 +565,13 @@
     } catch (e) {
       console.warn('Error getting existing order:', e);
     }
-    
+
     return null;
   }
 
   continueBtn?.addEventListener("click", async () => {
     if (!validateForm() || isProcessing) return;
-    
+
     const token = getAuthToken();
     if (!token) {
       alert('Vui lòng đăng nhập để tiếp tục.');
@@ -542,7 +586,7 @@
     try {
       // Kiểm tra xem có order pending từ lần checkout trước không
       let existingOrderId = await getExistingPendingOrder(token);
-      
+
       if (!existingOrderId) {
         // Không có order pending, cần checkout mới
         if (!holdId) {
@@ -562,15 +606,15 @@
         if (!checkoutResponse.ok) {
           const errorData = await checkoutResponse.json().catch(() => ({}));
           const errorMessage = errorData.error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.';
-          
+
           // Nếu lỗi là "Hold is not found" (410), thử tìm order pending theo showId
           if (checkoutResponse.status === 410 && errorMessage.includes('Hold is not found')) {
             // Thử tìm order pending theo showId và userId
             console.log('[Checkout] Hold not found, trying to find existing pending order...');
-            
+
             // Kiểm tra lại order pending (có thể đã có nhưng chưa lưu trong sessionStorage)
             existingOrderId = await getExistingPendingOrder(token);
-            
+
             if (!existingOrderId) {
               throw new Error('Thời gian giữ chỗ đã hết hạn. Vui lòng quay lại chọn ghế mới.');
             }
@@ -605,7 +649,7 @@
 
       // Lấy payment provider từ radio button đã chọn
       const paymentProvider = paymentMomo?.checked ? 'momo' : (paymentVnpay?.checked ? 'vnpay' : null);
-      
+
       if (!paymentProvider) {
         throw new Error('Vui lòng chọn phương thức thanh toán');
       }
