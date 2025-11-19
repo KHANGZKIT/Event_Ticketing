@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WS Test</title>
+</head>
+
+<body>
+    <h1>WS Test</h1>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io("http://localhost:4000", { withCredentials: true });
+
+        socket.on("connect", () => {
+            console.log("WS connected:", socket.id);
+            socket.emit("join-show", "TEST_SHOW");
+        });
+
+        socket.on("seat-updated", (payload) => {
+            console.log("seat-updated:", payload);
+        });
+    </script>
+</body>
+
+</html>

@@ -21,14 +21,14 @@ function getAuthToken() {
       console.warn('[getAuthToken] Failed to parse auth:', e);
     }
   }
-  
+
   // Fallback: lấy từ accessToken
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (token) {
     console.log('[getAuthToken] Found token in accessToken');
     return token;
   }
-  
+
   console.warn('[getAuthToken] No token found in storage');
   return null;
 }
@@ -99,25 +99,25 @@ function closeModal() {
 async function fetchJSON(url, opts = {}, tries = 2) {
   try {
     const r = await fetch(url, opts);
-    let data = null; 
-    try { 
-      data = await r.json(); 
+    let data = null;
+    try {
+      data = await r.json();
     } catch (e) {
       // Nếu không parse được JSON, lấy text
       const text = await r.text();
       console.error('[fetchJSON] Response not JSON:', text);
     }
-    
+
     if (!r.ok) {
       const msg = data?.error?.message || data?.message || `HTTP ${r.status}`;
       console.error('[fetchJSON] Error response:', { status: r.status, statusText: r.statusText, data });
-      
+
       // backoff nhẹ khi 429
       if (r.status === 429 && tries > 0) {
         await new Promise(res => setTimeout(res, 600));
         return fetchJSON(url, opts, tries - 1);
       }
-      
+
       // Thêm status code vào error message
       const error = new Error(msg);
       error.status = r.status;
@@ -334,12 +334,14 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
       const btn = document.createElement("button");
       btn.className = 'seat ' + tierClass(s.tier);
       btn.textContent = s.label;
+      btn.dataset.seat = s.label;   // ⬅️ THÊM
       btn.style.position = "absolute";
       btn.style.left = (s.x || 0) + "px";
       btn.style.top = (s.y || 0) + "px";
       applyStatus(btn, s.label, heldSet, bookedSet);
       btn.addEventListener("click", () => toggleSelect(btn, s.label, s.tier, price));
       seatMapEl.appendChild(btn);
+
     });
   } else {
     seatMapEl.style.display = "grid";
@@ -365,13 +367,14 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
       const price = getPriceForTier(s.tier);
       const btn = document.createElement("button");
       btn.className = 'seat ' + tierClass(s.tier);
-      // Hiển thị đầy đủ label ghế (ví dụ: A1, B2, C3...)
       btn.textContent = s.label;
+      btn.dataset.seat = s.label;  // ⬅️ THÊM
       btn.setAttribute('aria-label', `Ghế ${s.label}`);
       btn.setAttribute('title', `Ghế ${s.label} - ${s.tier}`);
       applyStatus(btn, s.label, heldSet, bookedSet);
       btn.addEventListener("click", () => toggleSelect(btn, s.label, s.tier, price));
       seatMapEl.appendChild(btn);
+
     });
   }
 }
@@ -382,7 +385,7 @@ function applyStatus(el, label, heldSet, bookedSet) {
 
 async function toggleSelect(btn, label, tier, price) {
   if (btn.classList.contains("booked") || btn.classList.contains("held")) return;
-  
+
   const isOn = btn.classList.toggle("selected");
   if (isOn) {
     selected.set(label, { tier, price });
@@ -477,7 +480,7 @@ modalPay?.addEventListener('click', async () => {
   }
 
   const token = getAuthToken();
-  
+
   // Kiểm tra token trước khi gửi request
   if (!token) {
     alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
@@ -485,21 +488,21 @@ modalPay?.addEventListener('click', async () => {
     window.location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${redirectTo}`;
     return;
   }
-  
+
   console.log('[seatmap] Token found:', token.substring(0, 20) + '...');
-  
+
   const seatLabels = [...selected.keys()];
-  
+
   // Tạo idempotency key để tránh duplicate requests (dùng crypto.randomUUID nếu có, hoặc timestamp + random)
   const idempotencyKey = `${currentShowId}-${seatLabels.sort().join(',')}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-  
+
   // Disable button và set trạng thái
   isCreatingHold = true;
   if (modalPay) {
     modalPay.disabled = true;
     const originalText = modalPay.textContent;
     modalPay.textContent = 'Đang xử lý...';
-    
+
     try {
       // Tạo hold với API
       console.log('[seatmap] Creating hold with:', { showId: currentShowId, seats: seatLabels, tokenLength: token.length });
@@ -519,7 +522,7 @@ modalPay?.addEventListener('click', async () => {
 
       if (holdResponse && holdResponse.ok && holdResponse.holdId) {
         currentHoldId = holdResponse.holdId;
-        
+
         // Chuyển đến trang thanh toán với dữ liệu
         const purchaseParams = new URLSearchParams({
           showId: currentShowId,
@@ -527,7 +530,7 @@ modalPay?.addEventListener('click', async () => {
           seats: seatLabels.join(','),
           eventId: eventIdParam || ''
         });
-        
+
         // Lưu thông tin vào sessionStorage để purchaseUI có thể dùng
         sessionStorage.setItem('purchaseData', JSON.stringify({
           showId: currentShowId,
@@ -552,15 +555,15 @@ modalPay?.addEventListener('click', async () => {
       }
     } catch (error) {
       console.error('Error creating hold:', error);
-      console.error('Error details:', { 
-        message: error.message, 
-        status: error.status, 
-        data: error.data 
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data
       });
-      
+
       // Xử lý lỗi HTTP 401 Unauthorized
       let errorMessage = 'Không thể đặt ghế. Vui lòng thử lại.';
-      
+
       if (error.status === 401 || error.message?.includes('401') || error.message?.includes('Unauthorized')) {
         errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
         // Redirect đến trang login
@@ -577,9 +580,9 @@ modalPay?.addEventListener('click', async () => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       alert(`Lỗi: ${errorMessage}`);
-      
+
       // Reset button
       modalPay.disabled = false;
       modalPay.textContent = originalText;
@@ -647,3 +650,34 @@ function updateLegendPrices() {
   if (legVip) legVip.textContent = vnd(getPriceForTier('VIP'));
   if (legNorm) legNorm.textContent = vnd(getPriceForTier('A') || getPriceForTier('normal'));
 }
+const urlParams = new URLSearchParams(window.location.search);
+const showId = urlParams.get("showId");
+
+const socket = io("http://localhost:4000", { withCredentials: true });
+
+socket.on("connect", () => {
+  console.log("WS connected", socket.id);
+  socket.emit("join-show", showId);
+});
+
+socket.on("seat-updated", (payload) => {
+  console.log("[ws] seat-updated", payload);
+  const { showId: sId, seats, status } = payload;
+  if (sId !== showId) return;
+
+  seats.forEach((code) => {
+    const el = document.querySelector(`[data-seat="${code}"]`);
+    if (!el) return;
+
+    if (status === "HELD") {
+      el.classList.add("held");
+      el.classList.remove("selected");
+      el.disabled = true;
+    } else if (status === "RELEASED") {
+      if (!el.classList.contains("booked")) {
+        el.classList.remove("held");
+        el.disabled = false;
+      }
+    }
+  });
+});

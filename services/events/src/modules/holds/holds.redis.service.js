@@ -5,8 +5,11 @@ import { CreateHoldSchema } from './holds.schema.js';
 import { getSeatMap } from '../shows/shows.service.js';
 import { incrMetric } from '../../metrics/metrics.js';
 import { logx } from '../../utils/logx.js';
+import axios from 'axios';   // ⬅️ THÊM DÒNG NÀY
 
-const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 900); // 15 minutes default
+const GATEWAY_INTERNAL_URL =
+    process.env.GATEWAY_INTERNAL_URL || "http://localhost:4000";
+const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 60); // 15 minutes default
 
 const heldKey = (showId, seatId) => `held:${showId}:${seatId}`;
 const holdKey = (holdId) => `hold:${holdId}`;
@@ -81,13 +84,13 @@ export async function createHold(userId, body, options = {}) {
     try {
         console.log('[holds.create] Fetching seatmap for showId:', showId);
         const seatmap = await getSeatMap(showId);
-        console.log('[holds.create] Seatmap response:', { 
-            hasSeatmap: !!seatmap, 
-            hasTemplate: !!seatmap?.template, 
+        console.log('[holds.create] Seatmap response:', {
+            hasSeatmap: !!seatmap,
+            hasTemplate: !!seatmap?.template,
             hasSeats: !!seatmap?.template?.seats,
             seatsCount: seatmap?.template?.seats?.length || 0
         });
-        
+
         // getSeatMap trả về { showId, template: { ...tpl, seats: [...] } }
         const seatmapSeats = seatmap?.template?.seats || seatmap?.seats || [];
         if (!seatmap || !Array.isArray(seatmapSeats) || seatmapSeats.length === 0) {
@@ -98,14 +101,14 @@ export async function createHold(userId, body, options = {}) {
         }
         const valid = new Set(seatmapSeats.map(s => s.seatId || s.label || s.id));
         console.log('[holds.create] Valid seats:', Array.from(valid).slice(0, 10), '... (total:', valid.size, ')');
-        
+
         // Normalize request seats: extract seatId if objects, otherwise use as-is
         const requestSeatIds = seats.map(s => {
             if (typeof s === 'string') return s;
             if (typeof s === 'object' && s !== null) return s.seatId || s.label || s.id || String(s);
             return String(s);
         });
-        
+
         for (const seatId of requestSeatIds) {
             if (!valid.has(seatId)) {
                 const e = new Error(`Seat ${seatId} not found in seatmap`);
@@ -116,8 +119,8 @@ export async function createHold(userId, body, options = {}) {
         }
 
         const sold = await prisma.ticket.findMany({
-            where: { 
-                showId, 
+            where: {
+                showId,
                 seatId: { in: requestSeatIds },
                 orderId: { not: null }
             },
@@ -171,6 +174,21 @@ export async function createHold(userId, body, options = {}) {
 
         await incrMetric('create:ok');
         logx('holds.create.ok', { userId, showId, holdId, seats: requestSeatIds, expiresAt });
+
+        // 🔔 Gửi thông báo WebSocket qua gateway
+        try {
+            await axios.post(`${GATEWAY_INTERNAL_URL}/internal/ws/seat-updated`, {
+                showId,
+                seats: requestSeatIds,
+                status: "HELD",
+                holdId,
+                expiresAt,
+            });
+        } catch (err) {
+            console.error("[holds.create] WS notify failed:", err.message);
+            // không throw, hold vẫn thành công, chỉ là không realtime
+        }
+
         return { ok: true, holdId, expiresAt };
     } catch (err) {
         if (reserved && idemRedisKey) {
@@ -216,6 +234,18 @@ export async function releaseHold(holdId) {
     const out = await tx.exec();
 
     logx('holds.release.ok', { holdId, showId: h.showId, released: h.seats.length });
+
+    try {
+        await axios.post(`${GATEWAY_INTERNAL_URL}/internal/ws/seat-updated`, {
+            showId: h.showId,
+            seats: h.seats,
+            status: "RELEASED",
+            holdId,
+        });
+    } catch (err) {
+        console.error("[holds.release] WS notify failed:", err.message);
+    }
+
     return { ok: true, released: h.seats.length, out };
 }
 
