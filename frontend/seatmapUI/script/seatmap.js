@@ -154,8 +154,11 @@ async function loadEventInfoByEventId(eventId) {
 
   // build show selector
   showSelect.innerHTML = "";
-  const sorted = [...shows].sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
-  sorted.forEach(s => {
+  const sortedShows = Array.isArray(shows)
+    ? [...shows].sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))
+    : [];
+
+  sortedShows.forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id;
     opt.textContent = `${fmtDate(s.startsAt)} • ${s.venue || "N/A"}`;
@@ -163,19 +166,22 @@ async function loadEventInfoByEventId(eventId) {
   });
 
   // chọn showId
-  if (!currentShowId) currentShowId = sorted[0]?.id || null;
+  if (!currentShowId) currentShowId = sortedShows[0]?.id || null;
   if (currentShowId) showSelect.value = currentShowId;
 
-  const curShow = sorted.find(s => s.id === currentShowId);
+  const curShow = sortedShows.find(s => s.id === currentShowId);
   eventDate.textContent = curShow ? fmtDate(curShow.startsAt) : "Chưa có ngày";
 
   if (currentShowId) await loadSeatMap(currentShowId);
 
   showSelect.addEventListener("change", async () => {
     currentShowId = showSelect.value;
-    const s = sorted.find(x => x.id === currentShowId);
+    const s = sortedShows.find(x => x.id === currentShowId);
     eventDate.textContent = s ? fmtDate(s.startsAt) : "Chưa có ngày";
     await loadSeatMap(currentShowId);
+
+    // 👉 join vào đúng room của show mới
+    joinCurrentShowRoom();
   });
 }
 
@@ -650,20 +656,28 @@ function updateLegendPrices() {
   if (legVip) legVip.textContent = vnd(getPriceForTier('VIP'));
   if (legNorm) legNorm.textContent = vnd(getPriceForTier('A') || getPriceForTier('normal'));
 }
-const urlParams = new URLSearchParams(window.location.search);
-const showId = urlParams.get("showId");
 
 const socket = io("http://localhost:4000", { withCredentials: true });
 
+function joinCurrentShowRoom() {
+  const roomId = currentShowId || qs.get("showId");
+  if (!roomId) return;
+
+  console.log("[ws] join room show:", roomId);
+  socket.emit("join-show", roomId);
+}
+
 socket.on("connect", () => {
-  console.log("WS connected", socket.id);
-  socket.emit("join-show", showId);
+  console.log("[ws] connected", socket.id);
+  joinCurrentShowRoom();
 });
 
 socket.on("seat-updated", (payload) => {
-  console.log("[ws] seat-updated", payload);
+  console.log("[ws] seat-updated payload:", payload);
   const { showId: sId, seats, status } = payload;
-  if (sId !== showId) return;
+
+  const current = currentShowId || showId;
+  if (sId !== current) return;
 
   seats.forEach((code) => {
     const el = document.querySelector(`[data-seat="${code}"]`);
