@@ -43,34 +43,6 @@
   let holdExpiresAt = purchaseData?.expiresAt ? new Date(purchaseData.expiresAt).getTime() : null;
   let holdReleased = false; // Flag to prevent multiple release calls
 
-  async function releaseHoldOnExpire() {
-    if (!holdId || holdReleased) return;
-    holdReleased = true;
-    const token = getAuthToken();
-    if (!token) {
-      console.warn('Hold ko xac thuc duoc token khi het han');
-      return;
-    }
-
-    try {
-      console.log('Hold: realeasing hold on expire:', holdId);
-      const res = await fetch(`${API_BASE}/holds/${encodeURIComponent(holdId)}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        console.warn('[hold] release-on-expire failed:', res.status, data);
-      } else {
-        console.log('[hold] Released on expire OK');
-      }
-    } catch (e) {
-      console.error('[hold] releaseOnExpire error:', e);
-    }
-  }
   // ====== Elements ======
   const minutesEl = $$("#minutes");
   const secondsEl = $$("#seconds");
@@ -154,18 +126,25 @@
 
 
   const startSeconds = parseStartSeconds();
-  const endAt = holdExpiresAt || (Date.now() + startSeconds * 1000);
+  const SAFETY_MS = 3000;
+  const endAt = holdExpiresAt
+    ? holdExpiresAt - SAFETY_MS
+    : Date.now() + startSeconds * 1000 - SAFETY_MS;
 
   const tick = () => {
-    const leftMs = endAt - Date.now();
+    const now = Date.now();
+    const leftMs = endAt - now;
+
     if (leftMs <= 0) {
+      releaseHoldOnExpire().catch(console.error);
+
       minutesEl.textContent = "00";
       secondsEl.textContent = "00";
       noteInstruction.textContent = "Hết thời gian giữ chỗ. Đang quay lại trang chọn ghế...";
       countdownNote.hidden = false;
       disableAll(true);
       clearInterval(timerId);
-      releaseHoldOnExpire();
+
       const qs = new URLSearchParams(location.search);
       const eventId = qs.get("eventId");
       const showId = qs.get("showId");
@@ -175,18 +154,20 @@
       } else if (showId) {
         backUrl += `?showId=${encodeURIComponent(showId)}`;
       }
-      //Doi 2 - 3s de chuyen trang
+
       setTimeout(() => {
         window.location.href = backUrl;
-      }, 3000)
+      }, 3000);
       return;
     }
+
     const left = Math.floor(leftMs / 1000);
     const m = Math.floor(left / 60);
     const s = left % 60;
     minutesEl.textContent = String(m).padStart(2, "0");
     secondsEl.textContent = String(s).padStart(2, "0");
   };
+
 
   let timerId = null;
 
@@ -492,10 +473,9 @@
     }
 
     try {
-      // Sử dụng fetch với keepalive để đảm bảo request được gửi ngay cả khi trang đang đóng
       const url = `${API_BASE}/holds/${holdId}`;
 
-      // fetch với keepalive: true đảm bảo request được gửi ngay cả khi trang đang đóng
+      // dùng keepalive để đảm bảo request vẫn được gửi khi đóng tab
       fetch(url, {
         method: 'DELETE',
         headers: {
@@ -507,9 +487,37 @@
         console.warn('Failed to release hold:', err);
       });
 
-      console.log('Hold release requested:', holdId);
+      console.log('Hold release requested (EXIT):', holdId);
     } catch (error) {
-      console.error('Error releasing hold:', error);
+      console.error('Error releasing hold (EXIT):', error);
+    }
+  }
+
+  async function releaseHoldOnExpire() {
+    if (!holdId || holdReleased) return;
+
+    holdReleased = true;
+    const token = getAuthToken();
+
+    if (!token) {
+      console.warn('No auth token found, cannot release hold on expire');
+      return;
+    }
+
+    try {
+      const url = `${API_BASE}/holds/${holdId}`;
+
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('[hold] Released on EXPIRE:', holdId, 'status:', res.status);
+    } catch (error) {
+      console.error('[hold] Error releasing on EXPIRE:', error);
     }
   }
 
