@@ -77,7 +77,45 @@
 
   const modal = $$("#modal");
   const closeModal = $$("#closeModal");
+  if (typeof io !== 'undefined') {
+    // Kết nối tới server Socket (Port 4000)
+    const socket = io('http://localhost:4000', {
+      transports: ['websocket', 'polling']
+    });
 
+    console.log('Socket initialized on Payment Page');
+
+    // Lắng nghe sự kiện Admin xóa hold
+    socket.on('server_force_release_hold', (data) => {
+      console.log('[Socket] Admin đã giải phóng hold:', data);
+
+      // Kiểm tra xem ID bị xóa có trùng với ID mình đang giữ không
+      if (data.holdId && data.holdId === holdId) {
+
+        // 1. Dừng đếm ngược ngay lập tức
+        if (timerId) clearInterval(timerId);
+
+        // 2. Đánh dấu đã release để không gọi API delete lần nữa
+        holdReleased = true;
+
+        // 3. Xóa dữ liệu phiên mua vé
+        sessionStorage.removeItem('purchaseData');
+
+        // 4. Khóa nút tiếp tục để chặn bấm
+        if (continueBtn) {
+          continueBtn.disabled = true;
+          continueBtn.textContent = "Phiên hết hạn";
+        }
+        alert("⚠️ THÔNG BÁO: Phiên giữ ghế của bạn đã bị hủy bởi Quản trị viên.");
+
+        if (showId) {
+          window.location.href = `/frontend/seatmapUI/seatmapUI.html?showId=${showId}&eventId=${eventId || ''}`;
+        } else {
+          window.location.href = '/frontend/HomePage/source/TrangChu.html';
+        }
+      }
+    });
+  }
 
   // Initialize ticket name if elements exist
   if (ticketName && ticketNameLabel) {
@@ -120,7 +158,7 @@
     const s = Number.isFinite(domSec) ? domSec : 0;
     const dataS = Number(countdownWrap?.dataset?.seconds || NaN);
     // If author set data-seconds, use it; else use text content; fallback 15:00
-    return Number.isFinite(dataS) ? dataS : (m * 60 + s || 1 * 60);
+    return Number.isFinite(dataS) ? dataS : (m * 60 + s || 10 * 60);
   };
 
 

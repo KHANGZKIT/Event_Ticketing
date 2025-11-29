@@ -1,0 +1,15 @@
+graph TD
+    Client["Client<br/>(Browser/Mobile)"] -->|"HTTP/HTTPS"| Gateway["Gateway Service<br/>:4000"]
+    
+    subgraph Internal["Internal Network"]
+        Gateway -->|"/api/auth/*"| Auth["Auth Service<br/>:4101"]
+        Gateway -->|"/api/events/*"| Events["Events Service<br/>:4102"]
+        Gateway -->|"/api/orders/*"| Events
+        
+        Auth -->|"Read/Write"| DB[("PostgreSQL")]
+        Events -->|"Read/Write"| DB
+        
+        Events -->|"Cache/Lock"| Redis[("Redis")]
+    end
+    
+    Events -.->|"Webhook"| PaymentGW["Payment Gateways<br/>(MoMo/VNPay)"]
