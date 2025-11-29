@@ -7,11 +7,14 @@
   <title>Đặt vé sự kiện - Ticketbox</title>
   <meta name="theme-color" content="#22c55e">
   <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-               connect-src 'self' http://localhost:4000; 
-               img-src 'self' https://salt.tkbcdn.com data:;
-               style-src 'self' 'unsafe-inline'; 
-               script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    connect-src 'self' http://localhost:4000 ws://localhost:4000 https://cdn.socket.io; 
+    img-src 'self' https://salt.tkbcdn.com https://i.pravatar.cc data:;
+    font-src 'self' https://fonts.gstatic.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.socket.io;
+  ">
   <link rel="stylesheet" href="thanhToanStyle.css">
 </head>
 
@@ -411,6 +414,7 @@
       renderAuthUI();
     });
   </script>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
   <script src="thanhToanJS.js" defer></script>
 </body>
 

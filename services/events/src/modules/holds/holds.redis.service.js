@@ -9,7 +9,7 @@ import axios from 'axios';   // ⬅️ THÊM DÒNG NÀY
 
 const GATEWAY_INTERNAL_URL =
     process.env.GATEWAY_INTERNAL_URL || "http://localhost:4000";
-const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 60); // 15 minutes default
+const HOLD_TTL_SECONDS = Number(process.env.HOLD_TTL_SECONDS || 600); // 15 minutes default
 
 const heldKey = (showId, seatId) => `held:${showId}:${seatId}`;
 const holdKey = (holdId) => `hold:${holdId}`;

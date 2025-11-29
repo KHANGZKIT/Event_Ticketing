@@ -1,0 +1,8 @@
+graph LR
+    FE["Dashboard Frontend"] -->|"GET /api/dashboard/*"| GW["Gateway<br/>:4000"]
+    GW -->|"Forward"| Events["Events Service<br/>:4102"]
+    Events -->|"Query"| DB[("PostgreSQL")]
+    Events -.->|"SCAN keys"| Redis[("Redis")]
+    
+    FE -->|"WebSocket /ws"| GW
+    GW -.->|"Broadcast"| FE

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 </head>
 
 <body>
@@ -21,6 +22,7 @@
     </div>
     <nav class="nav">
       <a href="#" class="active" data-page="overview"><i class="fa-solid fa-house"></i> Bảng điều khiển</a>
+      <a href="#" data-page="holds"><i class="fa-solid fa-lock"></i> Giữ ghế</a>
       <a href="#" data-page="tickets"><i class="fa-solid fa-file-invoice"></i> Đơn hàng</a>
       <a href="#" data-page="users"><i class="fa-solid fa-users"></i> Khách hàng</a>
       <a href="#" data-page="reports"><i class="fa-solid fa-chart-line"></i> Báo cáo</a>
@@ -54,10 +56,10 @@
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="user-profile" id="user-profile-dropdown">
-          <img id="header-avatar" src="https://i.pravatar.cc/150?img=32" alt="Ảnh đại diện">
+          <img id="header-avatar" src="logo.jpg" alt="Ảnh đại diện">
           <div class="profile-dropdown" id="profile-dropdown">
             <div class="profile-header">
-              <img id="dropdown-avatar" src="https://i.pravatar.cc/150?img=32" alt="Ảnh đại diện">
+              <img id="dropdown-avatar" src="logo.jpg" alt="Ảnh đại diện">
               <div class="profile-info">
                 <p id="profile-name" class="profile-name">Admin</p>
                 <p id="profile-email" class="profile-email">admin@example.com</p>
@@ -202,6 +204,62 @@
         </div>
       </section>
 
+      <section id="page-holds" class="hidden" data-page="holds">
+        <div class="section-title">
+          <h3><i class="fa-solid fa-lock"></i> Giám sát Giữ ghế</h3>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+              <input type="checkbox" id="holds-auto-refresh" checked>
+              <label for="holds-auto-refresh">Tự động</label>
+            </div>
+            <button id="holds-refresh" class="btn btn-sm">
+              <i class="fa-solid fa-rotate"></i> Làm mới
+            </button>
+            <span id="holds-count-badge" class="chip green">0 holds</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div id="holds-loading" style="display: none; text-align: center; padding: 20px;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--primary-color);"></i>
+              <p>Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="holds-empty" class="empty-state-container">
+              <div class="empty-illustration">
+                <i class="fa-solid fa-couch main-icon"></i>
+                <div class="status-dot">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </div>
+
+              <h3>Sàn giao dịch đang trống</h3>
+              <p>Hiện tại không có khách hàng nào đang giữ ghế. <br>Hệ thống đang chờ giao dịch mới xuất hiện.</p>
+
+              <button onclick="loadActiveHolds()" class="btn-secondary-light">
+                <i class="fa-solid fa-rotate-right"></i> Kiểm tra ngay
+              </button>
+            </div>
+
+            <table id="holds-table" class="table" style="display: none;">
+              <thead>
+                <tr>
+                  <th>Người dùng (Email)</th>
+                  <th>Sự kiện</th>
+                  <th>Ghế đang giữ</th>
+                  <th>Thời gian còn lại</th>
+                  <th>Thời điểm giữ</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section id="page-events" class="hidden" data-page="events">
         <div class="section-title">
           <h3>🗂️ Sự kiện</h3>
@@ -255,8 +313,8 @@
         <div class="section-title">
           <h3>👤 Khách hàng</h3>
           <div style="display: flex; gap: 12px; align-items: center;">
-            <input type="text" id="users-search" placeholder="Tìm kiếm email hoặc tên..." 
-                   style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 250px;">
+            <input type="text" id="users-search" placeholder="Tìm kiếm email hoặc tên..."
+              style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 250px;">
             <button id="us-refresh" class="btn">Làm mới</button>
           </div>
         </div>
@@ -305,7 +363,6 @@
     </main>
   </div>
 
-  <!-- Profile Modal -->
   <div id="profile-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -320,7 +377,7 @@
             <label>Ảnh đại diện</label>
             <div class="avatar-upload-section">
               <div class="avatar-preview-wrapper">
-                <img id="profile-avatar-preview" src="https://i.pravatar.cc/150?img=32" alt="Ảnh đại diện">
+                <img id="profile-avatar-preview" src="logo.jpg" alt="Ảnh đại diện">
                 <label for="avatar-upload" class="avatar-upload-btn">
                   <i class="fa-solid fa-camera"></i>
                   <span>Đổi ảnh</span>
@@ -355,6 +412,7 @@
   </div>
 
   <script src="scripts.js"></script>
+  <script src="holds-monitor.js"></script>
 </body>
 
 </html>

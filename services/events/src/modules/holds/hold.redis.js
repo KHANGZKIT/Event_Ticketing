@@ -3,7 +3,7 @@ import { getRedis } from '../../redis/client.js';
 import { incrMetric } from '../../utils/hardening.js';
 
 const LOCK_MS = 3000;
-const DEFAULT_TTL = 300;
+const DEFAULT_TTL = 600;
 
 function heldKey(showId, seatId) {
     return `held:${showId}:${seatId}`;

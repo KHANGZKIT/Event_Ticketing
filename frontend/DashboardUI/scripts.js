@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.DASHBOARD_BASE_URL ||
     document.body?.dataset?.baseUrl ||
     "http://localhost:4000";
-  
+
   console.log("Dashboard BASE_URL:", BASE_URL);
 
   // Lấy token từ storage
@@ -20,16 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const auth = JSON.parse(authStr);
         if (auth?.token) return auth.token;
-      } catch (e) {}
+      } catch (e) { }
     }
     return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || null;
   }
 
   function getUserInfo() {
     try {
-      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user') || 
-                     localStorage.getItem('profile') || sessionStorage.getItem('profile') ||
-                     localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user') ||
+        localStorage.getItem('profile') || sessionStorage.getItem('profile') ||
+        localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
       if (userStr) {
         return JSON.parse(userStr);
       }
@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
       Promise.all([
         loadRecentOrders().catch(e => console.error("loadRecentOrders error:", e)),
         loadUpcomingShows().catch(e => console.error("loadUpcomingShows error:", e)),
-      ]).catch(() => {}); // Ignore errors
+      ]).catch(() => { }); // Ignore errors
 
       // Xử lý từng response riêng để không bị dừng khi một API lỗi
       let kpis = {};
@@ -776,21 +776,22 @@ document.addEventListener("DOMContentLoaded", () => {
     renderUsersPager(page, totalPages);
   }
 
-  // ====== Page Router ======
   function showPage(page) {
-    // toggle nav active
+    if (page !== 'holds' && typeof window.cleanupHoldsMonitor === 'function') {
+      window.cleanupHoldsMonitor();
+    }
     navLinks.forEach((a) =>
       a.classList.toggle("active", a.getAttribute("data-page") === page)
     );
 
-    // toggle sections
     [
       "page-overview",
       "page-events",
       "page-tickets",
       "page-users",
-      "page-reports", // [MỚI]
-      "page-settings" // [MỚI]
+      "page-reports",
+      "page-settings",
+      "page-holds"
     ].forEach(
       (id) => {
         const el = document.getElementById(id);
@@ -806,6 +807,7 @@ document.addEventListener("DOMContentLoaded", () => {
       events: "Sự kiện",
       tickets: "Đơn hàng",
       users: "Khách hàng",
+      holds: "Giữ ghế",
       reports: "Báo cáo",
       settings: "Cài đặt",
     };
@@ -823,17 +825,19 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (page === "users") {
           usersPage = 1;
           await loadUsers();
+        } else if (page === "holds") {
+          if (typeof window.setupHoldsMonitor === 'function') {
+            window.setupHoldsMonitor();
+          } else {
+            console.warn("setupHoldsMonitor chưa sẵn sàng. Hãy kiểm tra file holds-monitor.js");
+          }
         }
-        // Các trang 'reports' và 'settings' không cần tải dữ liệu
       } catch (e) {
         console.error("Error loading page:", page, e);
-        // Không hiển thị alert, chỉ log vào console
-        // alert("Không tải được dữ liệu cho trang " + page);
       }
     })();
   }
 
-  // Gắn hành vi
   navLinks.forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -854,14 +858,12 @@ document.addEventListener("DOMContentLoaded", () => {
     loadUsers();
   });
 
-  // Search cho users
   const usersSearch = document.getElementById("users-search");
   if (usersSearch) {
     usersSearch.addEventListener("input", (e) => {
       usersSearchTerm = e.target.value.trim();
-      usersPage = 1; // Reset về trang 1 khi search
-      
-      // Debounce search
+      usersPage = 1;
+
       if (usersSearchTimeout) {
         clearTimeout(usersSearchTimeout);
       }
@@ -871,17 +873,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ====== PROFILE & LOGOUT ======
   function loadUserProfile() {
     const userInfo = getUserInfo();
     if (!userInfo) return;
 
-    // Update header avatar
     const headerAvatar = document.getElementById("header-avatar");
     const dropdownAvatar = document.getElementById("dropdown-avatar");
     const profileAvatarPreview = document.getElementById("profile-avatar-preview");
-    const avatarUrl = userInfo.avatar || userInfo.avatarUrl || userInfo.photoURL || "https://i.pravatar.cc/150?img=32";
-    
+    const avatarUrl = userInfo.avatar || userInfo.avatarUrl || userInfo.photoURL || "./logo.jpg";
+
     if (headerAvatar) headerAvatar.src = avatarUrl;
     if (dropdownAvatar) dropdownAvatar.src = avatarUrl;
     if (profileAvatarPreview) profileAvatarPreview.src = avatarUrl;
@@ -916,14 +916,12 @@ document.addEventListener("DOMContentLoaded", () => {
       sessionStorage.removeItem(key);
     });
 
-    // Redirect to login
     window.location.href = '/frontend/LoginUI/LogRegUI.html?tab=login';
   }
 
-  // Profile dropdown toggle
   const userProfileDropdown = document.getElementById("user-profile-dropdown");
   const profileDropdown = document.getElementById("profile-dropdown");
-  
+
   if (userProfileDropdown && profileDropdown) {
     userProfileDropdown.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1011,7 +1009,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (profileForm) {
     profileForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+
       const fullname = document.getElementById("profile-fullname")?.value || "";
       const avatarPreview = document.getElementById("profile-avatar-preview")?.src || "";
 
@@ -1034,7 +1032,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const auth = JSON.parse(authStr);
             auth.user = { ...auth.user, ...updatedUser };
             (localStorage.getItem('auth') ? localStorage : sessionStorage).setItem('auth', JSON.stringify(auth));
-          } catch (e) {}
+          } catch (e) { }
         }
 
         localStorage.setItem('user', JSON.stringify(updatedUser));

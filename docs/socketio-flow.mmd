@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant U1 as User 1 Browser
+    participant U2 as User 2 Browser
+    participant GW as Gateway Socket.IO Server
+    participant Events as Events Service
+    participant Redis
+
+    U1->>GW: WebSocket connect
+    GW-->>U1: Connected socket.id
+    U1->>GW: emit join-show S1
+    Note over GW: User 1 subscribes to room show:S1
+    
+    U2->>GW: WebSocket connect + join-show S1
+    Note over GW: User 2 cũng join room show:S1
+    
+    U1->>Events: POST /api/holds seats A1
+    Events->>Redis: SET held:S1:A1 = holdId
+    Events-->>U1: 201 holdId expiresAt
+    Events->>GW: POST /internal/ws/seat-updated
+    GW->>U1: emit to room show:S1 seat-updated
+    GW->>U2: emit to room show:S1 seat-updated
+    Note over U2: Ghế A1 tự động chuyển sang held
