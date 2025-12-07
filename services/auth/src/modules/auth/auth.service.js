@@ -80,3 +80,39 @@ export async function getMe(userId) {
     };
 }
 
+
+export async function updateUser(id, data) {
+    const u = await prisma.user.findUnique({ where: { id } });
+    if (!u) { const e = new Error('User not found'); e.status = 404; throw e; }
+
+    const updateData = {};
+    if (data.fullName) updateData.fullName = data.fullName;
+    if (data.email && data.email !== u.email) {
+        const exist = await prisma.user.findUnique({ where: { email: data.email } });
+        if (exist) { const e = new Error('Email already exists'); e.status = 409; throw e; }
+        updateData.email = data.email;
+    }
+    if (data.password) {
+        updateData.passwordHash = await hash(data.password);
+    }
+
+    const updated = await prisma.user.update({
+        where: { id },
+        data: updateData,
+        select: { id: true, email: true, fullName: true, createdAt: true }
+    });
+    return updated;
+}
+
+export async function deleteUser(id) {
+    const u = await prisma.user.findUnique({ where: { id } });
+    if (!u) { const e = new Error('User not found'); e.status = 404; throw e; }
+
+    // Check if admin
+    if (u.email === process.env.ADMIN_EMAIL) {
+        const e = new Error('Cannot delete super admin'); e.status = 403; throw e;
+    }
+
+    await prisma.user.delete({ where: { id } });
+    return { ok: true };
+}

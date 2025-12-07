@@ -137,12 +137,8 @@
   const UNIT_PRICE = calculateTotalPrice() / quantity || Number(sidebar?.dataset?.unitPrice || "1390000");
   if (unitPriceEl) unitPriceEl.textContent = `${fmt.format(UNIT_PRICE)} đ`;
 
-  // Voucher demo map
-  const VOUCHERS = {
-    "DELO10": 0.10,
-    "LOVER15": 0.15
-  };
-  let discountRate = 0;
+  // Track applied coupon
+  let appliedCoupon = null;
 
   // ====== Countdown ======
   const parseStartSeconds = () => {
@@ -325,14 +321,35 @@
     // Tính tổng từ selectedSeats thực tế
     const baseTotal = calculateTotalPrice();
     const sub = baseTotal * quantity;
-    const discount = Math.round(sub * discountRate);
-    const total = sub - discount;
+
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percent') {
+        // Phần trăm: discountValue là %, ví dụ 20 = 20%
+        discount = Math.round(sub * (appliedCoupon.discountValue / 100));
+      } else if (appliedCoupon.discountType === 'fixed') {
+        // Số tiền cố định: discountValue là số tiền VNĐ
+        discount = appliedCoupon.discountValue;
+      }
+    }
+
+    const total = Math.max(0, sub - discount); // Không để âm
 
     if (totalAmount) totalAmount.textContent = `${fmt.format(total)} đ`;
+
     if (discount > 0) {
       if (saveRow) saveRow.hidden = false;
       if (saveAmount) saveAmount.textContent = `${fmt.format(discount)} đ`;
-      if (voucherMsg) voucherMsg.textContent = `Áp dụng ${Math.round(discountRate * 100)}% thành công.`;
+
+      // Hiển thị message dựa theo loại giảm giá
+      if (voucherMsg) {
+        if (appliedCoupon.discountType === 'percent') {
+          voucherMsg.textContent = `Tiết kiệm ${appliedCoupon.discountValue}% (${fmt.format(discount)} đ)`;
+        } else {
+          voucherMsg.textContent = `Tiết kiệm ${fmt.format(discount)} đ`;
+        }
+        voucherMsg.style.color = "#065f46";
+      }
     } else {
       if (saveRow) saveRow.hidden = true;
       if (saveAmount) saveAmount.textContent = "0 đ";
@@ -356,18 +373,62 @@
     updateEverything();
   });
 
-  // ====== Voucher apply (demo) ======
-  applyVoucherBtn?.addEventListener("click", () => {
+  // ====== Voucher apply (API-based) ======
+  applyVoucherBtn?.addEventListener("click", async () => {
     const code = voucherInput.value.trim().toUpperCase();
-    if (!code) { discountRate = 0; updateEverything(); return; }
-    if (Object.hasOwn(VOUCHERS, code)) {
-      discountRate = VOUCHERS[code];
-      voucherMsg.style.color = "#065f46";
-    } else {
-      discountRate = 0;
-      voucherMsg.textContent = "Mã không hợp lệ.";
-      voucherMsg.style.color = "#b91c1c";
+
+    if (!code) {
+      appliedCoupon = null;
+      updateEverything();
+      return;
     }
+
+    const token = getAuthToken();
+    if (!token) {
+      voucherMsg.textContent = "Vui lòng đăng nhập để sử dụng mã giảm giá.";
+      voucherMsg.style.color = "#b91c1c";
+      return;
+    }
+
+    // Disable button while validating
+    applyVoucherBtn.disabled = true;
+    applyVoucherBtn.textContent = "Đang kiểm tra...";
+    voucherMsg.textContent = "";
+
+    try {
+      const res = await fetch(`${API_BASE}/coupons/validate/${encodeURIComponent(code)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMsg = errorData.error?.message || 'Mã giảm giá không hợp lệ';
+        throw new Error(errorMsg);
+      }
+
+      const data = await res.json();
+
+      if (data.valid && data.coupon) {
+        appliedCoupon = data.coupon;
+        voucherMsg.textContent = `Mã "${code}" hợp lệ!`;
+        voucherMsg.style.color = "#065f46";
+      } else {
+        appliedCoupon = null;
+        voucherMsg.textContent = "Mã giảm giá không hợp lệ.";
+        voucherMsg.style.color = "#b91c1c";
+      }
+    } catch (error) {
+      console.error('[Coupon validation error]:', error);
+      appliedCoupon = null;
+      voucherMsg.textContent = error.message || "Mã giảm giá không hợp lệ hoặc đã hết hạn.";
+      voucherMsg.style.color = "#b91c1c";
+    } finally {
+      applyVoucherBtn.disabled = false;
+      applyVoucherBtn.textContent = "Áp dụng";
+    }
+
     updateEverything();
   });
 
@@ -640,13 +701,20 @@
         }
 
         // Step 1: Checkout (tạo order với status pending)
+        const checkoutBody = { holdId };
+
+        // Thêm couponId nếu có áp dụng mã giảm giá
+        if (appliedCoupon?.id) {
+          checkoutBody.couponId = appliedCoupon.id;
+        }
+
         const checkoutResponse = await fetch(`${API_BASE}/orders/checkout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ holdId })
+          body: JSON.stringify(checkoutBody)
         });
 
         if (!checkoutResponse.ok) {

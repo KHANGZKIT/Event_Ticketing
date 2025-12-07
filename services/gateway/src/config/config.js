@@ -20,6 +20,8 @@ export const routes = [
     { prefix: '/api/orders', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
     { prefix: '/api/payments', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
     { prefix: '/api/tickets', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/coupons', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/seatmaps', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
 ];
 
 export const serverOptions = {

@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="table-upgrade.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 </head>
@@ -17,17 +18,17 @@
 <body>
   <aside class="sidebar">
     <div class="brand">
-      <i class="fa-solid fa-ticket"></i>
-      <span>TicketBook</span>
+      <a href="/frontend/DashboardUI/Dashboard.html"><img src="logo.svg" alt="Logo"></a>
     </div>
     <nav class="nav">
       <a href="#" class="active" data-page="overview"><i class="fa-solid fa-house"></i> Bảng điều khiển</a>
       <a href="#" data-page="holds"><i class="fa-solid fa-lock"></i> Giữ ghế</a>
       <a href="#" data-page="tickets"><i class="fa-solid fa-file-invoice"></i> Đơn hàng</a>
       <a href="#" data-page="users"><i class="fa-solid fa-users"></i> Khách hàng</a>
+      <a href="#" data-page="events"><i class="fa-solid fa-calendar-days"></i> Sự kiện</a>
+      <a href="#" data-page="coupons"><i class="fa-solid fa-tags"></i> Mã giảm giá</a>
       <a href="#" data-page="reports"><i class="fa-solid fa-chart-line"></i> Báo cáo</a>
       <a href="#" data-page="settings"><i class="fa-solid fa-gear"></i> Cài đặt</a>
-      <a href="#" data-page="events" style="display: none;">Sự kiện</a>
     </nav>
 
     <div class="sidebar-footer">
@@ -128,12 +129,12 @@
           </div>
           <div class="kpi">
             <h4>Sự kiện hôm nay</h4>
-            <p id="kpi-upcoming-today">0</p>
-            <span class="chip red">-5%</span>
+            <p id="kpi-upcoming-today">5</p>
+            <span class="chip green">+5%</span>
           </div>
           <div class="kpi">
             <h4>Người tham gia hôm nay</h4>
-            <p id="kpi-attendees-today">0</p>
+            <p id="kpi-attendees-today">250</p>
             <span class="chip red">-5%</span>
           </div>
         </div>
@@ -156,10 +157,10 @@
         </div>
 
         <div class="grid-3" style="margin-top: 24px;">
-          <div class="card card-table">
+          <div class="card card-table recent-orders-card">
             <div class="card-head">Đơn hàng gần đây</div>
-            <div class="card-body">
-              <table id="recent-orders-table" class="table">
+            <div class="card-body table-container">
+              <table id="recent-orders-table" class="table data-table">
                 <thead>
                   <tr>
                     <th>Mã đơn hàng</th>
@@ -172,10 +173,10 @@
             </div>
           </div>
 
-          <div class="card card-table">
+          <div class="card card-table top-events-card">
             <div class="card-head">Top 5 sự kiện bán chạy nhất</div>
-            <div class="card-body">
-              <table id="top-events-table" class="table">
+            <div class="card-body table-container">
+              <table id="top-events-table" class="table data-table">
                 <thead>
                   <tr>
                     <th>Tên sự kiện</th>
@@ -187,10 +188,10 @@
             </div>
           </div>
 
-          <div class="card card-table">
+          <div class="card card-table upcoming-events-card">
             <div class="card-head">Sự kiện sắp tới</div>
-            <div class="card-body">
-              <table id="upcoming-shows-table" class="table">
+            <div class="card-body table-container">
+              <table id="upcoming-shows-table" class="table data-table">
                 <thead>
                   <tr>
                     <th>Tên sự kiện</th>
@@ -263,7 +264,10 @@
       <section id="page-events" class="hidden" data-page="events">
         <div class="section-title">
           <h3>🗂️ Sự kiện</h3>
-          <div><button id="ev-refresh" class="btn">Làm mới</button></div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-add-event" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm sự kiện</button>
+            <button id="ev-refresh" class="btn">Làm mới</button>
+          </div>
         </div>
         <div class="card">
           <div class="card-head">Danh sách sự kiện mới nhất</div>
@@ -275,6 +279,7 @@
                   <th>Số suất chiếu</th>
                   <th>Trạng thái</th>
                   <th>Ngày tạo</th>
+                  <th>Hành động</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -313,6 +318,8 @@
         <div class="section-title">
           <h3>👤 Khách hàng</h3>
           <div style="display: flex; gap: 12px; align-items: center;">
+            <button id="btn-add-user" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Thêm khách
+              hàng</button>
             <input type="text" id="users-search" placeholder="Tìm kiếm email hoặc tên..."
               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 250px;">
             <button id="us-refresh" class="btn">Làm mới</button>
@@ -328,6 +335,7 @@
                   <th>Họ tên</th>
                   <th>Đơn hàng</th>
                   <th>Ngày tạo</th>
+                  <th>Hành động</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -342,21 +350,36 @@
           <h3><i class="fa-solid fa-chart-line"></i> Báo cáo</h3>
         </div>
         <div class="card">
-          <div class="card-head">Báo cáo</div>
           <div class="card-body">
-            <p>Trang báo cáo đang được xây dựng.</p>
+            <p>Trang cài đặt đang được xây dựng.</p>
           </div>
         </div>
       </section>
-
-      <section id="page-settings" class="hidden" data-page="settings">
+      <section id="page-coupons" class="hidden" data-page="coupons">
         <div class="section-title">
-          <h3><i class="fa-solid fa-gear"></i> Cài đặt</h3>
+          <h3><i class="fa-solid fa-tags"></i> Mã giảm giá</h3>
+          <button id="btn-add-coupon" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Tạo mã mới
+          </button>
         </div>
+
         <div class="card">
-          <div class="card-head">Cài đặt</div>
+          <div class="card-head">Danh sách mã giảm giá</div>
           <div class="card-body">
-            <p>Trang cài đặt đang được xây dựng.</p>
+            <table class="table" id="coupons-table">
+              <thead>
+                <tr>
+                  <th>Mã Code</th>
+                  <th>Loại</th>
+                  <th>Giá trị</th>
+                  <th>Giới hạn</th>
+                  <th>Đã dùng</th>
+                  <th>Hết hạn</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -405,6 +428,217 @@
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Hủy</button>
             <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Quản Lý Khách Hàng -->
+  <div id="user-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="user-modal-title">Thêm Khách hàng</h3>
+        <button class="modal-close" data-modal="user-modal">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="user-form">
+          <input type="hidden" id="user-id">
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="user-email" required placeholder="vd: nguoidung@email.com">
+          </div>
+
+          <div class="form-group">
+            <label>Họ tên *</label>
+            <input type="text" id="user-fullname" required placeholder="Nhập họ và tên">
+          </div>
+
+          <div class="form-group">
+            <label>Mật khẩu</label>
+            <input type="password" id="user-password" placeholder="Để trống nếu không thay đổi">
+            <small style="color: #666;">Chỉ nhập khi tạo mới hoặc muốn đổi mật khẩu</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary modal-close-btn" data-modal="user-modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-save"></i> Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Quản Lý Sự Kiện -->
+  <div id="event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="event-modal-title">Thêm Sự kiện</h3>
+        <button class="modal-close" data-modal="event-modal">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="event-form">
+          <input type="hidden" id="event-id">
+
+          <div class="form-group">
+            <label>Tên sự kiện *</label>
+            <input type="text" id="event-name" required placeholder="vd: Hòa nhạc mùa hè 2025">
+          </div>
+
+          <div class="form-group">
+            <label>Thành phố</label>
+            <input type="text" id="event-city" placeholder="vd: Hà Nội">
+          </div>
+
+          <div class="form-group">
+            <label>Ngày bắt đầu *</label>
+            <input type="datetime-local" id="event-startsAt" required>
+          </div>
+
+          <div class="form-group">
+            <label>Ảnh bìa (URL)</label>
+            <input type="text" id="event-cover" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary modal-close-btn" data-modal="event-modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-save"></i> Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Thêm Suất Chiếu -->
+  <div id="show-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Thêm Suất chiếu</h3>
+        <button class="modal-close" data-modal="show-modal">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="show-form">
+          <input type="hidden" id="show-event-id">
+
+          <div class="form-group">
+            <label>Thời gian chiếu *</label>
+            <input type="datetime-local" id="show-startsAt" required>
+          </div>
+
+          <div class="form-group">
+            <label>Địa điểm *</label>
+            <input type="text" id="show-venue" required placeholder="vd: Nhà hát Lớn Hà Nội - Phòng A1">
+          </div>
+
+          <div class="form-group">
+            <label>Sơ đồ ghế *</label>
+            <select id="show-seatmap" required>
+              <option value="">-- Chọn sơ đồ ghế --</option>
+            </select>
+            <button type="button" id="btn-add-seatmap" class="btn btn-sm" style="margin-top: 8px;">
+              <i class="fa-solid fa-plus"></i> Tạo sơ đồ mới
+            </button>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary modal-close-btn" data-modal="show-modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-save"></i> Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Tạo Sơ Đồ Ghế -->
+  <div id="seatmap-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Thêm Sơ đồ ghế</h3>
+        <button class="modal-close" data-modal="seatmap-modal">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="seatmap-form">
+          <div class="form-group">
+            <label>Tên sơ đồ *</label>
+            <input type="text" id="seatmap-name" required placeholder="vd: Rạp Standard 10x10">
+          </div>
+
+          <div class="form-group">
+            <label>Dữ liệu JSON *</label>
+            <textarea id="seatmap-json" rows="8" required placeholder='{"rows": 10, "cols": 10, "layout": [...]}'
+              style="font-family: monospace; font-size: 13px;"></textarea>
+            <small style="color: #666;">
+              Nhập cấu trúc JSON cho sơ đồ ghế (số hàng, cột, vị trí ghế...)
+            </small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary modal-close-btn" data-modal="seatmap-modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-save"></i> Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Tạo Mã Giảm Giá -->
+  <div id="coupon-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Tạo Mã giảm giá</h3>
+        <button class="modal-close" data-modal="coupon-modal">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="coupon-form">
+          <div class="form-group">
+            <label>Mã Code *</label>
+            <input type="text" id="coupon-code" required placeholder="vd: SUMMER2025"
+              style="text-transform: uppercase;">
+          </div>
+
+          <div class="form-group">
+            <label>Loại giảm giá *</label>
+            <select id="coupon-type">
+              <option value="percent">Phần trăm (%)</option>
+              <option value="fixed">Số tiền cố định (VNĐ)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Giá trị giảm *</label>
+            <input type="number" id="coupon-value" required min="0" placeholder="vd: 10 (nghĩa là 10% hoặc 10,000 VNĐ)">
+          </div>
+
+          <div class="form-group">
+            <label>Giới hạn số lần sử dụng</label>
+            <input type="number" id="coupon-limit" min="1" placeholder="Để trống = không giới hạn">
+          </div>
+
+          <div class="form-group">
+            <label>Ngày hết hạn</label>
+            <input type="datetime-local" id="coupon-expires">
+            <small style="color: #666;">Để trống = không hết hạn</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary modal-close-btn" data-modal="coupon-modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-save"></i> Tạo mã
+            </button>
           </div>
         </form>
       </div>

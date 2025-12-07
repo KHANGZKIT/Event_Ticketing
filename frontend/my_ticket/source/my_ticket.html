@@ -54,8 +54,8 @@
     </div>
     <div class="account">
       <a href="#" class="avatar-container">
-        <img id="headerAvatar" src="" alt="" class="header-avatar" 
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <img id="headerAvatar" src="" alt="" class="header-avatar"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div id="headerAvatarFallback" class="header-avatar-fallback" style="display: none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -153,19 +153,21 @@
 
       <div id="section-account-info" class="content-section hidden">
         <h2>Thông tin tài khoản</h2>
-        
+
         <div class="account-glass-card">
           <div class="account-glass-header">
             <div class="account-glass-avatar-wrapper">
               <img src="OIP.webp" id="avatar-preview">
               <label for="avatar-upload" class="avatar-upload-button" title="Tải ảnh mới">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
               </label>
-              <input type="file" id="avatar-upload" accept="image/png, image/jpeg, image/webp" class="hidden-file-input">
+              <input type="file" id="avatar-upload" accept="image/png, image/jpeg, image/webp"
+                class="hidden-file-input">
             </div>
             <h3 id="account-username-display">Đang tải...</h3>
           </div>
@@ -173,7 +175,12 @@
           <form class="account-glass-form">
             <div class="form-group">
               <label for="acc-fullname">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0" /><circle cx="12" cy="10" r="4" /><circle cx="12" cy="12" r="10" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 20a6 6 0 0 0-12 0" />
+                  <circle cx="12" cy="10" r="4" />
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
                 Họ và tên
               </label>
               <input type="text" id="acc-fullname" placeholder="Nhập họ và tên của bạn">
@@ -181,7 +188,11 @@
 
             <div class="form-group">
               <label for="acc-email">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
                 Email
               </label>
               <input type="email" id="acc-email" placeholder="email@example.com" disabled>
@@ -189,7 +200,11 @@
 
             <div class="form-group">
               <label for="acc-id">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
                 ID Tài khoản
               </label>
               <input type="text" id="acc-id" disabled>
@@ -197,7 +212,10 @@
 
             <div class="form-group">
               <label for="acc-role">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
                 Vai trò
               </label>
               <input type="text" id="acc-role" disabled>
@@ -210,21 +228,22 @@
 
         </div>
       </div>
-      </div>
-
-  <!-- Modal xem ảnh -->
-  <div id="imageModal" class="image-modal hidden">
-    <div class="image-modal-backdrop" onclick="closeImageModal()"></div>
-    <div class="image-modal-content">
-      <button class="image-modal-close" onclick="closeImageModal()" aria-label="Đóng">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-      <img id="imageModalImg" src="" alt="Xem ảnh">
     </div>
-  </div>
+
+    <!-- Modal xem ảnh -->
+    <div id="imageModal" class="image-modal hidden">
+      <div class="image-modal-backdrop" onclick="closeImageModal()"></div>
+      <div class="image-modal-content">
+        <button class="image-modal-close" onclick="closeImageModal()" aria-label="Đóng">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <img id="imageModalImg" src="" alt="Xem ảnh">
+      </div>
+    </div>
 </body>
 <script>
   const API_BASE = 'http://localhost:4000/api';
@@ -331,7 +350,7 @@
   function updateHeaderAvatar(avatarUrl) {
     const avatarImg = document.getElementById('headerAvatar');
     const avatarFallback = document.getElementById('headerAvatarFallback');
-    
+
     if (avatarUrl) {
       if (avatarImg) {
         avatarImg.src = avatarUrl;
@@ -383,7 +402,7 @@
     // Thử lấy từ auth.user trước
     const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
     let avatarUrl = null;
-    
+
     if (authStr) {
       try {
         const auth = JSON.parse(authStr);
@@ -392,7 +411,7 @@
         console.warn('Failed to parse auth:', e);
       }
     }
-    
+
     // Nếu không có, thử lấy từ user
     if (!avatarUrl) {
       const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
@@ -405,7 +424,7 @@
         }
       }
     }
-    
+
     updateHeaderAvatar(avatarUrl);
   }
 
@@ -529,7 +548,6 @@
         <p><strong>Giá vé:</strong> <span class="price">${vnd(price)}</span></p>
         <p><strong>Ngày diễn ra:</strong> ${timeStr}</p>
         <p><strong>Địa điểm:</strong> ${venue}</p>
-        <p><strong>Mã đơn:</strong> ${order.id}</p>
       </div>
       <div class="ticket-status ${statusClass}">
         <span class="status-dot"></span> ${statusLabel}
@@ -604,16 +622,16 @@
       const fragment = document.createDocumentFragment();
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = cards.join('');
-      
+
       // Move all nodes to fragment
       while (tempDiv.firstChild) {
         fragment.appendChild(tempDiv.firstChild);
       }
-      
+
       // Single DOM update
       listEl.innerHTML = '';
       listEl.appendChild(fragment);
-      
+
       // Thêm event listener cho ảnh ticket
       listEl.querySelectorAll('.ticket-image-clickable').forEach(img => {
         img.addEventListener('click', () => {
@@ -621,7 +639,7 @@
           openImageModal(imageUrl);
         });
       });
-      
+
       listEl.querySelectorAll('.btn-view').forEach(btn => {
         btn.addEventListener('click', () => {
           const orderId = btn.getAttribute('data-order');
@@ -643,7 +661,7 @@
     if (filterTimeout) {
       clearTimeout(filterTimeout);
     }
-    
+
     filterTimeout = setTimeout(() => {
       const cards = document.querySelectorAll('.ticket-card');
       let hasVisibleTickets = false;
@@ -711,7 +729,7 @@
     (async function init() {
       if (window.__MYTNDAY_INITED_RAN__) return;
       window.__MYTNDAY_INITED_RAN__ = true;
-      
+
       const token = getToken();
       if (!token) {
         const back = encodeURIComponent(location.pathname + location.search);
@@ -720,7 +738,7 @@
       }
       const me = await getUser();
       setUserName(me);
-      
+
       // Load avatar vào header
       loadHeaderAvatar();
 
@@ -784,7 +802,7 @@
         const section = item.getAttribute('data-section');
         if (section) {
           showSection(section);
-          
+
           if (section === 'account-info') {
             // **[MỚI]** Gọi hàm render mới
             renderAccountInfoForm();
@@ -829,28 +847,28 @@
         if (idEl) {
           idEl.value = user.id || '—';
         }
-         if (avatarPreview) {
-           // Lấy avatar từ user object hoặc từ storage
-           const avatarUrl = user.avatar || user.avatarUrl || user.photoURL || 
-                            (() => {
-                              const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
-                              if (authStr) {
-                                try {
-                                  const auth = JSON.parse(authStr);
-                                  return auth?.user?.avatar || auth?.user?.avatarUrl || auth?.user?.photoURL;
-                                } catch (e) {}
-                              }
-                              return null;
-                            })();
-           avatarPreview.src = avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCIgMTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iNjAiIGZpbGw9InVybCgjYSkiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02MCA3NUM2OC4yODQzIDc1IDc1IDY4LjI4NDMgNzUgNjBDNzUgNTEuNzE1NyA2OC4yODQzIDQ1IDYwIDQ1QzUxLjcxNTcgNDUgNDUgNTEuNzE1NyA0NSA2MEM0NSA2OC4yODQzIDUxLjcxNTcgNzUgNjAgNzVaTTMwIDk3LjVDMzAgODcuOTU0MyAzNy45NTQzIDgwIDQ3LjUgODBINDcyLjVDODIuMDQ1NyA4MCA5MCA4Ny45NTQzIDkwIDk3LjVWMTA1SDMwVjk3LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMjAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzBGRkY1QiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMEU3RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K';
-           // Thêm click để xem ảnh
-           avatarPreview.style.cursor = 'pointer';
-           avatarPreview.onclick = () => {
-             if (avatarUrl) {
-               openImageModal(avatarUrl);
-             }
-           };
-          }
+        if (avatarPreview) {
+          // Lấy avatar từ user object hoặc từ storage
+          const avatarUrl = user.avatar || user.avatarUrl || user.photoURL ||
+            (() => {
+              const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+              if (authStr) {
+                try {
+                  const auth = JSON.parse(authStr);
+                  return auth?.user?.avatar || auth?.user?.avatarUrl || auth?.user?.photoURL;
+                } catch (e) { }
+              }
+              return null;
+            })();
+          avatarPreview.src = avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCIgMTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iNjAiIGZpbGw9InVybCgjYSkiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02MCA3NUM2OC4yODQzIDc1IDc1IDY4LjI4NDMgNzUgNjBDNzUgNTEuNzE1NyA2OC4yODQzIDQ1IDYwIDQ1QzUxLjcxNTcgNDUgNDUgNTEuNzE1NyA0NSA2MEM0NSA2OC4yODQzIDUxLjcxNTcgNzUgNjAgNzVaTTMwIDk3LjVDMzAgODcuOTU0MyAzNy45NTQzIDgwIDQ3LjUgODBINDcyLjVDODIuMDQ1NyA4MCA5MCA4Ny45NTQzIDkwIDk3LjVWMTA1SDMwVjk3LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMjAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzBGRkY1QiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMEU3RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K';
+          // Thêm click để xem ảnh
+          avatarPreview.style.cursor = 'pointer';
+          avatarPreview.onclick = () => {
+            if (avatarUrl) {
+              openImageModal(avatarUrl);
+            }
+          };
+        }
 
         if (roleEl) {
           if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
@@ -947,7 +965,7 @@
             // Giả lập API call
             await new Promise(resolve => setTimeout(resolve, 1500));
             console.log('Đã gửi dữ liệu:', { fullName, avatarFile, avatarUrl: avatarUrl ? 'base64 data' : null });
-            
+
             // Cập nhật avatar vào storage để tất cả các trang có thể đọc
             if (avatarUrl) {
               updateAvatarInStorage(avatarUrl);
@@ -960,7 +978,7 @@
                 user.fullName = fullName;
                 localStorage.setItem('user', JSON.stringify(user));
                 sessionStorage.setItem('user', JSON.stringify(user));
-                
+
                 // Cập nhật trong auth.user
                 const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
                 if (authStr) {
@@ -971,15 +989,15 @@
                       localStorage.setItem('auth', JSON.stringify(auth));
                       sessionStorage.setItem('auth', JSON.stringify(auth));
                     }
-                  } catch (e) {}
+                  } catch (e) { }
                 }
-                
+
                 setUserName(user);
               }
             }
-            
+
             alert('Cập nhật thành công!');
-            
+
           } catch (error) {
             console.error('Lỗi cập nhật:', error);
             alert('Cập nhật thất bại. Vui lòng thử lại.');

@@ -28,3 +28,18 @@ export async function me(req, res, next) {
 
 
 
+
+export async function updateUser(req, res, next) {
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        res.json(await svc.updateUser(id, data));
+    } catch (e) { next(e); }
+}
+
+export async function deleteUser(req, res, next) {
+    try {
+        const { id } = req.params;
+        res.json(await svc.deleteUser(id));
+    } catch (e) { next(e); }
+}

@@ -999,3 +999,93 @@ body.dark-mode #theme-toggle i {
     transform: translateY(0);
   }
 }
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+  margin: 0 2px;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #5c3fc2 0%, #79028b 100%);
+  color: white !important;
+}
+
+.btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(193, 13, 148, 0.306);
+}
+
+/* ===== Modal Animation ===== */
+.modal {
+  backdrop-filter: blur(5px);
+  transition: opacity 0.3s ease;
+}
+
+.modal.active .modal-content {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== Form Improvements ===== */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group select,
+.form-group textarea {
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 93, 250, 0.15);
+}
+
+/* ===== Table Action Buttons ===== */
+.table td button {
+  transition: all 0.2s ease;
+}
+
+.table td button:hover {
+  transform: scale(1.1);
+}
+
+/* ===== Alerts & Messages ===== */
+.empty-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-color-light);
+}
+
+.empty-message i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
