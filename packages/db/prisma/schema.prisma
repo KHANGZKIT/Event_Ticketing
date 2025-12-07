@@ -75,18 +75,18 @@ model SeatMap {
  */
 
 model Event {
-  id       String    @id @default(uuid())
-  name     String
-  city     String?
-  cover    String?
-  startsAt DateTime?
-  category  String?
+  id          String    @id @default(uuid())
+  name        String
+  city        String?
+  cover       String?
+  startsAt    DateTime?
+  category    String?
   description String?
-  venueId   String?  
-  venue   Venue?  @relation(fields: [venueId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  venueId     String?
+  venue       Venue?    @relation(fields: [venueId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   shows Show[]
 
@@ -142,17 +142,20 @@ enum ShowStatus {
  */
 
 model Order {
-  id        String      @id @default(uuid())
-  userId    String
-  showId    String
-  amount    Int // GIỮ Int để không gãy service hiện tại
-  currency  String      @default("VND")
-  status    OrderStatus @default(pending)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id             String      @id @default(uuid())
+  userId         String
+  showId         String
+  amount         Int // GIỮ Int để không gãy service hiện tại (sau khi giảm giá)
+  currency       String      @default("VND")
+  status         OrderStatus @default(pending)
+  couponId       String? // Mã giảm giá đã áp dụng
+  discountAmount Int?        @default(0) // Số tiền giảm
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   tickets Ticket[]
   payment Payment?
+  coupon  Coupon?  @relation(fields: [couponId], references: [id], onDelete: SetNull)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
@@ -235,6 +238,27 @@ model ShowTicketType {
 
   @@unique([showId, name])
   @@index([showId])
+}
+
+/**
+ * ============ Coupon (Mã giảm giá) ============
+ */
+
+model Coupon {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  discountType  String // "percent" or "fixed"
+  discountValue Int // 10 = 10% or 10,000 VNĐ
+  usageLimit    Int? // null = unlimited
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders Order[]
+
+  @@index([code])
+  @@index([expiresAt])
 }
 
 /**

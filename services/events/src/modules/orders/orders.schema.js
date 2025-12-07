@@ -1,4 +1,5 @@
 import { z } from 'zod'
-export const CheckoutSchema = z.object({ 
-    holdId: z.string().uuid()
+export const CheckoutSchema = z.object({
+    holdId: z.string().uuid(),
+    couponId: z.string().uuid().optional()
 })

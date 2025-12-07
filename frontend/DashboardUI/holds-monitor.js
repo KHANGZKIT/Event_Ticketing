@@ -79,9 +79,7 @@
             }
 
             const res = await fetch(`${BASE_URL}/api/dashboard/active-holds`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!res.ok) throw new Error(`Lỗi kết nối: ${res.status}`);
@@ -173,9 +171,7 @@
             const token = getToken();
             const res = await fetch(`${BASE_URL}/api/dashboard/holds/${holdId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -206,7 +202,8 @@
             clearInterval(holdsAutoRefreshInterval);
             holdsAutoRefreshInterval = null;
         }
-        // Lưu ý: Không đóng socket hoàn toàn để tái sử dụng
+        // Lưu ý: Không đóng socket hoàn toàn để tái sử dụng, hoặc đóng nếu muốn tiết kiệm resource
+        // Ở đây ta chỉ clear interval polling.
     }
 
     function setupHoldsMonitor() {
@@ -267,5 +264,4 @@
             setupHoldsMonitor();
         }
     });
-
-})(); 
+})();

@@ -120,17 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Wrapper for CRUD operations with Content-Type header
-    async function fetchWithAuth(url, options = {}) {
-        const opts = { ...options };
-        opts.headers = opts.headers || {};
-        opts.headers['Content-Type'] = 'application/json';
-        if (AUTH_TOKEN) {
-            opts.headers.Authorization = "Bearer " + AUTH_TOKEN;
-        }
-        return await fetch(BASE_URL + url, opts);
-    }
-
     // ====== Utils ======
     const fmtVND = (n) => (Number(n || 0)).toLocaleString("vi-VN");
     const fmtDate = (s) => (s ? new Date(s).toLocaleString("vi-VN") : "-");
@@ -246,18 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const ctx = el.getContext("2d");
-        let rs = ratios || {};
-
-        // Demo data nếu không có dữ liệu thực
-        const hasData = Object.values(rs).some(v => Number(v) > 0);
-        if (!hasData) {
-            rs = {
-                'Thành công': 85,
-                'Thất bại': 10,
-                'Hoàn tiền': 5
-            };
-        }
-
+        const rs = ratios || {};
         const labels = Object.keys(rs);
         const data = labels.map((k) => Math.round(Number(rs[k] || 0)));
 
@@ -268,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     labels,
                     datasets: [{
                         data,
-                        backgroundColor: ['#36B37E', '#F26A8D', '#FFAB00', '#7C5DFA'],
+                        backgroundColor: ['#7C5DFA', '#F26A8D', '#FFAB00', '#36B37E'],
                     }]
                 },
                 options: {
@@ -296,21 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const ctx = el.getContext("2d");
-        let arr = safeArray(series);
-
-        // Sử dụng demo data nếu không đủ dữ liệu thực
-        if (arr.length < 3) {
-            const today = new Date();
-            arr = [];
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                // Random số vé từ 30-150
-                arr.push({ date: dateStr, count: Math.floor(Math.random() * 120) + 30 });
-            }
-        }
-
+        const arr = safeArray(series);
         const labels = arr.map((x) => x.date);
         const data = arr.map((x) => Number(x.count || 0));
         const unit = getGroupLabel(group);
@@ -516,30 +480,26 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderEvents(list) {
         const tb = document.querySelector("#events-table tbody");
         if (!tb) return;
+
         const arr = safeArray(list);
         if (!arr.length) {
-            tb.innerHTML = `<tr><td colspan="5">Không có dữ liệu</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="4">Không có dữ liệu</td></tr>`;
             return;
         }
         tb.innerHTML = arr
             .map(
                 (ev) => `
-    <tr>
-      <td>${ev.name || "N/A"}</td>
-      <td>${Number(ev.showsCount || 0)}</td>
-      <td>${chipStatus(ev.status || "published")}</td>
-      <td>${fmtDate(ev.createdAt)}</td>
-      <td>
-        <button class="btn btn-sm" onclick="openAddShowModal('${ev.id}')" 
-                title="Thêm suất chiếu">
-          <i class="fa-solid fa-calendar-plus"></i> Thêm show
-        </button>
-      </td>
-    </tr>
-  `
+      <tr>
+        <td>${ev.name || "N/A"}</td>
+        <td>${Number(ev.showsCount || 0)}</td>
+        <td>${chipStatus(ev.status || "published")}</td>
+        <td>${fmtDate(ev.createdAt)}</td>
+      </tr>
+    `
             )
             .join("");
     }
+
     async function loadEvents() {
         const res = await apiFetch(BASE_URL + "/api/events?limit=20&order=desc");
         if (!res.ok) {
@@ -679,30 +639,29 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!tb) return;
         const arr = safeArray(list);
         if (!arr.length) {
-            tb.innerHTML = `<tr><td colspan="5">Không có dữ liệu</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="4">Không có dữ liệu</td></tr>`;
             return;
         }
         tb.innerHTML = arr
             .map(
                 (u) => `
-    <tr>
-      <td>${u.email || "-"}</td>
-      <td>${u.fullName || "-"}</td>
-      <td>${Number(u.ordersCount || 0)}</td>
-      <td>${fmtDate(u.createdAt)}</td>
-      <td>
-        <button class="btn btn-sm" onclick="editUser('${u.id}')" title="Sửa">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" title="Xóa">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </td>
-    </tr>
-  `
+      <tr>
+        <td>${u.email || "-"}</td>
+        <td>${u.fullName || "-"}</td>
+        <td>${Number(
+                    u.ordersCount != null
+                        ? u.ordersCount
+                        : u._count && u._count.orders
+                            ? u._count.orders
+                            : 0
+                )}</td>
+        <td>${fmtDate(u.createdAt)}</td>
+      </tr>
+    `
             )
             .join("");
     }
+
     function renderUsersPager(page, totalPages) {
         const host = document.getElementById("users-pager");
         if (!host) return;
@@ -776,255 +735,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         renderUsersPager(page, totalPages);
     }
-    // ============================================
-    // PHẦN CRUD - MODAL VÀ XỬ LÝ
-    // ============================================
-    // --- Hàm Mở/Đóng Modal ---
-    function openModal(id) {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('active');
-    }
-    function closeModal(id) {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('active');
-    }
-    // Đóng modal khi click nút X hoặc nút Hủy
-    document.querySelectorAll('.modal-close, .modal-close-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const modalId = btn.getAttribute('data-modal') || btn.closest('.modal').id;
-            closeModal(modalId);
-        });
-    });
-    // Đóng modal khi click ra ngoài
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal(modal.id);
-            }
-        });
-    });
-    // --- CRUD USERS (Khách hàng) ---
-    document.getElementById('btn-add-user').addEventListener('click', () => {
-        document.getElementById('user-form').reset();
-        document.getElementById('user-id').value = '';
-        document.getElementById('user-modal-title').innerText = 'Thêm Khách hàng';
-        openModal('user-modal');
-    });
-    document.getElementById('user-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('user-id').value;
-        const email = document.getElementById('user-email').value;
-        const fullName = document.getElementById('user-fullname').value;
-        const password = document.getElementById('user-password').value;
-        const url = id ? `/api/auth/users/${id}` : `/api/auth/register`;
-        const method = id ? 'PATCH' : 'POST';
-        const body = { email, fullName };
-        if (password) body.password = password;
-        try {
-            const res = await fetchWithAuth(url, { method, body: JSON.stringify(body) });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Lỗi lưu khách hàng');
-            }
-            alert('✅ Lưu thành công!');
-            closeModal('user-modal');
-            loadUsers();
-        } catch (err) {
-            alert('❌ ' + err.message);
-        }
-    });
-    window.editUser = async function (id) {
-        document.getElementById('user-form').reset();
-        document.getElementById('user-id').value = id;
-        document.getElementById('user-modal-title').innerText = 'Sửa Khách hàng';
-        openModal('user-modal');
-    }
-    window.deleteUser = async function (id) {
-        if (!confirm('❓ Bạn có chắc muốn xóa khách hàng này?')) return;
-        try {
-            const res = await fetchWithAuth(`/api/auth/users/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Lỗi xóa khách hàng');
-            alert('✅ Đã xóa thành công!');
-            loadUsers();
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
-    }
-    // --- CRUD EVENTS (Sự kiện) ---
-    document.getElementById('btn-add-event').addEventListener('click', () => {
-        document.getElementById('event-form').reset();
-        document.getElementById('event-id').value = '';
-        document.getElementById('event-modal-title').innerText = 'Thêm Sự kiện';
-        openModal('event-modal');
-    });
-    document.getElementById('event-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('event-id').value;
-        const name = document.getElementById('event-name').value;
-        const city = document.getElementById('event-city').value;
-        const startsAt = new Date(document.getElementById('event-startsAt').value).toISOString();
-        const cover = document.getElementById('event-cover').value;
-        if (id) {
-            alert('⚠️ Chức năng sửa sự kiện chưa được hỗ trợ bởi API backend');
-            return;
-        }
-        try {
-            const res = await fetchWithAuth('/api/events', {
-                method: 'POST',
-                body: JSON.stringify({ name, city, startsAt, cover })
-            });
-            if (!res.ok) throw new Error('Lỗi tạo sự kiện');
-            alert('✅ Tạo sự kiện thành công!');
-            closeModal('event-modal');
-            loadEvents();
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
-    });
-    // --- SHOWS (Suất chiếu) ---
-    window.openAddShowModal = function (eventId) {
-        document.getElementById('show-form').reset();
-        document.getElementById('show-event-id').value = eventId;
-        loadSeatmapsSelect();
-        openModal('show-modal');
-    }
-    document.getElementById('show-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const eventId = document.getElementById('show-event-id').value;
-        const startsAt = new Date(document.getElementById('show-startsAt').value).toISOString();
-        const venue = document.getElementById('show-venue').value;
-        const seatMapId = document.getElementById('show-seatmap').value;
-        try {
-            const res = await fetchWithAuth('/api/shows', {
-                method: 'POST',
-                body: JSON.stringify({ eventId, startsAt, venue, seatMapId })
-            });
-            if (!res.ok) throw new Error('Lỗi tạo suất chiếu');
-            alert('✅ Tạo suất chiếu thành công!');
-            closeModal('show-modal');
-            loadEvents(); // Reload để cập nhật số suất chiếu
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
-    });
-    // --- COUPONS (Mã giảm giá) ---
-    async function loadCoupons() {
-        try {
-            const res = await fetchWithAuth('/api/coupons');
-            if (!res.ok) return;
-            const data = await res.json();
-            const tbody = document.querySelector('#coupons-table tbody');
-            tbody.innerHTML = '';
 
-            const list = data.items || [];
-            if (!list.length) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px;">📋 Chưa có mã giảm giá nào</td></tr>';
-                return;
-            }
-
-            list.forEach(c => {
-                const tr = document.createElement('tr');
-                const typeText = c.discountType === 'percent' ? '%' : 'VNĐ';
-                const expiresText = c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('vi-VN') : 'Không giới hạn';
-
-                tr.innerHTML = `
-        <td><strong>${c.code}</strong></td>
-        <td>${typeText}</td>
-        <td>${c.discountValue}</td>
-        <td>${c.usageLimit || '∞'}</td>
-        <td>${c.usedCount || 0}</td>
-        <td>${expiresText}</td>
-        <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteCoupon('${c.id}')" 
-                  title="Xóa mã giảm giá">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </td>
-      `;
-                tbody.appendChild(tr);
-            });
-        } catch (e) {
-            console.error('Lỗi load coupons:', e);
-        }
-    }
-    document.getElementById('btn-add-coupon').addEventListener('click', () => {
-        document.getElementById('coupon-form').reset();
-        openModal('coupon-modal');
-    });
-    document.getElementById('coupon-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const code = document.getElementById('coupon-code').value.toUpperCase();
-        const discountType = document.getElementById('coupon-type').value;
-        const discountValue = Number(document.getElementById('coupon-value').value);
-        const usageLimit = document.getElementById('coupon-limit').value
-            ? Number(document.getElementById('coupon-limit').value)
-            : undefined;
-        const expiresAt = document.getElementById('coupon-expires').value
-            ? new Date(document.getElementById('coupon-expires').value).toISOString()
-            : undefined;
-        try {
-            const res = await fetchWithAuth('/api/coupons', {
-                method: 'POST',
-                body: JSON.stringify({ code, discountType, discountValue, usageLimit, expiresAt })
-            });
-            if (!res.ok) throw new Error('Lỗi tạo mã giảm giá');
-            alert('✅ Tạo mã giảm giá thành công!');
-            closeModal('coupon-modal');
-            loadCoupons();
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
-    });
-    window.deleteCoupon = async function (id) {
-        if (!confirm('❓ Xóa mã giảm giá này?')) return;
-        try {
-            const res = await fetchWithAuth(`/api/coupons/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Lỗi xóa mã giảm giá');
-            alert('✅ Đã xóa mã giảm giá!');
-            loadCoupons();
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
-    }
-    // --- SEATMAPS (Sơ đồ ghế) ---
-    document.getElementById('btn-add-seatmap').addEventListener('click', () => {
-        openModal('seatmap-modal');
-    });
-    document.getElementById('seatmap-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('seatmap-name').value;
-
-        try {
-            const schema = JSON.parse(document.getElementById('seatmap-json').value);
-            const res = await fetchWithAuth('/api/seatmaps', {
-                method: 'POST',
-                body: JSON.stringify({ name, schema })
-            });
-            if (!res.ok) throw new Error('Lỗi tạo sơ đồ ghế');
-            alert('✅ Tạo sơ đồ ghế thành công!');
-            closeModal('seatmap-modal');
-            loadSeatmapsSelect();
-        } catch (e) {
-            alert('❌ ' + e.message + ' (Kiểm tra JSON có đúng định dạng không)');
-        }
-    });
-    async function loadSeatmapsSelect() {
-        try {
-            const res = await fetchWithAuth('/api/seatmaps');
-            if (!res.ok) return;
-            const data = await res.json();
-            const sel = document.getElementById('show-seatmap');
-            sel.innerHTML = '<option value="">-- Chọn sơ đồ ghế --</option>';
-            (data.items || []).forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.innerText = s.name;
-                sel.appendChild(opt);
-            });
-        } catch (e) {
-            console.error('Lỗi load seatmaps:', e);
-        }
-    }
     function showPage(page) {
         if (page !== 'holds' && typeof window.cleanupHoldsMonitor === 'function') {
             window.cleanupHoldsMonitor();
@@ -1040,8 +751,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "page-users",
             "page-reports",
             "page-settings",
-            "page-holds",
-            "page-coupons"
+            "page-holds"
         ].forEach(
             (id) => {
                 const el = document.getElementById(id);
@@ -1058,8 +768,7 @@ document.addEventListener("DOMContentLoaded", () => {
             users: "Khách hàng",
             holds: "Giữ ghế",
             reports: "Báo cáo",
-            settings: "Cài đặt",
-            coupons: "Mã giảm giá"
+            settings: "Cài đặt"
         };
         if (headerTitle) headerTitle.textContent = titleMap[page] || "Dashboard";
 
@@ -1081,8 +790,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         console.warn("setupHoldsMonitor chưa sẵn sàng.");
                     }
-                } else if (page === "coupons") {
-                    await loadCoupons();
                 }
             } catch (e) {
                 console.error("Error loading page:", page, e);

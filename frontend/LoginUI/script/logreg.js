@@ -229,27 +229,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!email || !fullName || !password) return alert("Điền đủ Email / Họ tên / Mật khẩu");
 
       try {
-        // Ưu tiên /register, fallback /signup nếu 404/405
-        let ok = true, data;
-        try {
-          data = await fetchJSON(`${AUTH_BASE}/register`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, fullName, password })
-          });
-        } catch (e1) {
-          // fallback
-          data = await fetchJSON(`${AUTH_BASE}/signup`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, fullName, password })
-          });
-        }
+        const data = await fetchJSON(`${AUTH_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, fullName, password })
+        });
 
         // Đăng ký xong → quay về trang đăng nhập
         alert("Đăng ký thành công. Vui lòng đăng nhập.");
-        window.location.href = toURL("./LogRegUI.html?tab=login");
+        showLogin(); // Chuyển tab luôn thay vì reload trang
       } catch (err) {
         console.error("[register] error:", err);
-        alert(err.message || "Đăng ký thất bại.");
+        let msg = err.message || "Đăng ký thất bại.";
+        // Xử lý message lỗi phổ biến
+        if (msg.includes("409") || msg.includes("Conflict")) {
+          msg = "Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.";
+        }
+        alert(msg);
       }
     });
   }
