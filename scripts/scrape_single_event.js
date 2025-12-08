@@ -161,7 +161,7 @@ function deriveTiersFromTemplate(tpl) {
         }
         const priceByTier = tpl.priceTiers || {};
         const defaultPrice = priceByTier['Default'] || priceByTier['STANDARD'] || 100000;
-        
+
         return [{
             name: 'Default',
             price: defaultPrice,
@@ -203,15 +203,15 @@ async function createShowWithSeatmap(event, eventData) {
         // Chọn một seatmap ngẫu nhiên
         const availableSeatmaps = await getAvailableSeatmaps();
         const seatMapId = pick(availableSeatmaps);
-        
+
         console.log(`\n🎫 Đang tạo show với seatmap: ${seatMapId}...`);
-        
+
         // Load seatmap template
         const template = await loadSeatMapTemplate(seatMapId);
-        
+
         // Validate template
         expandSeatsFromTemplate(template);
-        
+
         // Tạo show
         const showStartsAt = event.startsAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 ngày sau nếu không có ngày
         const show = await prisma.show.create({
@@ -223,17 +223,17 @@ async function createShowWithSeatmap(event, eventData) {
                 status: 'scheduled',
             },
         });
-        
+
         // Clone seatmap vào DB
         await cloneSeatMapForShow(show.id, seatMapId, template);
-        
+
         // Lấy tiers từ template
         const tiers = deriveTiersFromTemplate(template);
-        
+
         // Áp dụng giá từ scrape nếu có
         const priceMin = eventData.priceMin || null;
         const priceMax = eventData.priceMax || null;
-        
+
         // Nếu có giá từ scrape, phân bổ cho các tiers (ghi đè giá từ template)
         if (priceMin && tiers.length > 0) {
             if (tiers.length === 1) {
@@ -250,7 +250,7 @@ async function createShowWithSeatmap(event, eventData) {
             }
         }
         // Nếu không có giá từ scrape, giữ nguyên giá từ template (nếu có)
-        
+
         // Tạo ShowTicketType với giá
         await prisma.$transaction(
             tiers.map((t) =>
@@ -264,13 +264,13 @@ async function createShowWithSeatmap(event, eventData) {
                 })
             )
         );
-        
+
         // Tạo tickets từ seatmap
         const seatObjs = expandSeatsFromTemplate(template);
         const allSeats = seatObjs.map((s) => s.seatId);
-        
+
         console.log(`   📍 Đang tạo ${allSeats.length} ghế...`);
-        
+
         // Chia batch để tránh SQL quá dài
         const BATCH = 1000;
         for (let i = 0; i < allSeats.length; i += BATCH) {
@@ -280,14 +280,14 @@ async function createShowWithSeatmap(event, eventData) {
                 { timeout: 60000 }
             );
         }
-        
+
         console.log(`✅ Đã tạo show với ${allSeats.length} ghế và ${tiers.length} loại vé`);
         console.log(`   Show ID: ${show.id}`);
         console.log(`   Các loại vé:`);
         tiers.forEach((t) => {
             console.log(`     - ${t.name}: ${(t.price || 100000).toLocaleString('vi-VN')} đ (${t.capacity} ghế)`);
         });
-        
+
         return show;
     } catch (err) {
         console.error('⚠️  Lỗi khi tạo show:', err.message);
@@ -402,8 +402,8 @@ async function scrapeSingleEvent(url) {
             timeout: 30000
         });
 
-        // Đợi JavaScript load
-        await new Promise((r) => setTimeout(r, 2500));
+        // Đợi JavaScript load - cần đợi đủ lâu để React render
+        await new Promise((r) => setTimeout(r, 5000));
 
         // Kiểm tra xem có bị chặn không
         const currentUrl = page.url();
@@ -630,20 +630,29 @@ async function scrapeSingleEvent(url) {
                 }
             }
 
-            // 5. GIÁ VÉ (min/max nếu có số)
-            let priceEl =
-                document.querySelector('[class*="price"], .ticket-price, .event-price') ||
-                document.querySelector('[class*="gia"]') ||
-                document.querySelector('[class*="ticket"]');
-            if (priceEl) {
-                const txt = priceEl.textContent.replace(/\./g, '').replace(/,/g, '').toLowerCase();
-                const nums = Array.from(txt.matchAll(/\d{4,}/g))
-                    .map((m) => Number(m[0]))
-                    .sort((a, b) => a - b);
-                if (nums.length) {
-                    data.priceMin = nums[0];
-                    data.priceMax = nums[nums.length - 1];
-                }
+            // 5. GIÁ VÉ - Tìm trong toàn bộ text của page
+            // Ticketbox hiển thị: "Giá từ" rồi xuống dòng "350.000 đ"
+            const bodyText = document.body.innerText || '';
+
+            // Debug: log nếu tìm thấy "Giá từ"
+            const hasGiaTu = bodyText.includes('Giá từ');
+            if (hasGiaTu) {
+                // Tìm vị trí "Giá từ" và lấy 50 ký tự sau đó
+                const idx = bodyText.indexOf('Giá từ');
+                const snippet = bodyText.substring(idx, idx + 50).replace(/\n/g, ' ');
+                console.log('DEBUG price snippet:', snippet);
+            }
+
+            // Pattern đơn giản hơn: tìm số có format XXX.XXX hoặc X.XXX.XXX
+            const allNumbers = bodyText.match(/\d{1,3}(?:\.\d{3})+/g) || [];
+            const prices = allNumbers
+                .map(n => parseInt(n.replace(/\./g, ''), 10))
+                .filter(n => n >= 50000 && n <= 50000000) // Giá vé hợp lý
+                .sort((a, b) => a - b);
+
+            if (prices.length > 0) {
+                data.priceMin = prices[0];
+                data.priceMax = prices[prices.length - 1];
             }
 
             return data;

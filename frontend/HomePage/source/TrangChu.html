@@ -6,49 +6,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TicketBook</title>
   <link rel="stylesheet" href="../css/style.css">
-  <meta http-equiv="Content-Security-Policy" 
-  content="default-src 'self'; 
-           connect-src 'self' http://localhost:4000; 
-           img-src 'self' https://salt.tkbcdn.com data:;
-           style-src 'self' 'unsafe-inline'; 
-           script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+
+  <!-- AOS - Animate On Scroll Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- CSP: Allow all HTTPS images -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+           connect-src 'self' http://localhost:4000 https:; 
+           img-src 'self' https: data:;
+           style-src 'self' 'unsafe-inline' https://unpkg.com; 
+           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;">
+
+  <!-- Smooth Scroll CSS -->
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Page load animation */
+    body {
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Enhanced card hover */
+    .event-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+  </style>
 </head>
 
 <body>
   <div class="header">
     <a href="../../HomePage/source/TrangChu.html"><img src="../../HomePage/logo.svg" alt=""></a>
     <form class="search-bar" action="../../Ticketbox/code/events-search.html" method="GET">
-      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off"> <button type="submit"> <svg
-          xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m21 21-4.34-4.34" />
+      <span class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
-      </button>
+      </span>
+      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off">
+      <button type="submit" class="search-btn">Tìm kiếm</button>
     </form>
 
-    <div class="my-ticket">
-      <a href="../../my_ticket/source/my_ticket.html">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path
-            d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-          <path d="M13 5v2" />
-          <path d="M13 17v2" />
-          <path d="M13 11v2" />
-        </svg>
-        <span>Vé của tôi</span>
-      </a>
-    </div>
-    <a href="../../Ticketbox/code/create-event.html" class="btn-create-event"
-      style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.15); color: white; padding: 12px 20px; border-radius: 15px; font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.4s ease; margin-left: 10px;">
-      Tạo sự kiện
+    <!-- Tạo sự kiện -->
+    <a href="../../Ticketbox/code/create-event.html" class="btn-create-event">Tạo sự kiện</a>
+
+    <!-- Vé của tôi -->
+    <a href="../../my_ticket/source/my_ticket.html" class="btn-my-ticket">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path
+          d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+        <path d="M13 5v2" />
+        <path d="M13 17v2" />
+        <path d="M13 11v2" />
+      </svg>
+      Vé của tôi
     </a>
+
+    <!-- Đăng nhập | Đăng ký -->
     <div id="authArea" class="auth-area">
-      <div class="login">
-        <a href="../../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">...</a>
-        <a href="../../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">...</a>
-      </div>
+      <a href="../../LoginUI/LogRegUI.html?tab=login" class="auth-link">Đăng nhập</a>
+      <span class="auth-divider">|</span>
+      <a href="../../LoginUI/LogRegUI.html?tab=register" class="auth-link">Đăng ký</a>
+    </div>
+
+    <!-- Cờ Việt Nam -->
+    <div class="flag-dropdown">
+      <span class="flag-icon">🇻🇳</span>
+      <span class="flag-arrow">▼</span>
     </div>
 
   </div>
@@ -80,7 +120,7 @@
       </div>
     </div>
 
-    <section class="event-section">
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800">
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
         <h3>Sự kiện đặc biệt</h3>
         <a href="../../Ticketbox/code/events-search.html?category=special"
@@ -110,7 +150,7 @@
       </div>
     </section>
 
-    <section class="event-section">
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
         <h3>Sự kiện xu hướng</h3>
         <a href="../../Ticketbox/code/events-search.html?category=trending"
@@ -140,7 +180,7 @@
       </div>
     </section>
 
-    <section class="event-section">
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
         <h3>Dành cho bạn</h3>
         <a href="../../Ticketbox/code/events-search.html?category=foryou"
@@ -170,7 +210,7 @@
       </div>
     </section>
 
-    <section class="event-section">
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
         <h3>Nhạc sống</h3>
         <a href="../../Ticketbox/code/events-search.html?category=music"
@@ -276,6 +316,16 @@
     })();
   </script>
 
+  <!-- AOS Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      once: true,           // Animation chỉ chạy 1 lần
+      duration: 800,        // Thời gian animation
+      easing: 'ease-out-cubic',
+      offset: 50            // Khoảng cách từ bottom viewport
+    });
+  </script>
 </body>
 
 </html>
