@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết quả thanh toán - Ticketbox</title>
+  <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               connect-src 'self' http://localhost:4000; 
+               img-src 'self' https://salt.tkbcdn.com data:;
+               style-src 'self' 'unsafe-inline'; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+  <link rel="stylesheet" href="payment-return.css">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="icon" id="statusIcon">
+      <span class="loading"></span>
+    </div>
+    <h1 id="statusTitle">Đang kiểm tra...</h1>
+    <p class="message" id="statusMessage">Vui lòng đợi trong giây lát.</p>
+    <div class="order-info" id="orderInfo" style="display: none;">
+      <div class="order-info-item">
+        <span class="order-info-label">Mã đơn hàng:</span>
+        <span class="order-info-value" id="orderId">-</span>
+      </div>
+      <div class="order-info-item">
+        <span class="order-info-label">Trạng thái:</span>
+        <span class="order-info-value" id="orderStatus">-</span>
+      </div>
+      <div class="order-info-item">
+        <span class="order-info-label">Số tiền:</span>
+        <span class="order-info-value" id="orderAmount">-</span>
+      </div>
+    </div>
+    <div class="actions" id="actions" style="display: none;">
+      <a href="../my_ticket/source/my_ticket.html" class="btn btn-primary" id="viewTicketsBtn">Xem vé của tôi</a>
+      <a href="../HomePage/source/TrangChu.html" class="btn btn-secondary">Về trang chủ</a>
+    </div>
+  </div>
+
+  <script src="payment-return.js"></script>
+</body>
+
+</html>

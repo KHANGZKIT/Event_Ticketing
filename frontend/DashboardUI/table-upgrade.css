@@ -1,0 +1,185 @@
+/* ============================================ */
+/* 🎨 MODERN TABLE UPGRADE - TicketBook Dashboard */
+/* ============================================ */
+
+/* Cards Container cho các bảng */
+.recent-orders-card,
+.top-events-card,
+.upcoming-events-card {
+    background: #ffffff;
+    border-radius: 5px;
+    padding: 0;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.recent-orders-card:hover,
+.top-events-card:hover,
+.upcoming-events-card:hover {
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Card Header */
+.card-head {
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.card-head::before {
+    content: "📋";
+    font-size: 20px;
+}
+
+.top-events-card .card-head::before {
+    content: "🏆";
+}
+
+.upcoming-events-card .card-head::before {
+    content: "📅";
+}
+
+/* Table Styling */
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.data-table thead {
+    background: linear-gradient(to right, #f8fafc, #f1f5f9);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.data-table thead th {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background: linear-gradient(to right, #f8fafc, #ffffff);
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+/* ID Column - Monospace */
+.data-table tbody td:first-child {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Event Name Column - Highlight */
+.data-table tbody td:nth-child(2) {
+    font-weight: 600;
+    color: #0f172a;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Badge for numbers/counts */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-head {
+        font-size: 16px;
+        padding: 16px 20px;
+    }
+
+    .data-table thead th,
+    .data-table tbody td {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Scrollable table container */
+.table-container {
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

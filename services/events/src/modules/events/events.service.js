@@ -2,19 +2,48 @@ import { prisma } from "@app/db";
 
 /** GET /events */
 export async function listEvents(query) {
-    const { q, city, page = "1", pageSize = "10" } = query;
-    const take = Math.min(parseInt(pageSize) || 10, 50);
-    const skip = (Math.max(parseInt(page) || 1, 1) - 1) * take;
 
-    const where = {
+    // Đọc tất cả query
+    const { q, city, category, page = "1", pageSize = "10" } = query;
+
+    const take = Math.min(Number.parseInt(pageSize) || 10, 50);
+    const skip = (Math.max(Number.parseInt(page) || 1, 1) - 1) * take;
+
+    // SỬA: Xây dựng 'whereEvent' KHÔNG CÓ 'q'
+    const whereEvent = {
         deletedAt: null,
         ...(city ? { city } : {}),
-        ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
     };
 
-    const [items, total] = await Promise.all([
+    // Category handling:
+    // - if category === 'other' → include events with null/empty/'other'
+    // - if category provided and not 'other' and no search 'q' → exact match
+    if (category) {
+        if (category === 'other') {
+            whereEvent.OR = [
+                ...(whereEvent.OR || []),
+                { category: null },
+                { category: '' },
+                { category: 'other' },
+            ];
+        } else if (!q) {
+            // only enforce strict category when not performing a text search
+            whereEvent.category = category;
+        }
+    }
+
+    if (q) {
+        // Giờ nó sẽ tìm (name HOẶC category) chứa 'q'
+        whereEvent.OR = [
+            { name: { contains: q, mode: "insensitive" } },
+            { category: { contains: q, mode: "insensitive" } },
+        ];
+    }
+
+    // 1) Lấy page events
+    const [events, total] = await Promise.all([
         prisma.event.findMany({
-            where,
+            where: whereEvent, // 'whereEvent' giờ đã chính xác
             skip,
             take,
             orderBy: { createdAt: "desc" },
@@ -26,41 +55,113 @@ export async function listEvents(query) {
                 startsAt: true,
                 createdAt: true,
                 updatedAt: true,
-                _count: {
-                    select: {
-                        shows: {
-                            where: {
-                                deletedAt: null,
-                                status: "scheduled",
-                                startsAt: { gte: new Date() },
-                            },
-                        },
-                    },
-                },
-                shows: {
-                    where: {
-                        deletedAt: null,
-                        status: "scheduled",
-                        startsAt: { gte: new Date() },
-                    },
-                    orderBy: { startsAt: "asc" },
-                    take: 1,
-                    select: { startsAt: true },
-                },
+                category: true, // Giờ dòng này đã an toàn
             },
         }),
-        prisma.event.count({ where }),
+        prisma.event.count({ where: whereEvent }),
     ]);
 
-    const normalized = items.map((e) => ({
-        ...e,
-        upcomingCount: e._count.shows,
-        minStartsAt: e.shows[0]?.startsAt ?? null,
-    }));
+    if (events.length === 0) {
+        return { items: [], total, page: Number(page), pageSize: take };
+    }
 
-    return { items: normalized, total, page: Number(page), pageSize: take };
+    const eventIds = events.map(e => e.id);
+    const now = new Date();
+
+    // 2) Lấy count shows (Giữ nguyên)
+    const counts = await prisma.show.groupBy({
+        by: ["eventId"],
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        _count: { _all: true },
+    });
+
+    // 3) Lấy min(startsAt) (Giữ nguyên)
+    const mins = await prisma.show.groupBy({
+        by: ["eventId"],
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        _min: { startsAt: true },
+    });
+
+    // 4) Lấy show đầu tiên của mỗi event để lấy venue và giá
+    const firstShows = await prisma.show.findMany({
+        where: {
+            eventId: { in: eventIds },
+            deletedAt: null,
+            status: "scheduled",
+            startsAt: { gte: now },
+        },
+        select: {
+            id: true,
+            eventId: true,
+            venue: true,
+            venueDb: {
+                select: {
+                    name: true,
+                    address: true,
+                },
+            },
+            ticketTypes: {
+                select: {
+                    price: true,
+                },
+                orderBy: {
+                    price: 'asc',
+                },
+                take: 1,
+            },
+        },
+        orderBy: {
+            startsAt: 'asc',
+        },
+    });
+
+    // Map eventId -> firstShow (lấy show đầu tiên của mỗi event)
+    const showToEventMap = new Map();
+    firstShows.forEach(s => {
+        if (!showToEventMap.has(s.eventId)) {
+            showToEventMap.set(s.eventId, s);
+        }
+    });
+
+    const countMap = new Map(counts.map(c => [c.eventId, c._count._all]));
+    const minMap = new Map(mins.map(m => [m.eventId, m._min.startsAt || null]));
+
+    const items = events.map(e => {
+        const firstShow = showToEventMap.get(e.id);
+        const venue = firstShow?.venueDb?.name || firstShow?.venue || null;
+        const venueAddress = firstShow?.venueDb?.address || null;
+        
+        // Tìm giá min từ show đầu tiên
+        let minPrice = null;
+        if (firstShow?.ticketTypes && firstShow.ticketTypes.length > 0) {
+            minPrice = firstShow.ticketTypes[0].price;
+        }
+
+        return {
+            ...e,
+            upcomingCount: countMap.get(e.id) ?? 0,
+            minStartsAt: minMap.get(e.id) ?? null,
+            venue: venue,
+            venueAddress: venueAddress,
+            price: minPrice ? {
+                min: minPrice,
+                display: `${minPrice.toLocaleString('vi-VN')} đ`,
+            } : null,
+        };
+    });
+
+    return { items, total, page: Number(page), pageSize: take };
 }
-
 /** GET /events/:id */
 export async function getEvent(id) {
     const ev = await prisma.event.findFirst({
@@ -71,7 +172,16 @@ export async function getEvent(id) {
             city: true,
             cover: true,
             startsAt: true,
+            category: true,
             venueId: true,
+            venue: {
+                select: {
+                    id: true,
+                    name: true,
+                    address: true,
+                    city: true,
+                },
+            },
             createdAt: true,
             updatedAt: true,
         },

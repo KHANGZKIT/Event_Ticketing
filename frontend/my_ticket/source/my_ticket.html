@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vé Của Tôi</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Thêm style này để ẩn/hiện empty state */
+    .hidden {
+      display: none;
+    }
+
+    /* Ẩn input file mặc định */
+    .hidden-file-input {
+      display: none;
+    }
+  </style>
+</head>
+<script>
+  // yêu cầu login trước khi xem trang
+  if (!localStorage.getItem('auth') && !sessionStorage.getItem('auth')
+    && !localStorage.getItem('accessToken') && !sessionStorage.getItem('accessToken')) {
+    window.location.href = '../../LoginUI/LogRegUI.html?tab=login&redirect=' + encodeURIComponent(location.pathname + location.search);
+  }
+</script>
+
+<body>
+  <div class="header">
+    <a href="../../HomePage/source/TrangChu.html"><img src="../../HomePage/logo.svg" alt=""></a>
+    <div class="search-bar">
+      <input type="text" placeholder="Bạn tìm gì hôm nay?">
+      <button>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21 21-4.34-4.34" />
+          <circle cx="11" cy="11" r="8" />
+        </svg>
+      </button>
+    </div>
+    <div class="my-ticket">
+      <a href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+          <path d="M13 5v2" />
+          <path d="M13 17v2" />
+          <path d="M13 11v2" />
+        </svg>
+        <span>Vé của tôi</span>
+      </a>
+    </div>
+    <div class="account">
+      <a href="#" class="avatar-container">
+        <img id="headerAvatar" src="" alt="" class="header-avatar"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div id="headerAvatarFallback" class="header-avatar-fallback" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20a6 6 0 0 0-12 0" />
+            <circle cx="12" cy="10" r="4" />
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+        </div>
+        <span id="headerUserName">...</span>
+        <div class="dropdown-arrow">▼</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="left">
+      <nav>
+        <ul>
+          <li><a href="#" class="left-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 20a6 6 0 0 0-12 0" />
+                <circle cx="12" cy="10" r="4" />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              <span id="sidebarTitle">Tài khoản</span>
+            </a></li>
+          <li><a href="#" class="left-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Cài đặt tài khoản
+            </a></li>
+          <li><a href="#" class="left-item" data-section="account-info">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="8" height="18" x="3" y="3" rx="1" />
+                <path d="M7 3v18" />
+                <path
+                  d="M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z" />
+              </svg>
+              Thông tin tài khoản
+            </a></li>
+          <li><a href="#" class="left-item active" data-section="my-tickets">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+                <path d="M13 5v2" />
+                <path d="M13 17v2" />
+                <path d="M13 11v2" />
+              </svg>
+              Vé của tôi
+            </a></li>
+          <li><a href="#" class="left-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4" />
+                <path d="M16 2v4" />
+                <rect width="18" height="18" x="3" y="4" rx="2" />
+                <path d="M3 10h18" />
+              </svg>
+              Sự kiện của tôi
+            </a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="main-content">
+      <div id="section-my-tickets" class="content-section">
+        <h2>Vé của tôi</h2>
+        <div class="tabs">
+          <button class="tab">Tất cả</button>
+          <button class="tab">Thành công</button>
+          <button class="tab">Đang xử lý</button>
+          <button class="tab">Đã hủy</button>
+        </div>
+
+        <div class="empty-state hidden">
+          <div class="illustration">
+            <div class="sun"></div>
+            <div class="character"></div>
+            <div class="beach"></div>
+          </div>
+          <h3>Bạn chưa có vé nào</h3>
+          <p>Hãy mua vé sự kiện để có thể xem lịch sử vé của bạn ở đây</p>
+          <a class="cta-button" href="/frontend/HomePage/source/TrangChu.html">Khám phá sự kiện</a>
+        </div>
+
+        <div class="ticket-list">
+        </div>
+      </div>
+
+      <div id="section-account-info" class="content-section hidden">
+        <h2>Thông tin tài khoản</h2>
+
+        <div class="account-glass-card">
+          <div class="account-glass-header">
+            <div class="account-glass-avatar-wrapper">
+              <img src="OIP.webp" id="avatar-preview">
+              <label for="avatar-upload" class="avatar-upload-button" title="Tải ảnh mới">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </label>
+              <input type="file" id="avatar-upload" accept="image/png, image/jpeg, image/webp"
+                class="hidden-file-input">
+            </div>
+            <h3 id="account-username-display">Đang tải...</h3>
+          </div>
+
+          <form class="account-glass-form">
+            <div class="form-group">
+              <label for="acc-fullname">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 20a6 6 0 0 0-12 0" />
+                  <circle cx="12" cy="10" r="4" />
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+                Họ và tên
+              </label>
+              <input type="text" id="acc-fullname" placeholder="Nhập họ và tên của bạn">
+            </div>
+
+            <div class="form-group">
+              <label for="acc-email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                Email
+              </label>
+              <input type="email" id="acc-email" placeholder="email@example.com" disabled>
+            </div>
+
+            <div class="form-group">
+              <label for="acc-id">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                ID Tài khoản
+              </label>
+              <input type="text" id="acc-id" disabled>
+            </div>
+
+            <div class="form-group">
+              <label for="acc-role">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Vai trò
+              </label>
+              <input type="text" id="acc-role" disabled>
+            </div>
+
+            <button type="submit" class="btn-save-changes">
+              Lưu thay đổi
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal xem ảnh -->
+    <div id="imageModal" class="image-modal hidden">
+      <div class="image-modal-backdrop" onclick="closeImageModal()"></div>
+      <div class="image-modal-content">
+        <button class="image-modal-close" onclick="closeImageModal()" aria-label="Đóng">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <img id="imageModalImg" src="" alt="Xem ảnh">
+      </div>
+    </div>
+</body>
+<script>
+  const API_BASE = 'http://localhost:4000/api';
+  const qs = new URLSearchParams(location.search);
+  // ======= Image cache & helpers (no QR) =======
+  const eventCache = new Map();   // eventId -> eventDetail (có image)
+  const imgCache = new Map();   // eventId -> final image url
+
+  // Ưu tiên các key tên thường gặp trong DB cho ảnh
+  function pickEventImage(ev = {}, show = {}) {
+    const keys = [
+      'image', 'imageUrl', 'poster', 'posterUrl', 'banner', 'bannerUrl', 'cover', 'coverUrl', 'thumbnail', 'thumbUrl'
+    ];
+    for (const k of keys) {
+      if (ev && ev[k]) return ev[k];
+      if (show && show[k]) return show[k];
+    }
+    return null;
+  }
+
+  async function fetchEventOnce(eventId) {
+    if (!eventId) return null;
+    if (eventCache.has(eventId)) return eventCache.get(eventId);
+    try {
+      const r = await fetch(`${API_BASE}/events/${eventId}`);
+      if (!r.ok) throw new Error();
+      const ev = await r.json();
+      eventCache.set(eventId, ev);
+      return ev;
+    } catch { return null; }
+  }
+
+  // Lấy url ảnh sự kiện (có cache). Nếu BE chưa trả ảnh trong /orders/:id,
+  // sẽ gọi thêm /events/:id đúng 1 lần cho mỗi event.
+  async function getEventImageUrl(eventId, show, eventFromDetail) {
+    if (imgCache.has(eventId)) return imgCache.get(eventId);
+
+    // 1) Ưu tiên ảnh có sẵn trong payload /orders/:id
+    let url = pickEventImage(eventFromDetail, show);
+
+    // 2) Nếu chưa có, fetch /events/:id một lần
+    if (!url && eventId) {
+      const ev = await fetchEventOnce(eventId);
+      url = pickEventImage(ev, show);
+    }
+
+    // 3) Fallback ảnh tĩnh từ HomePage (bạn có thể đổi path này theo bộ ảnh của bạn)
+    if (!url) url = '/frontend/HomePage/Asset/default_event.jpg';
+
+    imgCache.set(eventId, url);
+    return url;
+  }
+
+  /* ===== Auth helpers ===== */
+  function getToken() {
+    return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  }
+  async function getUser() {
+    const cached = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (cached) return JSON.parse(cached);
+    const token = getToken();
+    if (!token) return null;
+    try {
+      // Thử /api/auth/me trước, nếu không được thì thử /api/me
+      let r = await fetch(`${API_BASE}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!r.ok) {
+        r = await fetch(`${API_BASE}/me`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!r.ok) throw new Error();
+      }
+      const me = await r.json();
+      localStorage.setItem('user', JSON.stringify(me));
+      return me;
+    } catch { return null; }
+  }
+
+  /* ===== UI helpers ===== */
+  function vnd(n) { return new Intl.NumberFormat('vi-VN').format(n) + 'đ'; }
+  function fmtDateTime(s) {
+    const d = new Date(s); if (isNaN(d)) return '';
+    return d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+  function getFullName(me) {
+    if (!me) return '';
+    // tuỳ BE: dùng field nào có trước
+    return (
+      me.fullName ||
+      [me.firstName, me.lastName].filter(Boolean).join(' ') ||
+      me.name ||
+      me.username ||
+      '' // Email sẽ hiển thị riêng
+    );
+  }
+
+  // Cập nhật tên người dùng trên header/sidebar
+  function setUserName(nameOrUser) {
+    const name = typeof nameOrUser === 'string' ? nameOrUser : getFullName(nameOrUser);
+    const h = document.getElementById('headerUserName');
+    const s = document.getElementById('sidebarTitle');
+    if (h) h.textContent = name || 'Tài khoản';
+    if (s) s.textContent = `Tài khoản của ${name || ''}`.trim();
+  }
+
+  /* ===== Avatar Management ===== */
+  function updateHeaderAvatar(avatarUrl) {
+    const avatarImg = document.getElementById('headerAvatar');
+    const avatarFallback = document.getElementById('headerAvatarFallback');
+
+    if (avatarUrl) {
+      if (avatarImg) {
+        avatarImg.src = avatarUrl;
+        avatarImg.style.display = '';
+        // Thêm click để xem ảnh
+        avatarImg.style.cursor = 'pointer';
+        avatarImg.onclick = () => openImageModal(avatarUrl);
+      }
+      if (avatarFallback) {
+        avatarFallback.style.display = 'none';
+      }
+    } else {
+      if (avatarImg) {
+        avatarImg.style.display = 'none';
+      }
+      if (avatarFallback) {
+        avatarFallback.style.display = 'flex';
+      }
+    }
+  }
+
+  /* ===== Image Modal ===== */
+  function openImageModal(imageUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('imageModalImg');
+    if (modal && modalImg) {
+      modalImg.src = imageUrl;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // Ngăn scroll khi modal mở
+    }
+  }
+
+  function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      document.body.style.overflow = ''; // Khôi phục scroll
+    }
+  }
+
+  // Đóng modal bằng ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  });
+
+  function loadHeaderAvatar() {
+    // Thử lấy từ auth.user trước
+    const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+    let avatarUrl = null;
+
+    if (authStr) {
+      try {
+        const auth = JSON.parse(authStr);
+        avatarUrl = auth?.user?.avatar || auth?.user?.avatarUrl || auth?.user?.photoURL;
+      } catch (e) {
+        console.warn('Failed to parse auth:', e);
+      }
+    }
+
+    // Nếu không có, thử lấy từ user
+    if (!avatarUrl) {
+      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          avatarUrl = user?.avatar || user?.avatarUrl || user?.photoURL;
+        } catch (e) {
+          console.warn('Failed to parse user:', e);
+        }
+      }
+    }
+
+    updateHeaderAvatar(avatarUrl);
+  }
+
+  /**
+   * Cập nhật avatar vào tất cả storage locations để các trang khác có thể đọc
+   */
+  function updateAvatarInStorage(avatarUrl) {
+    // Cập nhật trong 'auth'
+    const authKeys = ['auth'];
+    authKeys.forEach(key => {
+      [localStorage, sessionStorage].forEach(storage => {
+        const authStr = storage.getItem(key);
+        if (authStr) {
+          try {
+            const auth = JSON.parse(authStr);
+            if (auth.user) {
+              auth.user.avatar = avatarUrl;
+              auth.user.avatarUrl = avatarUrl;
+              storage.setItem(key, JSON.stringify(auth));
+            }
+          } catch (e) {
+            console.warn(`Failed to update ${key} in ${storage === localStorage ? 'localStorage' : 'sessionStorage'}:`, e);
+          }
+        }
+      });
+    });
+
+    // Cập nhật trong 'user'
+    const userKeys = ['user', 'profile'];
+    userKeys.forEach(key => {
+      [localStorage, sessionStorage].forEach(storage => {
+        const userStr = storage.getItem(key);
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            user.avatar = avatarUrl;
+            user.avatarUrl = avatarUrl;
+            storage.setItem(key, JSON.stringify(user));
+          } catch (e) {
+            console.warn(`Failed to update ${key} in ${storage === localStorage ? 'localStorage' : 'sessionStorage'}:`, e);
+          }
+        }
+      });
+    });
+
+    // Broadcast storage event để các tab/window khác cập nhật
+    // Note: StorageEvent chỉ hoạt động giữa các tab khác nhau, không hoạt động trong cùng tab
+    // Nên ta cần dispatch custom event cho cùng tab
+    window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: { avatarUrl } }));
+
+    // Cập nhật header ngay lập tức
+    updateHeaderAvatar(avatarUrl);
+  }
+
+
+  /* ===== Orders & Tickets ===== */
+  /** /orders/my → { items:[{id, amount, status, createdAt, showId}], total, ... } */
+  async function fetchMyOrders() {
+    const token = getToken();
+    const r = await fetch(`${API_BASE}/orders/my`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (r.status === 401) {
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+      return Promise.reject(new Error('Unauthorized'));
+    }
+    if (!r.ok) throw new Error('Không tải được danh sách đơn hàng');
+    return r.json();
+  }
+
+  async function fetchOrderDetail(orderId) {
+    const token = getToken();
+    const r = await fetch(`${API_BASE}/orders/${orderId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (r.status === 401) {
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+      return Promise.reject(new Error('Unauthorized'));
+    }
+    if (!r.ok) throw new Error('Không tải được chi tiết đơn hàng');
+    return r.json();
+  }
+
+  /** Render từng ticket thành thẻ */
+  function makeTicketCard({ ticket, order, show, event, imageUrl }) {
+    const seat = ticket?.seatId || ticket?.seat || '—';
+    const tier = ticket?.tier || ticket?.priceTier || '';
+    const price = ticket?.price || order?.amount || 0;
+
+    // map status -> class/label
+    const raw = (order?.status || '').toLowerCase();
+    const statusMap = {
+      paid: 'success', succeeded: 'success', success: 'success',
+      pending: 'pending', processing: 'pending',
+      canceled: 'cancel', cancelled: 'cancel', failed: 'cancel'
+    };
+    const statusClass = statusMap[raw] || 'success';
+    const statusLabel = statusClass === 'success' ? 'Thành công'
+      : statusClass === 'pending' ? 'Đang xử lý'
+        : 'Đã hủy';
+
+    const showName = (event?.name || show?.name || 'Sự kiện');
+    const venue = (show?.venue || event?.city || '');
+    const timeStr = fmtDateTime(show?.startsAt);
+    const img = imageUrl || '/frontend/HomePage/Asset/default_event.jpg';
+
+    // Escape quotes trong URL để tránh lỗi
+    const safeImg = img.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `
+  <div class="ticket-card" data-status="${statusClass}"> <div class="ticket-qr">
+      <img src="${img}" alt="${showName}" loading="lazy" class="ticket-image-clickable"
+           data-image-url="${safeImg}"
+           onerror="this.onerror=null;this.src='/frontend/HomePage/Asset/default_event.jpg'">
+    </div>
+    <div class="ticket-info">
+      <h3>${showName}</h3>
+      <div class="ticket-details">
+        <p><strong>Ghế:</strong> ${seat} ${tier ? `(${tier})` : ''}</p>
+        <p><strong>Giá vé:</strong> <span class="price">${vnd(price)}</span></p>
+        <p><strong>Ngày diễn ra:</strong> ${timeStr}</p>
+        <p><strong>Địa điểm:</strong> ${venue}</p>
+      </div>
+      <div class="ticket-status ${statusClass}">
+        <span class="status-dot"></span> ${statusLabel}
+      </div>
+    </div>
+    <div class="ticket-actions">
+      <button class="btn-view" data-order="${order.id}" data-ticket="${ticket.id}">Xem chi tiết</button>
+      </div>
+  </div>`;
+  }
+
+  async function renderMyTickets() {
+    const listEl = document.querySelector('.ticket-list');
+    const emptyEl = document.querySelector('.empty-state');
+
+    emptyEl?.classList.add('hidden'); // Luôn ẩn empty state khi bắt đầu
+    listEl.innerHTML = 'Đang tải vé của bạn...';
+    try {
+      const my = await fetchMyOrders();
+      const items = my?.items || [];
+
+      if (!items.length) {
+        listEl.innerHTML = ''; // Xóa chữ "Đang tải..."
+        emptyEl?.classList.remove('hidden'); // Hiện empty state
+        return;
+      }
+
+      // lấy chi tiết từng order (tickets + show + event)
+      const details = await Promise.all(items.map(o => fetchOrderDetail(o.id)));
+
+      const cards = [];
+      // Tập hợp eventId duy nhất để lấy ảnh (nếu thiếu)
+      const uniqueEventIds = new Set();
+
+      for (let i = 0; i < items.length; i++) {
+        const order = items[i];
+        const det = details[i] || {};
+        const tickets = det.tickets || [];
+        const show = det.show || det.data?.show || null;
+        const event = show?.event || det.event || det.data?.event || null;
+
+        if (event?.id) uniqueEventIds.add(event.id);
+
+        if (!tickets.length) {
+          // Vẫn render đơn hàng dù không có vé (ví dụ: đơn hàng thất bại)
+          const statusClass = (order.status || 'cancel').toLowerCase();
+          cards.push(`
+      <div class="ticket-card" data-status="${statusClass}">
+        <div class="ticket-info">
+          <h3>${event?.name || 'Sự kiện'}</h3>
+          <div class="ticket-details">
+            <p><strong>Đơn hàng:</strong> ${order.id}</p>
+            <p><strong>Trạng thái:</strong> ${order.status}</p>
+            <p><strong>Ngày tạo:</strong> ${fmtDateTime(order.createdAt)}</p>
+          </div>
+        </div>
+      </div>
+    `);
+          continue;
+        }
+
+        // Lấy url ảnh (cache theo eventId)
+        let imageUrl = '/frontend/HomePage/Asset/default_event.jpg';
+        if (event?.id) imageUrl = await getEventImageUrl(event.id, show, event);
+
+        tickets.forEach(tk => {
+          cards.push(makeTicketCard({ ticket: tk, order, show, event, imageUrl }));
+        });
+      }
+
+      // Tối ưu: Dùng DocumentFragment để batch DOM updates
+      const fragment = document.createDocumentFragment();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cards.join('');
+
+      // Move all nodes to fragment
+      while (tempDiv.firstChild) {
+        fragment.appendChild(tempDiv.firstChild);
+      }
+
+      // Single DOM update
+      listEl.innerHTML = '';
+      listEl.appendChild(fragment);
+
+      // Thêm event listener cho ảnh ticket
+      listEl.querySelectorAll('.ticket-image-clickable').forEach(img => {
+        img.addEventListener('click', () => {
+          const imageUrl = img.getAttribute('data-image-url') || img.src;
+          openImageModal(imageUrl);
+        });
+      });
+
+      listEl.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const orderId = btn.getAttribute('data-order');
+          const ticketId = btn.getAttribute('data-ticket');
+          alert(`Order ${orderId}\nTicket ${ticketId}`);
+        });
+      });
+      filterByTab('all');
+
+    } catch (e) {
+      console.error(e);
+      listEl.innerHTML = `<p class="error">Lỗi khi tải vé của bạn. Vui lòng thử lại sau.</p>`;
+    }
+  }
+  /* ===== Filter tabs ===== */
+  let filterTimeout = null;
+  function filterByTab(tabKey) {
+    // Debounce để tránh lag khi filter nhanh
+    if (filterTimeout) {
+      clearTimeout(filterTimeout);
+    }
+
+    filterTimeout = setTimeout(() => {
+      const cards = document.querySelectorAll('.ticket-card');
+      let hasVisibleTickets = false;
+
+      // Tối ưu: Dùng requestAnimationFrame để batch DOM updates
+      requestAnimationFrame(() => {
+        cards.forEach(card => {
+          const st = card.getAttribute('data-status') || 'success';
+          const show =
+            tabKey === 'all' ||
+            (tabKey === 'success' && st.includes('success')) ||
+            (tabKey === 'pending' && st.includes('pending')) ||
+            (tabKey === 'cancel' && st.includes('cancel'));
+
+          // Dùng class thay vì style.display để tối ưu
+          if (show) {
+            card.classList.remove('hidden-card');
+            hasVisibleTickets = true;
+          } else {
+            card.classList.add('hidden-card');
+          }
+        });
+
+        const emptyEl = document.querySelector('.empty-state');
+        const listEl = document.querySelector('.ticket-list');
+
+        if (!hasVisibleTickets && listEl.innerHTML !== 'Đang tải vé của bạn...') {
+          emptyEl?.classList.remove('hidden');
+        } else {
+          emptyEl?.classList.add('hidden');
+        }
+      });
+    }, 50); // Debounce 50ms
+  }
+
+  function wireTabs() {
+    const mapKey = (text) => {
+      const t = text.toLowerCase();
+      if (t.includes('thành công')) return 'success';
+      if (t.includes('đang xử lý')) return 'pending';
+      if (t.includes('đã hủy')) return 'cancel';
+      return 'all';
+    };
+
+    const tabs = document.querySelectorAll('.tabs .tab');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterByTab(mapKey(btn.textContent || ''));
+      });
+    });
+
+    const first = document.querySelector('.tabs .tab');
+    first?.classList.add('active');
+  }
+  wireTabs();
+
+  /* ===== Boot ===== */
+  if (window.__MYTICKET_INITED__) {
+    console.debug('my_ticket: skip duplicate init');
+  } else {
+    window.__MYTICKET_INITED__ = true;
+
+    (async function init() {
+      if (window.__MYTNDAY_INITED_RAN__) return;
+      window.__MYTNDAY_INITED_RAN__ = true;
+
+      const token = getToken();
+      if (!token) {
+        const back = encodeURIComponent(location.pathname + location.search);
+        location.href = `/frontend/LoginUI/LogRegUI.html?tab=login&redirect=${back}`;
+        return;
+      }
+      const me = await getUser();
+      setUserName(me);
+
+      // Load avatar vào header
+      loadHeaderAvatar();
+
+      document.querySelectorAll('.my-ticket a').forEach(a => a.href = '/frontend/my_ticket/source/my_ticket.html');
+
+      // Hiển thị section "Vé của tôi" mặc định
+      showSection('my-tickets');
+      await renderMyTickets();
+
+      // **[MỚI]** Kích hoạt các hàm cho trang tài khoản
+      wireAccountPage();
+
+      // Lắng nghe storage event để cập nhật avatar khi có thay đổi từ tab khác
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'auth' || e.key === 'user') {
+          loadHeaderAvatar();
+        }
+      });
+
+      // Lắng nghe custom event từ cùng tab
+      window.addEventListener('avatarUpdated', (e) => {
+        if (e.detail && e.detail.avatarUrl) {
+          updateHeaderAvatar(e.detail.avatarUrl);
+        } else {
+          loadHeaderAvatar();
+        }
+      });
+
+    })();
+
+    document.querySelectorAll('a[href="#"]').forEach(a => {
+      a.addEventListener('click', e => e.preventDefault());
+    });
+
+    document.querySelectorAll('.my-ticket a').forEach(a => {
+      a.setAttribute('href', '/frontend/my_ticket/source/my_ticket.html');
+    });
+
+    /* ===== Section Navigation ===== */
+    function showSection(sectionName) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+
+      const targetSection = document.getElementById(`section-${sectionName}`);
+      if (targetSection) {
+        targetSection.classList.remove('hidden');
+      }
+
+      document.querySelectorAll('.left-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === sectionName) {
+          item.classList.add('active');
+        }
+      });
+    }
+
+    document.querySelectorAll('.left-item[data-section]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = item.getAttribute('data-section');
+        if (section) {
+          showSection(section);
+
+          if (section === 'account-info') {
+            // **[MỚI]** Gọi hàm render mới
+            renderAccountInfoForm();
+          }
+        }
+      });
+    });
+
+    /* ===== [MỚI] Account Info Rendering (Form) ===== */
+    async function renderAccountInfoForm() {
+      const usernameEl = document.getElementById('account-username-display');
+      const fullnameEl = document.getElementById('acc-fullname');
+      const emailEl = document.getElementById('acc-email');
+      const idEl = document.getElementById('acc-id');
+      const roleEl = document.getElementById('acc-role');
+      const avatarPreview = document.getElementById('avatar-preview');
+
+      // Set loading state
+      if (usernameEl) usernameEl.textContent = 'Đang tải...';
+      if (fullnameEl) fullnameEl.value = '';
+      if (emailEl) emailEl.value = '';
+      if (idEl) idEl.value = '';
+      if (roleEl) roleEl.value = '';
+
+      try {
+        const user = await getUser();
+        if (!user) {
+          throw new Error('Không thể lấy thông tin người dùng');
+        }
+
+        // Render thông tin
+        const fullName = getFullName(user);
+        if (usernameEl) {
+          usernameEl.textContent = user.username || fullName || user.email;
+        }
+        if (fullnameEl) {
+          fullnameEl.value = fullName;
+        }
+        if (emailEl) {
+          emailEl.value = user.email || '—';
+        }
+        if (idEl) {
+          idEl.value = user.id || '—';
+        }
+        if (avatarPreview) {
+          // Lấy avatar từ user object hoặc từ storage
+          const avatarUrl = user.avatar || user.avatarUrl || user.photoURL ||
+            (() => {
+              const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+              if (authStr) {
+                try {
+                  const auth = JSON.parse(authStr);
+                  return auth?.user?.avatar || auth?.user?.avatarUrl || auth?.user?.photoURL;
+                } catch (e) { }
+              }
+              return null;
+            })();
+          avatarPreview.src = avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCIgMTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iNjAiIGZpbGw9InVybCgjYSkiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02MCA3NUM2OC4yODQzIDc1IDc1IDY4LjI4NDMgNzUgNjBDNzUgNTEuNzE1NyA2OC4yODQzIDQ1IDYwIDQ1QzUxLjcxNTcgNDUgNDUgNTEuNzE1NyA0NSA2MEM0NSA2OC4yODQzIDUxLjcxNTcgNzUgNjAgNzVaTTMwIDk3LjVDMzAgODcuOTU0MyAzNy45NTQzIDgwIDQ3LjUgODBINDcyLjVDODIuMDQ1NyA4MCA5MCA4Ny45NTQzIDkwIDk3LjVWMTA1SDMwVjk3LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMjAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzBGRkY1QiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMEU3RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K';
+          // Thêm click để xem ảnh
+          avatarPreview.style.cursor = 'pointer';
+          avatarPreview.onclick = () => {
+            if (avatarUrl) {
+              openImageModal(avatarUrl);
+            }
+          };
+        }
+
+        if (roleEl) {
+          if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+            const roleLabels = user.roles.map(role => {
+              const roleMap = { 'admin': 'Quản trị viên', 'staff': 'Nhân viên', 'user': 'Người dùng' };
+              return roleMap[role] || role;
+            });
+            roleEl.value = roleLabels.join(', ');
+          } else {
+            roleEl.value = 'Người dùng';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading account info:', error);
+        if (usernameEl) usernameEl.textContent = 'Lỗi tải thông tin';
+      }
+    }
+
+    /* ===== [MỚI] Xử lý trang tài khoản ===== */
+    function wireAccountPage() {
+      const avatarUpload = document.getElementById('avatar-upload');
+      const avatarPreview = document.getElementById('avatar-preview');
+      const accountForm = document.querySelector('.account-glass-form');
+      const saveButton = document.querySelector('.btn-save-changes');
+
+      // 1. Xem trước ảnh tải lên
+      if (avatarUpload && avatarPreview) {
+        avatarUpload.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const dataUrl = event.target.result;
+              avatarPreview.src = dataUrl;
+              // Cập nhật avatar vào storage ngay khi chọn ảnh (preview)
+              // User có thể cancel form, nhưng preview sẽ giữ lại
+            }
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // 2. Xử lý submit form
+      if (accountForm && saveButton) {
+        accountForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          saveButton.textContent = 'Đang lưu...';
+          saveButton.disabled = true;
+
+          try {
+            // Lấy dữ liệu
+            const fullName = document.getElementById('acc-fullname').value;
+            const avatarFile = document.getElementById('avatar-upload').files[0];
+            let avatarUrl = null;
+
+            // Nếu có ảnh mới, convert sang base64 để lưu vào storage
+            if (avatarFile) {
+              avatarUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(avatarFile);
+              });
+            } else if (avatarPreview && avatarPreview.src) {
+              // Nếu không có file mới nhưng có preview (đã chọn trước đó), dùng preview
+              avatarUrl = avatarPreview.src;
+            }
+
+            // =======================================================
+            // TODO: GỌI API CẬP NHẬT CỦA BẠN Ở ĐÂY
+            //
+            // const formData = new FormData();
+            // formData.append('fullName', fullName);
+            // if (avatarFile) {
+            //   formData.append('avatar', avatarFile);
+            // }
+            //
+            // const token = getToken();
+            // const response = await fetch(`${API_BASE}/users/me`, { // (hoặc endpoint của bạn)
+            //   method: 'PATCH', // (hoặc PUT)
+            //   headers: { 'Authorization': `Bearer ${token}` },
+            //   body: formData
+            // });
+            //
+            // if (!response.ok) throw new Error('Cập nhật thất bại');
+            // const updatedUser = await response.json();
+            //
+            // // Lưu avatarUrl từ response (nếu API trả về URL)
+            // if (updatedUser.avatarUrl) {
+            //   avatarUrl = updatedUser.avatarUrl;
+            // }
+            // =======================================================
+
+            // Giả lập API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            console.log('Đã gửi dữ liệu:', { fullName, avatarFile, avatarUrl: avatarUrl ? 'base64 data' : null });
+
+            // Cập nhật avatar vào storage để tất cả các trang có thể đọc
+            if (avatarUrl) {
+              updateAvatarInStorage(avatarUrl);
+            }
+
+            // Cập nhật fullName nếu có
+            if (fullName) {
+              const user = await getUser();
+              if (user) {
+                user.fullName = fullName;
+                localStorage.setItem('user', JSON.stringify(user));
+                sessionStorage.setItem('user', JSON.stringify(user));
+
+                // Cập nhật trong auth.user
+                const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+                if (authStr) {
+                  try {
+                    const auth = JSON.parse(authStr);
+                    if (auth.user) {
+                      auth.user.fullName = fullName;
+                      localStorage.setItem('auth', JSON.stringify(auth));
+                      sessionStorage.setItem('auth', JSON.stringify(auth));
+                    }
+                  } catch (e) { }
+                }
+
+                setUserName(user);
+              }
+            }
+
+            alert('Cập nhật thành công!');
+
+          } catch (error) {
+            console.error('Lỗi cập nhật:', error);
+            alert('Cập nhật thất bại. Vui lòng thử lại.');
+          } finally {
+            saveButton.textContent = 'Lưu thay đổi';
+            saveButton.disabled = false;
+          }
+        });
+      }
+    }
+  }
+</script>
+
+</html>

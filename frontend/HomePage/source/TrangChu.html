@@ -1,694 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TicketBook</title>
   <link rel="stylesheet" href="../css/style.css">
+
+  <!-- AOS - Animate On Scroll Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- CSP: Allow all HTTPS images -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+           connect-src 'self' http://localhost:4000 https:; 
+           img-src 'self' https: data:;
+           style-src 'self' 'unsafe-inline' https://unpkg.com; 
+           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;">
+
+  <!-- Smooth Scroll CSS -->
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Page load animation */
+    body {
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Enhanced card hover */
+    .event-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+  </style>
 </head>
+
 <body>
-  <!-- HEADER -->
   <div class="header">
-    <h1><a href="#">TicketBook</a></h1>
-    <div class="search-bar">
-      <input type="text" placeholder="Bạn tìm gì hôm nay?">
-      <button>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m21 21-4.34-4.34"/>
-          <circle cx="11" cy="11" r="8"/>
+    <a href="../../HomePage/source/TrangChu.html"><img src="../../HomePage/logo.svg" alt=""></a>
+    <form class="search-bar" action="../../Ticketbox/code/events-search.html" method="GET">
+      <span class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
-      </button>
+      </span>
+      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off">
+      <button type="submit" class="search-btn">Tìm kiếm</button>
+    </form>
+
+    <!-- Tạo sự kiện -->
+    <a href="../../Ticketbox/code/create-event.html" class="btn-create-event">Tạo sự kiện</a>
+
+    <!-- Vé của tôi -->
+    <a href="../../my_ticket/source/my_ticket.html" class="btn-my-ticket">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path
+          d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+        <path d="M13 5v2" />
+        <path d="M13 17v2" />
+        <path d="M13 11v2" />
+      </svg>
+      Vé của tôi
+    </a>
+
+    <!-- Đăng nhập | Đăng ký -->
+    <div id="authArea" class="auth-area">
+      <a href="../../LoginUI/LogRegUI.html?tab=login" class="auth-link">Đăng nhập</a>
+      <span class="auth-divider">|</span>
+      <a href="../../LoginUI/LogRegUI.html?tab=register" class="auth-link">Đăng ký</a>
     </div>
-    <div class="my-ticket">
-      <a href="#">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
-          <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
-        </svg>
-        <span>Vé của tôi</span>
-      </a>
+
+    <!-- Cờ Việt Nam -->
+    <div class="flag-dropdown">
+      <span class="flag-icon">🇻🇳</span>
+      <span class="flag-arrow">▼</span>
     </div>
-    <div class="login">
-      <button class="btn-login">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-        </svg>
-        Đăng nhập
-      </button>
-      <button class="btn-register">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
-        </svg>
-        Đăng ký
-      </button>
-    </div>
+
   </div>
 
-  <!-- MENU & DROPDOWN -->
   <div class="menu-container">
     <nav class="menu">
-      <a href="#">Nhạc sống</a>
-      <a href="#">Sân khấu & Nghệ thuật</a>
-      <a href="#">Thể thao</a>
-      <a href="#">Khác</a>
+      <a href="../../Ticketbox/code/events-search.html?category=music">Nhạc sống</a>
+      <a href="../../Ticketbox/code/events-search.html?category=art">Sân khấu & Nghệ thuật</a>
+      <a href="../../Ticketbox/code/events-search.html?category=sport">Thể thao</a>
+      <a href="../../Ticketbox/code/events-search.html?category=other">Khác</a>
     </nav>
     <div class="dropdown">
       <button class="dropbtn">Chọn địa điểm <span class="arrow">▼</span></button>
       <div class="dropdown-content">
-        <a href="#">Hà Nội</a>
-        <a href="#">Hồ Chí Minh</a>
-        <a href="#">Quảng Ninh</a>
-        <a href="#">Huế</a>
-        <a href="#">Quảng Nam</a>
-        <a href="#">Đà Nẵng</a>
+        <a href="../../Ticketbox/code/events-search.html?city=hanoi">Hà Nội</a>
+        <a href="../../Ticketbox/code/events-search.html?city=hcm">Hồ Chí Minh</a>
+        <a href="../../Ticketbox/code/events-search.html?city=danang">Đà Nẵng</a>
       </div>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div class="content">
-    <!-- SLIDER -->
     <div class="slider-container">
       <div class="slider">
-        <img src="../Asset/anhMau.jpg" class="slide active" alt="Event 1">
-        <img src="../Asset/Robber.jpg" class="slide" alt="Event 2">
-        <img src="../Asset/rb.webp" class="slide" alt="Event 3">
       </div>
       <button class="prev">❮</button>
       <button class="next">❯</button>
       <div class="dots">
-        <span class="dot active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
       </div>
     </div>
 
-    <!-- EVENT SECTIONS -->
-    <section class="event-section">
-      <h3>Sự kiện đặc biệt</h3>
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h3>Sự kiện đặc biệt</h3>
+        <a href="../../Ticketbox/code/events-search.html?category=special"
+          style="color: #2ecc71; text-decoration: none; font-weight: 500;">Xem tất cả &gt;</a>
+      </div>
       <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
       </div>
     </section>
-    <section class="event-section">
-      <h3>Sự kiện đặc biệt</h3>
+
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h3>Sự kiện xu hướng</h3>
+        <a href="../../Ticketbox/code/events-search.html?category=trending"
+          style="color: #2ecc71; text-decoration: none; font-weight: 500;">Xem tất cả &gt;</a>
+      </div>
       <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
       </div>
     </section>
-    <section class="event-section">
-      <h3>Sự kiện xu hướng</h3>
+
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h3>Dành cho bạn</h3>
+        <a href="../../Ticketbox/code/events-search.html?category=foryou"
+          style="color: #2ecc71; text-decoration: none; font-weight: 500;">Xem tất cả &gt;</a>
+      </div>
       <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
       </div>
     </section>
-    <section class="event-section">
-      <h3>Dành cho bạn</h3>
-      <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
+
+    <section class="event-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <h3>Nhạc sống</h3>
+        <a href="../../Ticketbox/code/events-search.html?category=music"
+          style="color: #2ecc71; text-decoration: none; font-weight: 500;">Xem tất cả &gt;</a>
       </div>
-    </section>
-    <section class="event-section">
-      <h3>Nhạc sống</h3>
       <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-      </div>
-    </section>
-    <section class="event-section">
-      <h3>Sân khấu & Nghệ thuật</h3>
-      <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-      </div>
-    </section>
-    <section class="event-section">
-      <h3>Thể loại khác</h3>
-      <div class="event-grid">
-        <!-- Repeat event card -->
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
-        <a href="#" class="event-card">
-          <img src="../Asset/anhMau.jpg" alt="">
-          <div class="event-info">
-            <p class="event-name">Anh Trai Say Hi</p>
-            <p class="event-price">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                <path d="M12 17.5v-11"/>
-              </svg>
-              100.000đ
-            </p>
-            <p class="event-date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-              </svg>
-              26/09/2025
-            </p>
-          </div>
-        </a>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
       </div>
     </section>
   </div>
-
-  <!-- FOOTER -->
   <footer class="footer">
     <div>
       <h4>Hotline</h4>
@@ -715,54 +266,66 @@
   </footer>
 
   <script>
-  let slideIndex = 0;
-  const slides = document.querySelectorAll(".slide");
-  const dots = document.querySelectorAll(".dot");
+    // ===== Slider =====
+    // Code slider này sẽ được TÁI KHỞI TẠO bởi hàm updateSliderWithEvents()
+    // trong file events.js sau khi API load xong.
+    // Chúng ta để trống nó ở đây.
 
-  function showSlide(index) {
-    slides.forEach((s, i) => s.classList.toggle("active", i === index));
-    dots.forEach((d, i) => d.classList.toggle("active", i === index));
-  }
-
-  // NÚT NEXT
-  document.querySelector(".next").addEventListener("click", () => {
-    slideIndex = (slideIndex + 1) % slides.length;
-    showSlide(slideIndex);
-  });
-
-  // NÚT PREV
-  document.querySelector(".prev").addEventListener("click", () => {
-    slideIndex = (slideIndex - 1 + slides.length) % slides.length;
-    showSlide(slideIndex);
-  });
-
-  // DOTS
-  dots.forEach((dot, i) => {
-    dot.addEventListener("click", () => {
-      slideIndex = i;
-      showSlide(slideIndex);
-    });
-  });
-
-  // TỰ ĐỘNG CHUYỂN MỖI 5 GIÂY
-  setInterval(() => {
-    slideIndex = (slideIndex + 1) % slides.length;
-    showSlide(slideIndex);
-  }, 5000);
-
-  // Khởi động lần đầu
-  showSlide(slideIndex);
-
-  // Tối ưu slider cho mobile: thêm transition mượt hơn
-const style = document.createElement('style');
-style.innerHTML = `
-  @media (max-width: 768px) {
-    .slide {
-      transition: opacity 0.8s ease !important;
+    // Tối ưu slider cho mobile: thêm transition mượt hơn
+    const style = document.createElement('style');
+    style.innerHTML = `
+    @media (max-width: 768px) {
+      .slide { transition: opacity 0.8s ease !important; }
     }
-  }
-`;
-document.head.appendChild(style);
-</script>
+  `;
+    document.head.appendChild(style);
+
+  </script>
+
+  <script src="../js/events.js"></script>
+
+  <script>
+    // ===== GỌI renderAuthUI() =====
+    if (typeof renderAuthUI === 'function') {
+      renderAuthUI();
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderAuthUI === 'function') renderAuthUI();
+      });
+    }
+
+    // Auto cập nhật nếu login ở tab khác
+    window.addEventListener('storage', (e) => {
+      if (['auth', 'accessToken', 'token', 'user', 'profile'].includes(e.key)) {
+        if (typeof renderAuthUI === 'function') renderAuthUI();
+      }
+    });
+
+    // Fix link "Vé của tôi"
+    (function fixMyTicketLink() {
+      const href = location.pathname;
+      const at = href.indexOf('/frontend/');
+      if (at === -1) return;
+
+      const frontRoot = href.slice(0, at + '/frontend/'.length);
+      const myTicket = frontRoot + 'my_ticket/source/my_ticket.html';
+
+      document.querySelectorAll('.my-ticket a,[data-link="my-ticket"]').forEach(a => {
+        a.setAttribute('href', myTicket);
+      });
+    })();
+  </script>
+
+  <!-- AOS Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      once: true,           // Animation chỉ chạy 1 lần
+      duration: 800,        // Thời gian animation
+      easing: 'ease-out-cubic',
+      offset: 50            // Khoảng cách từ bottom viewport
+    });
+  </script>
 </body>
+
 </html>

@@ -1,0 +1,104 @@
+{
+  "id": "map_concert_premium",
+  "name": "Premium Concert Hall – Multi-zone",
+  "priceTiers": {
+    "VIP": 1000000,
+    "A": 700000,
+    "B": 450000,
+    "C": 280000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 24
+        },
+        {
+          "id": "B",
+          "from": 5,
+          "to": 24
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 9,
+          "to": 26
+        },
+        {
+          "id": "D",
+          "from": 11,
+          "to": 26
+        },
+        {
+          "id": "E",
+          "from": 13,
+          "to": 26
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "F",
+          "from": 15,
+          "to": 28
+        },
+        {
+          "id": "G",
+          "from": 17,
+          "to": 28
+        },
+        {
+          "id": "H",
+          "from": 17,
+          "to": 28
+        },
+        {
+          "id": "I",
+          "from": 17,
+          "to": 28
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "J",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 14
+        },
+        {
+          "id": "L",
+          "from": 19,
+          "to": 30
+        },
+        {
+          "id": "M",
+          "from": 19,
+          "to": 30
+        },
+        {
+          "id": "N",
+          "from": 19,
+          "to": 30
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

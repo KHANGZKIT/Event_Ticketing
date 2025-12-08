@@ -1,141 +1,161 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chọn ghế</title>
-    <link rel="stylesheet" href="/frontend/seatmapUI/style/seatmap.css" />
-    <link rel="stylesheet" href="/frontend/seatmapUI/style/ticket.css">
-  </head>
-  <body>
-    <div class="layout">
-      <!-- SIDEBAR: Thông tin sự kiện + giỏ -->
-      <aside class="sidebar">
-        <div class="event-card">
-          <h2 class="event-title" id="eventTitle">Live Concert 2025</h2>
-          <div class="event-meta">
-            <div class="event-row">
-              🗓 <span id="eventDate">20/11/2025 · 19:30</span>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chọn ghế</title>
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  connect-src 'self' http://localhost:4000 ws://localhost:4000;
+  img-src 'self' https://salt.tkbcdn.com data:;
+  style-src 'self' 'unsafe-inline';
+  script-src 'self' 'unsafe-inline' http://localhost:4000;
+">
+  <link rel="stylesheet" href="/frontend/seatmapUI/style/seatmap.css" />
+  <link rel="stylesheet" href="/frontend/seatmapUI/style/ticket.css">
+</head>
+
+<body>
+  <div class="layout">
+    <!-- SIDEBAR: Thông tin sự kiện + giỏ -->
+    <aside class="sidebar">
+      <div class="event-card">
+        <h2 class="event-title" id="eventTitle">Live Concert 2025</h2>
+        <div class="event-meta">
+          <div class="event-row">
+            <label for="showSelect" style="font-weight:600;margin-right:8px">Suất chiếu</label>
+            <div class="event-row" style="margin-top:8px">
+              <span id="eventDate"></span>
             </div>
-            <div class="event-row">
-              <span id="eventPlace">Nhà thi đấu Quân khu 7</span>
+            <div class="event-row" style="margin-top:4px">
+              <span id="eventPlace"></span>
             </div>
+            <select id="showSelect" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px;"></select>
           </div>
-        </div>
-
-        <div class="cart">
-          <div class="cart-head">
-            <h3>Ghế đã chọn</h3>
-            <div class="prices">
-              <div class="price-line">
-                <span>VIP</span><strong id="priceVip">150.000đ</strong>
-              </div>
-              <div class="price-line">
-                <span>Thường</span><strong id="priceNormal">100.000đ</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="cart-body">
-            <table class="cart-table" id="cartTable">
-              <thead>
-                <tr>
-                  <th>Ghế</th>
-                  <th>Loại</th>
-                  <th>Giá</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- render bằng JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <div class="cart-foot">
-            <div class="total-line">
-              <span>Tổng</span>
-              <strong id="cartTotal">0đ</strong>
-            </div>
-            <button id="checkoutBtn" class="btn-primary">Đặt vé</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- MAIN: Sân khấu + sơ đồ ghế -->
-      <main class="main">
-        <div class="container">
-          <div class="stagePanel">
-            <div class="screen">SÂN KHẤU</div>
-          </div>
-
-          <div class="map">
-            <div class="seat-map" id="seatMap"></div>
-
-            <div class="legend">
-              <div class="legend-item">
-                <div class="legend-box vip"></div>
-                <div class="legend-info">
-                  <span class="legend-type">VIP</span>
-                  <span class="legend-price">150.000đ</span>
-                </div>
-              </div>
-              <div class="legend-item">
-                <div class="legend-box normal"></div>
-                <div class="legend-info">
-                  <span class="legend-type">Thường</span>
-                  <span class="legend-price">100.000đ</span>
-                </div>
-              </div>
-              <div class="legend-item">
-                <div class="legend-box booked"></div>
-                <div class="legend-info">
-                  <span class="legend-type">Đã đặt</span>
-                </div>
-              </div>
-              <div class="legend-item">
-                <div class="legend-box selected"></div>
-                <div class="legend-info">
-                  <span class="legend-type">Đang chọn</span>
-                </div>
-              </div>
-              <div class="legend-item">
-                <div class="legend-box purchasing"></div>
-                <div class="legend-info">
-                  <span class="legend-type">Đang thanh toán</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-
-    <!--billPanel !-->
-
-    <div class="billPanel hidden" id="billPanel">
-      <div class="ticket">
-        <div class="ticket-left">
-          <div class="brand">TICKETBOX</div>
-          <h2 class="event" id="billEvent">Live Concert 2025</h2>
-          <div class="meta">
-            <span id="billDate">20/11/2025 · 19:30</span>
-            <span id="billPlace">Nhà thi đấu Quân khu 7</span>
-          </div>
-          <div class="serial" id="billSeats">Ghế: (chưa có)</div>
-        </div>
-        <div class="ticket-right">
-          <div class="price-badge" id="billTotal">0đ</div>
-          <div class="qr"></div>
         </div>
       </div>
 
-      <div class="ticket-buttons">
-        <button class="btn-confirm" id="billConfirm">Thanh toán</button>
-        <button class="btn-cancel" id="billCancel">Hủy</button>
+      <div class="cart">
+        <div class="cart-head">
+          <h3>Ghế đã chọn</h3>
+          <div class="prices">
+            <div class="price-line">
+              <span>VIP</span><strong id="priceVip">150.000đ</strong>
+            </div>
+            <div class="price-line">
+              <span>Thường</span><strong id="priceNormal">100.000đ</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-body">
+          <table class="cart-table" id="cartTable">
+            <thead>
+              <tr>
+                <th>Ghế</th>
+                <th>Loại</th>
+                <th>Giá</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- render bằng JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cart-foot">
+          <div class="total-line">
+            <span>Tổng</span>
+            <strong id="cartTotal">0đ</strong>
+          </div>
+          <button id="checkoutBtn" class="btn-primary">Đặt vé</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN: Sân khấu + sơ đồ ghế -->
+    <main class="main">
+      <div class="container">
+        <div class="stagePanel">
+          <div class="screen">SÂN KHẤU</div>
+        </div>
+
+        <div class="map">
+          <div class="seat-map" id="seatMap"></div>
+
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-box vip"></div>
+              <div class="legend-info">
+                <span class="legend-type">VIP</span>
+                <span class="legend-price" id="legendVipPrice">150.000đ</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-box normal"></div>
+              <div class="legend-info">
+                <span class="legend-type">Thường</span>
+                <span class="legend-price" id="legendNormalPrice">100.000đ</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-box booked"></div>
+              <div class="legend-info">
+                <span class="legend-type">Đã đặt</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-box selected"></div>
+              <div class="legend-info">
+                <span class="legend-type">Đang chọn</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-box purchasing"></div>
+              <div class="legend-info">
+                <span class="legend-type">Đang thanh toán</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!--billPanel !-->
+
+  <!-- MODAL CHECKOUT -->
+  <div id="checkoutModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalEvent">
+      <div class="modal-body">
+        <div class="ticket">
+          <div class="ticket-left">
+            <div class="brand">TICKETBOOK</div>
+            <h2 class="event" id="modalEvent">Live Concert 2025</h2>
+            <div class="meta">
+              <span id="modalDate">20/11/2025 · 19:30</span>
+              <span id="modalPlace">Nhà thi đấu Quân khu 7</span>
+            </div>
+            <div class="serial" id="modalSeats">Ghế: (chưa có)</div>
+          </div>
+          <div class="ticket-right">
+            <div class="price-badge" id="modalTotal">0đ</div>
+            <div class="qr"><img src="OIP.webp" alt=""></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button id="modalPay" class="btn-ok">Thanh toán</button>
+        <button id="modalClose" class="btn-cancel">Hủy</button>
       </div>
     </div>
+  </div>
 
-    <script src="/frontend/seatmapUI/script/seatmap.js"></script>
-  </body>
+  <script src="http://localhost:4000/socket.io/socket.io.js"></script>
+
+  <script src="/frontend/seatmapUI/script/seatmap.js"></script>
+</body>
+
 </html>

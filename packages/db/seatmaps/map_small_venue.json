@@ -1,0 +1,58 @@
+{
+  "id": "map_small_venue",
+  "name": "Small Venue – Intimate",
+  "priceTiers": {
+    "VIP": 500000,
+    "A": 300000,
+    "B": 180000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 8
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "B",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "C",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "D",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

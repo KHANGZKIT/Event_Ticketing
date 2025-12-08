@@ -8,7 +8,22 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:clean": "node packages/db/prisma/cleanup_dev.js",
     "seed:auto": "node packages/db/prisma/seed_auto.js",
-    "seed:users": "node packages/db/prisma/seed_users.js"
+    "seed:users": "node packages/db/prisma/seed_users.js",
+    "scrape:ticketbox": "node scripts/scrape_ticketbox.js",
+    "scrape:single": "node scripts/scrape_single_event.js",
+    "scrape:cookie": "node scripts/scrape_with_cookie.js",
+    "update:seatmaps": "node scripts/update_shows_seatmap.js",
+    "migrate:seatmap": "node scripts/migrate_seatmap_to_db.js",
+    "sync:seatmaps": "node scripts/sync_seatmaps_to_db.js",
+    "check:holds": "node scripts/check_redis_holds.js",
+    "fix:seatmaps": "node scripts/fix_all_seatmaps.js",
+    "fix:categories": "node scripts/fix_missing_categories.js",
+    "export:data": "node scripts/export_data.js",
+    "import:data": "node scripts/import_data.js",
+    "check:jwt": "node scripts/check_jwt_secret.js",
+    "test:payment": "node scripts/test-payment.js",
+    "cleanup:demo-orders": "node scripts/cleanup_demo_orders.js",
+    "scrape:list": "node scripts/scrape_from_url_file.js"
   },
   "private": true,
   "workspaces": [
@@ -27,8 +42,8 @@
   },
   "homepage": "https://github.com/KHANGZKIT/Event_Ticketing#readme",
   "dependencies": {
-    "@prisma/client": "^6.17.1",
-    "axios": "^1.12.2",
+    "@prisma/client": "^6.19.0",
+    "axios": "^1.13.2",
     "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -41,11 +56,13 @@
     "ioredis": "^5.8.2",
     "nodemon": "^3.1.10",
     "qrcode": "^1.5.4",
+    "qs": "^6.14.0",
+    "socket.io": "^4.8.1",
     "url": "^0.11.4",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "bcryptjs": "^3.0.2",
-    "puppeteer": "^24.25.0"
+    "bcryptjs": "^3.0.3",
+    "puppeteer": "^24.32.0"
   }
 }

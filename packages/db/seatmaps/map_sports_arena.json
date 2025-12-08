@@ -1,0 +1,104 @@
+{
+  "id": "map_sports_arena",
+  "name": "Sports Arena – Multi-level",
+  "priceTiers": {
+    "VIP": 1100000,
+    "A": 750000,
+    "B": 480000,
+    "C": 300000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 22
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 22
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 26
+        },
+        {
+          "id": "F",
+          "from": 1,
+          "to": 26
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "H",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "I",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "J",
+          "from": 1,
+          "to": 28
+        },
+        {
+          "id": "K",
+          "from": 1,
+          "to": 28
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "L",
+          "from": 1,
+          "to": 30
+        },
+        {
+          "id": "M",
+          "from": 1,
+          "to": 30
+        },
+        {
+          "id": "N",
+          "from": 1,
+          "to": 30
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

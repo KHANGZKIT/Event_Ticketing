@@ -1,0 +1,109 @@
+{
+  "id": "map_outdoor_stage",
+  "name": "Outdoor Stage – Festival",
+  "priceTiers": {
+    "VIP": 800000,
+    "A": 450000,
+    "B": 280000,
+    "C": 150000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 25
+        },
+        {
+          "id": "B",
+          "from": 5,
+          "to": 25
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "rows": [
+        {
+          "id": "C",
+          "from": 9,
+          "to": 28
+        },
+        {
+          "id": "D",
+          "from": 11,
+          "to": 28
+        },
+        {
+          "id": "E",
+          "from": 13,
+          "to": 28
+        },
+        {
+          "id": "F",
+          "from": 15,
+          "to": 28
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        {
+          "id": "G",
+          "from": 17,
+          "to": 30
+        },
+        {
+          "id": "H",
+          "from": 17,
+          "to": 30
+        },
+        {
+          "id": "I",
+          "from": 17,
+          "to": 30
+        },
+        {
+          "id": "J",
+          "from": 17,
+          "to": 30
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "rows": [
+        {
+          "id": "K",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "L",
+          "from": 1,
+          "to": 16
+        },
+        {
+          "id": "M",
+          "from": 19,
+          "to": 32
+        },
+        {
+          "id": "N",
+          "from": 19,
+          "to": 32
+        },
+        {
+          "id": "O",
+          "from": 19,
+          "to": 32
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM"
+}
+

@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { getRedis } from '../../redis/client.js';
+import { incrMetric } from '../../utils/hardening.js';
 
 const LOCK_MS = 3000;
-const DEFAULT_TTL = 300;
+const DEFAULT_TTL = 600;
 
 function heldKey(showId, seatId) {
     return `held:${showId}:${seatId}`;
@@ -26,8 +27,15 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
 
     // input validation
     if (!userId || !showId || !Array.isArray(seatIds) || seatIds.length === 0) {
+        console.log('[holds.err] invalid-input', { userId, showId, seatIds });
         return { ok: false, reason: 'Invalid input' };
     }
+
+    // khi lock fail:
+    console.log('[holds.err] lock-failed', { showId, seatId, acquired });
+
+    // khi phát hiện conflicts từ MGET:
+    console.log('[holds.err] seats-conflict', { showId, conflicts });
 
     //Lay ghe theo thu tu de tranh deadlock
     const acquired = [];
@@ -36,7 +44,7 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
         const ok = await redis.set(lockKey(showId, seatId), lockId, 'PX', LOCK_MS, 'NX');
         if (!ok) {
             await releaseLocks(redis, showId, acquired, lockId);
-            return { ok: false, conflicts: [], reason: 'Lock acquisition failed' };
+            return { ok: false, reason: 'lock-failed', conflicts: [seatId] };
         }
 
         acquired.push(seatId);
@@ -54,12 +62,24 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
         });
         if (conflicts.length) {
             await releaseLocks(redis, showId, acquired, lockId);
-            return { ok: false, conflicts: [seatId], reason: 'lock-failed' };
+            return { ok: false, reason: 'conflict', conflicts };
         }
         const tx = redis.multi();
         tx.set(holdKey(holdId), JSON.stringify({ userId, showId, seats: sorted, expiresAt }), 'EX', ttlSec);
+        const RETRIES = 3, BASE = 40; // ms
         for (const seatId of sorted) {
-            tx.set(heldKey(showId, seatId), holdId, 'EX', ttlSec);
+            let ok = false, attempt = 0;
+            while (!ok && attempt <= RETRIES) {
+                ok = !!(await redis.set(lockKey(showId, seatId), lockId, 'PX', LOCK_MS, 'NX'));
+                if (!ok) { attempt++; if (attempt > RETRIES) break; await incrMetric('holds:create:retry'); await sleep(jitter(BASE * attempt)); }
+            }
+            if (!ok) {
+                await releaseLocks(redis, showId, acquired, lockId);
+                await incrMetric('holds:create:conflict');
+                logx('holds.create.conflict', { userId, showId, seatId });
+                return { ok: false, reason: 'conflict', conflicts: [seatId] };
+            }
+            acquired.push(seatId);
         }
         console.log('[debug-write]', {
             holdKey: holdKey(holdId),
@@ -69,6 +89,7 @@ export async function createHoldAtomic({ userId, showId, seatIds, ttlSec = DEFAU
         const out = await tx.exec();
         console.log('[debug-out]', out); // kỳ vọng: [[null,"OK"], [null,"OK"], ...]
         if (!out || out.some(([err]) => err)) {
+            console.log('[holds.err] tx-failed', { out });
             return { ok: false, reason: 'tx-failed', out };
         }
         return { ok: true, holdId, expiresAt, seats: sorted };

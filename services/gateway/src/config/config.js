@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-function ensureUrl(name) {
-    const v = process.env[name];
+function ensureUrl(name, defaultValue = null) {
+    const v = process.env[name] || defaultValue;
     if (!v) throw new Error(`Missing env ${name}`);
     new URL(v);
     return v;
@@ -14,11 +14,14 @@ export const routes = [
 
     // Ví dụ các service khác (giữ nguyên hoặc thêm rewrite nếu backend không có /api/...):
     { prefix: '/api/events', target: ensureUrl('EVENT_SVC_URL'),   /* rewrite: '/events' */ },
+    { prefix: "/api/dashboard", target: ensureUrl("EVENT_SVC_URL", "http://localhost:4102") },
     { prefix: '/api/shows', target: ensureUrl('SHOW_SVC_URL'),    /* rewrite: '/shows'  */ },
-    { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL') },
-    { prefix: '/api/orders', target: ensureUrl('ORDER_SVC_URL') },
-    { prefix: '/api/payments', target: ensureUrl('PAYMENT_SVC_URL') },
-    { prefix: '/api/tickets', target: ensureUrl('TICKET_SVC_URL') },
+    { prefix: '/api/holds', target: ensureUrl('HOLD_SVC_URL'), rewrite: '/api/holds', auth: true },
+    { prefix: '/api/orders', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/payments', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/tickets', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/coupons', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
+    { prefix: '/api/seatmaps', target: ensureUrl('EVENT_SVC_URL', 'http://localhost:4102') },
 ];
 
 export const serverOptions = {

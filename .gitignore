@@ -1,2 +1,56 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+Environment variables
 .env
-node_modules
+.env.local
+.env.*.local
+*.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma
+packages/db/prisma/migrations/
+
+# Docker volumes
+pgdata/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Backup files
+backup.sql
+*.backup
+data_export.json
+data/

@@ -3,8 +3,8 @@ import * as ctrl from "./holds.redis.controller.js";
 import { authGuard } from "../../middlewares/authGuard.js";
 
 const r = Router();
-
-r.post('/', authGuard, ctrl.createHold);    //Tao hold  
-r.delete('/:id', authGuard, ctrl.releaseHold);  // Bo Hold
+// thin routes, logic lives in controller
+r.post('/', authGuard, ctrl.createHold);
+r.delete('/:id', authGuard, ctrl.releaseHold);
 
 export default r;

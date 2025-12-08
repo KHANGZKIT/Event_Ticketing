@@ -1,0 +1,67 @@
+{
+  "id": "map_studio_intimate",
+  "name": "Studio Intimate – Small Venue",
+  "priceTiers": {
+    "VIP": 300000,
+    "Standard": 150000,
+    "Economy": 80000
+  },
+  "zones": [
+    {
+      "id": "VIP",
+      "rows": [
+        {
+          "id": "A",
+          "from": 1,
+          "to": 8
+        },
+        {
+          "id": "B",
+          "from": 1,
+          "to": 8
+        }
+      ]
+    },
+    {
+      "id": "Standard",
+      "rows": [
+        {
+          "id": "C",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "D",
+          "from": 1,
+          "to": 10
+        },
+        {
+          "id": "E",
+          "from": 1,
+          "to": 10
+        }
+      ]
+    },
+    {
+      "id": "Economy",
+      "rows": [
+        {
+          "id": "F",
+          "from": 1,
+          "to": 12
+        },
+        {
+          "id": "G",
+          "from": 1,
+          "to": 12
+        }
+      ]
+    }
+  ],
+  "format": "ROW_NUM",
+  "meta": {
+    "type": "studio",
+    "capacity": 80
+  }
+}
+

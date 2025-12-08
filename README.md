@@ -2,6 +2,8 @@
 
 A small-but-solid event ticketing system designed to help you learn realistic backend patterns: auth, RBAC, events & shows, seatmaps, seat holds, availability, checkout & tickets. Starts as a **modular monolith** and can be split into **services**.
 
+> 🚀 **Quick Start**: Xem [SETUP.md](./SETUP.md) để setup dự án nhanh chóng với dữ liệu mẫu đầy đủ.
+
 ---
 
 ## ✨ Features (current)
