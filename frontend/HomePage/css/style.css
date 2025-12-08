@@ -44,91 +44,152 @@ body {
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
 
-/* SEARCH BAR */
+/* SEARCH BAR - New Design */
 .search-bar {
   display: flex;
-  width: 380px;
-  background: rgba(255, 255, 255, 0.24);
-  backdrop-filter: blur(20px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  align-items: center;
+  width: 420px;
+  background: #fff;
+  border-radius: 8px;
   overflow: hidden;
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.search-bar:hover {
-  width: 400px;
-  box-shadow: 0 12px 40px rgba(46, 204, 113, 0.3);
+.search-bar:hover,
+.search-bar:focus-within {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #9ca3af;
 }
 
 .search-bar input {
   flex: 1;
   border: none;
   outline: none;
-  padding: 10px 20px;
+  padding: 12px 8px;
   background: transparent;
-  color: #fff;
+  color: #374151;
   font-size: 15px;
 }
 
 .search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #9ca3af;
 }
 
-.search-bar button {
-  background: rgba(255, 255, 255, 0.2);
+.search-btn {
+  background: transparent;
   border: none;
-  padding: 10px 20px;
+  border-left: 1px solid #e5e7eb;
+  padding: 12px 20px;
+  color: #2ecc71;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.search-btn:hover {
+  background: #f3f4f6;
+  color: #27ae60;
+}
+
+/* HEADER BUTTONS - Ticketbox Style */
+.btn-create-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
 }
 
-.search-bar button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+.btn-create-event:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
 }
 
-.search-bar svg {
-  width: 20px;
-  height: 20px;
-  color: #fff;
-}
-
-/* MY TICKET & LOGIN */
-.my-ticket a,
-.btn-login,
-.btn-register {
+.btn-my-ticket {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
+  gap: 6px;
   color: white;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 500;
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.4s ease;
+  padding: 8px 12px;
+  transition: opacity 0.2s;
 }
 
-.my-ticket a:hover,
-.btn-login:hover,
-.btn-register:hover {
-  background: rgba(63, 93, 103, 0.9);
-  color: #2ecc71;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(10, 29, 18, 0.4);
+.btn-my-ticket:hover {
+  opacity: 0.8;
 }
 
-.btn-register {
-  background: linear-gradient(135deg, #b22647, #0c3390);
+.btn-my-ticket svg {
+  width: 18px;
+  height: 18px;
 }
 
-.btn-register:hover {
+/* Auth Links */
+.auth-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-link {
   color: white;
-  background: linear-gradient(135deg, #b22647, #0c3390);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.auth-link:hover {
+  opacity: 0.8;
+}
+
+.auth-divider {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
+
+/* Flag Dropdown */
+.flag-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  transition: background 0.2s;
+}
+
+.flag-dropdown:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.flag-icon {
+  font-size: 20px;
+}
+
+.flag-arrow {
+  font-size: 10px;
+  color: white;
 }
 
 /* MENU CONTAINER */
@@ -348,6 +409,7 @@ body {
   grid-template-columns: repeat(5, 1fr);
   gap: 28px;
 }
+
 @media (max-width: 1400px) {
   .event-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -727,19 +789,18 @@ button,
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #e940ff, #00e0ff);
   padding: 6px 10px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10 px;
   cursor: pointer;
   line-height: 1;
-  box-shadow: 0 8px 25px rgba(233, 64, 255, 0.2), 0 8px 25px rgba(0, 224, 255, 0.2);
+  box-shadow: 0 8px 25px rgba(246, 191, 253, 0.2), 0 8px 25px rgba(0, 224, 255, 0.2);
 }
 
 .user-btn .user-name {
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
+  color: #000000;
   max-width: 160px;
   white-space: nowrap;
   overflow: hidden;
