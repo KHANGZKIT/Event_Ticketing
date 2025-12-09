@@ -6,13 +6,10 @@ import { spawn } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// ✅ Mặc định đọc file url.txt nằm cùng folder scripts/
 const fileArg = process.argv[2] || 'url.txt';
 const urlFile = path.isAbsolute(fileArg)
     ? fileArg
     : path.resolve(__dirname, fileArg);
-
 async function run() {
     try {
         const raw = await fs.readFile(urlFile, 'utf8');
@@ -25,12 +22,9 @@ async function run() {
             console.error(`[scrape:list] File ${urlFile} không có URL nào.`);
             process.exit(1);
         }
-
         console.log(`[scrape:list] Bắt đầu import ${urls.length} URL từ ${urlFile}\n`);
-
         const succeeded = [];
         const failed = [];
-
         const runOne = (url) =>
             new Promise((resolve, reject) => {
                 const child = spawn('node', ['scripts/scrape_single_event.js', url], {
@@ -42,7 +36,6 @@ async function run() {
                     reject(new Error(`scrape_single_event exited with code ${code}`));
                 });
             });
-
         for (let i = 0; i < urls.length; i++) {
             const url = urls[i];
             console.log(`\n[${i + 1}/${urls.length}] ${url}`);
@@ -54,7 +47,6 @@ async function run() {
                 failed.push(url);
             }
         }
-
         console.log(
             `\n[scrape:list] Hoàn thành. Thành công: ${succeeded.length}. Thất bại: ${failed.length}.`,
         );
