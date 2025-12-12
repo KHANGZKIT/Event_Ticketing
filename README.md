@@ -1,335 +1,359 @@
-# Event Ticketing (SOA / Modular Monolith → Microservices)
+# Event Ticketing System
 
-A small-but-solid event ticketing system designed to help you learn realistic backend patterns: auth, RBAC, events & shows, seatmaps, seat holds, availability, checkout & tickets. Starts as a **modular monolith** and can be split into **services**.
+Một hệ thống bán vé sự kiện hoàn chỉnh được xây dựng theo kiến trúc **Microservices / SOA** với đầy đủ các tính năng: xác thực, phân quyền RBAC, quản lý sự kiện & suất diễn, sơ đồ ghế ngồi, giữ ghế real-time, thanh toán trực tuyến, check-in QR và dashboard quản trị.
 
 > 🚀 **Quick Start**: Xem [SETUP.md](./SETUP.md) để setup dự án nhanh chóng với dữ liệu mẫu đầy đủ.
 
 ---
 
-## ✨ Features (current)
+## ✨ Tính năng chính
 
-- JWT Auth (register/login) + RBAC via roles (`admin`, `staff`, `user`)
-- Events & Shows CRUD (soft delete)
-- Seatmap templates (JSON) → expanded to seats
-- Holds (in‑memory) with TTL → Availability exposes `sold` / `held` / `available`
-- Prisma/PostgreSQL schema with `User`, `Role`, `UserRole`, `Event`, `Show`, `Order`, `Ticket`
+### 🔐 Xác thực & Phân quyền
+- JWT Auth (register/login) với mã hóa bcrypt
+- RBAC với 3 vai trò: `admin`, `staff`, `user`
+- Token verification chung giữa các services
 
-> Roadmap: Redis-based holds, Checkout (Order + Ticket transaction), Check-in (QR / scan).
+### 🎫 Quản lý Sự kiện
+- CRUD sự kiện (Event) với soft delete
+- Quản lý suất diễn (Show) với trạng thái `scheduled`, `cancelled`, `completed`
+- Hỗ trợ phân loại sự kiện (category)
+- Quản lý địa điểm (Venue)
+
+### 🪑 Sơ đồ ghế & Giữ chỗ
+- Seatmap templates (JSON) với price tiers
+- Giữ ghế real-time với Redis TTL
+- WebSocket thông báo trạng thái ghế (Socket.IO)
+- Availability API: `sold` / `held` / `available`
+
+### 💳 Thanh toán & Đơn hàng
+- Checkout flow với idempotency key
+- Tích hợp thanh toán đa cổng: MoMo, VNPay
+- Quản lý mã giảm giá (Coupon) - fixed & percent
+- Trạng thái đơn hàng: `pending`, `paid`, `failed`, `cancelled`
+
+### 🎟️ Vé & Check-in
+- Tạo vé với mã QR unique
+- Check-in idempotent qua mã QR
+- Ngăn chặn double-booking qua unique constraint
+
+### 📊 Dashboard & Thống kê
+- Real-time analytics cho admin
+- Theo dõi doanh thu, số vé bán
+- Monitor holds đang active
 
 ---
 
-## 🧱 Architecture
+## 🧱 Kiến trúc hệ thống
 
 ```
-services/
-  auth/         # JWT, roles
-  events/       # Events/Shows/Seatmap + Holds + Availability
-  orders/       # (next) Checkout & tickets
-  gateway/      # Reverse proxy / API gateway
-packages/
-  db/           # Prisma schema & client (workspace package)
-  shared/       # (optional) shared middlewares & utils
+Event_Ticketing/
+├── services/
+│   ├── auth/           # JWT Authentication + RBAC
+│   ├── events/         # Events/Shows/Seatmap/Holds/Orders/Payments/Tickets/Dashboard
+│   └── gateway/        # API Gateway (Reverse Proxy)
+├── packages/
+│   └── db/             # Prisma schema & client (shared workspace)
+├── frontend/
+│   ├── HomePage/       # Trang chủ hiển thị sự kiện
+│   ├── LoginUI/        # Đăng nhập/Đăng ký
+│   ├── Ticketbox/      # Chi tiết sự kiện
+│   ├── shows/          # Danh sách suất diễn
+│   ├── seatmapUI/      # Chọn ghế ngồi
+│   ├── PurchaseUI/     # Thanh toán
+│   ├── my_ticket/      # Vé của tôi
+│   ├── DashboardUI/    # Quản trị viên
+│   └── shared/         # CSS/JS dùng chung
+├── scripts/            # Utility scripts (scraping, seeding, migration)
+├── docs/               # API docs, Postman collection, diagrams
+└── docker-compose.yml  # PostgreSQL 16 + Redis 7
 ```
-
-**Phase A (now):** multiple services sharing a single DB package `@app/db`.
-
-**Phase B (later):** split DB per service, move holds to Redis, integrate payment.
 
 ---
 
 ## 🛠 Tech Stack
 
-- Runtime: **Node.js (ESM)**, **Express**
-- ORM: **Prisma** + **PostgreSQL**
-- Auth: **JWT (HS256)**
-- Validation: **Zod**
-- Dev: **npm workspaces**, **nodemon**
-- (Optional) **Redis** for holds (production)
+| Layer | Technology |
+|-------|------------|
+| **Runtime** | Node.js (ESM), Express 5 |
+| **Database** | PostgreSQL 16 + Prisma ORM |
+| **Cache/Queue** | Redis 7 (holds, real-time) |
+| **Auth** | JWT (HS256), bcrypt |
+| **Real-time** | Socket.IO |
+| **Validation** | Zod |
+| **QR Code** | qrcode library |
+| **Dev Tools** | npm workspaces, nodemon |
+| **Container** | Docker Compose |
 
 ---
 
-## 📦 Monorepo Layout (example)
+## 🗃 Database Schema
+
+Prisma schema với **12 models** chính:
 
 ```
-Event_Ticketing/
-├─ services/
-│  ├─ auth/
-│  │  └─ src/
-│  │     ├─ app.js, server.js
-│  │     └─ modules/auth/* (controller/service/routes/schema)
-│  ├─ events/
-│  │  └─ src/
-│  │     ├─ app.js, server.js
-│  │     └─ modules/{events,shows,holds}/*
-│  └─ gateway/
-│     └─ src/* (http-proxy or reverse proxy)
-├─ packages/
-│  ├─ db/
-│  │  ├─ prisma/
-│  │  │  ├─ schema.prisma
-│  │  │  └─ seatmaps/
-│  │  │     └─ m1.json (example template)
-│  │  └─ src/client.ts|js (Prisma client export)
-│  └─ shared/ (optional)
-└─ .env (root, optional for gateway) + per-service .env
+┌─────────────────────────────────────────────────────────────┐
+│  RBAC                                                        │
+│  ├── User (email, passwordHash, fullName)                   │
+│  ├── Role (admin, staff, user)                              │
+│  └── UserRole (many-to-many)                                │
+├─────────────────────────────────────────────────────────────┤
+│  Venue & SeatMap                                            │
+│  ├── Venue (name, city, address)                            │
+│  └── SeatMap (name, schema JSON)                            │
+├─────────────────────────────────────────────────────────────┤
+│  Event & Show                                               │
+│  ├── Event (name, city, cover, category, description)       │
+│  ├── Show (startsAt, venue, seatMapId, status)              │
+│  └── ShowTicketType (name, price, capacity)                 │
+├─────────────────────────────────────────────────────────────┤
+│  Order & Payment                                            │
+│  ├── Order (userId, showId, amount, status, couponId)       │
+│  ├── Payment (provider, providerRef, status)                │
+│  ├── Ticket (showId, seatId, code, checkedInAt)             │
+│  ├── Coupon (code, discountType, discountValue)             │
+│  └── IdempotencyKey (checkout safety)                       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## 🔐 Environment Variables
 
-Create **.env** for each service that runs a server, plus one for `packages/db`.
-
 ### packages/db/prisma/.env
-
-```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/event_ticketing?schema=public"
+```env
+DATABASE_URL="postgresql://admin:secret@localhost:5432/eventdb?schema=public"
 ```
 
 ### services/auth/.env
-
-```
+```env
 PORT=4101
 JWT_SECRET=your_super_secret_256bits
-ADMIN_EMAIL=admin@example.com    # for seeding/granting admin later
 ```
 
 ### services/events/.env
-
-```
+```env
 PORT=4102
-JWT_SECRET=your_super_secret_256bits   # MUST match auth
-HOLD_TTL_SECONDS=300                   # optional
+JWT_SECRET=your_super_secret_256bits
+HOLD_TTL_SECONDS=300
+REDIS_URL=redis://localhost:6379
+
+# Payment providers
+MOMO_PARTNER_CODE=...
+MOMO_ACCESS_KEY=...
+MOMO_SECRET_KEY=...
+VNPAY_TMN_CODE=...
+VNPAY_HASH_SECRET=...
 ```
 
-### services/gateway/.env (example)
-
-```
+### services/gateway/.env
+```env
 PORT=4000
 AUTH_URL=http://localhost:4101
 EVENTS_URL=http://localhost:4102
-ORDERS_URL=http://localhost:4103
 ```
 
-> **Note:** `JWT_SECRET` must be identical across services so they can verify tokens issued by `auth`.
+> ⚠️ **Lưu ý:** `JWT_SECRET` phải giống nhau giữa tất cả services.
 
 ---
 
-## 🗃 Database & Prisma
+## 📦 Cài đặt & Chạy
 
-### Install deps (root)
-
+### 1. Cài đặt dependencies
 ```bash
 npm install
 ```
 
-### Dev migrate (from repo root)
+### 2. Khởi động Docker (PostgreSQL + Redis)
+```bash
+docker-compose up -d
+```
 
+### 3. Migrate database
 ```bash
 npm run -w packages/db migrate:dev -- --name init
+# hoặc quick sync:
+npm run -w packages/db db:push
 ```
 
-If you only need a quick sync for local dev (no migration file):
-
+### 4. Seed dữ liệu
 ```bash
-npm run -w packages/db db:push   # alias for `prisma db push`
+npm run seed:auto    # Seed tự động
+npm run seed:users   # Seed users
 ```
 
-### Seed (roles, sample event/show)
-
-Add a seed script (example) and run:
-
+### 5. Chạy services
 ```bash
-npm run -w packages/db db:seed
+npm run -w services/auth dev      # Port 4101
+npm run -w services/events dev    # Port 4102
+npm run -w services/gateway dev   # Port 4000
 ```
 
-### Open Prisma Studio
+---
 
+## 🔌 API Endpoints
+
+### Gateway Routes (Port 4000)
+
+| Route | Service | Description |
+|-------|---------|-------------|
+| `/api/auth/*` | auth:4101 | Đăng ký, đăng nhập |
+| `/api/events/*` | events:4102 | CRUD sự kiện |
+| `/api/shows/*` | events:4102 | Suất diễn & seatmap |
+| `/api/holds/*` | events:4102 | Giữ ghế |
+| `/api/orders/*` | events:4102 | Đơn hàng |
+| `/api/checkout/*` | events:4102 | Thanh toán |
+| `/api/tickets/*` | events:4102 | Vé & check-in |
+| `/api/payments/*` | events:4102 | Payment callbacks |
+| `/api/coupons/*` | events:4102 | Mã giảm giá |
+| `/api/dashboard/*` | events:4102 | Admin stats |
+
+### Auth API
 ```bash
-npm run -w packages/db db
+POST /api/auth/register    # { email, password, fullName }
+POST /api/auth/login       # { email, password } → { token }
+GET  /api/auth/me          # Bearer → { id, email, roles }
 ```
 
----
-
-## ▶️ Run Services (dev)
-
-Each service has its own script, e.g.:
-
+### Events API
 ```bash
-npm run -w services/auth dev
-npm run -w services/events dev
-npm run -w services/gateway dev
+GET    /api/events              # Danh sách sự kiện
+GET    /api/events/:id          # Chi tiết sự kiện
+GET    /api/events/:id/shows    # Suất diễn của sự kiện
+POST   /api/events              # Tạo sự kiện (admin)
+PUT    /api/events/:id          # Cập nhật (admin)
+DELETE /api/events/:id          # Xóa mềm (admin)
 ```
 
-Typical dev scripts:
-
-```json
-"dev": "nodemon src/server.js"
-```
-
-> Windows note: use the `-w <workspace_path>` flag (e.g., `-w services/auth`).
-
----
-
-## 🔐 Auth API (quick)
-
-**POST /api/auth/register**
-
-```json
-{ "email": "user@example.com", "password": "pass123", "fullName": "User" }
-```
-
-**POST /api/auth/login** → `{ token }`
-
-**GET /api/auth/me** (Bearer) → `{ id, email, fullName, roles: ["user", ...] }`
-
-RBAC helper (example): `requireRole('admin')` for admin endpoints.
-
----
-
-## 🎫 Events & Shows
-
-- **GET /api/events** — list events
-- **GET /api/events/:id** — event detail
-- **GET /api/events/:id/shows** — shows of an event
-- **POST /api/events** (admin)
-- **PUT /api/events/:id** (admin)
-- **DELETE /api/events/:id** (admin, soft delete)
-
-**Seatmap & Availability**
-
-- **GET /api/shows/:id/seatmap** → `{ showId, template, seats[] }`
-- **GET /api/shows/:id/availability** → `{ showId, availability: [{ seatId, state }] }`
-
-  - `state ∈ {"sold", "held", "available"}` (priority: sold > held > available)
-
----
-
-## 🪑 Seatmap Template (example: `packages/db/prisma/seatmaps/m1.json`)
-
-```json
-{
-  "id": "m1",
-  "name": "My Dinh Basic",
-  "priceTiers": { "VIP": 1200000, "A": 800000, "B": 500000 },
-  "zones": [
-    {
-      "id": "VIP",
-      "rows": [
-        { "id": "A", "from": 1, "to": 20 },
-        { "id": "B", "from": 1, "to": 20 }
-      ]
-    },
-    {
-      "id": "A",
-      "rows": [
-        { "id": "C", "from": 1, "to": 25 },
-        { "id": "D", "from": 1, "to": 25 }
-      ]
-    },
-    {
-      "id": "B",
-      "rows": [
-        { "id": "E", "from": 1, "to": 30 },
-        { "id": "F", "from": 1, "to": 30 }
-      ]
-    }
-  ],
-  "format": "ROW_NUM"
-}
-```
-
----
-
-## 🕒 Holds & Availability (dev, in‑memory)
-
-- **POST /api/holds** (Bearer)
-
-```json
-{ "showId": "<uuid>", "seats": ["A1", "A2"] }
-```
-
-→ `201 { "holdId": "...", "expiresAt": 173... }`
-
-- **DELETE /api/holds/:id** (Bearer)
-  → `204 No Content`
-
-- **GET /api/shows/:id/availability**
-  → marks seats as `sold` (from DB tickets) and `held` (from in‑memory store).
-
-> Production: replace with Redis `SETNX hold:<showId>:<seatId> <holdId> EX 300` & `HSET holdmeta:<holdId> ...`.
-
----
-
-## 🧪 Quick cURL Cheatsheet
-
+### Shows & Seatmap API
 ```bash
-# Login
-curl -s -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"yourpass"}'
+GET /api/shows/:id              # Chi tiết suất diễn
+GET /api/shows/:id/seatmap      # Sơ đồ ghế
+GET /api/shows/:id/availability # Trạng thái ghế (sold/held/available)
+```
 
-# Seatmap
-curl -s http://localhost:4000/api/shows/<SHOW_ID>/seatmap | jq .
+### Holds API (Redis-based)
+```bash
+POST   /api/holds               # { showId, seats } → hold ghế (TTL 300s)
+DELETE /api/holds/:id           # Hủy hold
+GET    /api/holds/active        # Holds đang active (admin)
+```
 
-# Hold seats
-curl -i -X POST http://localhost:4000/api/holds \
-  -H "Authorization: Bearer <TOKEN>" -H "Content-Type: application/json" \
-  -d "{\"showId\":\"<SHOW_ID>\",\"seats\":[\"A1\",\"A2\"]}"
+### Checkout & Orders API
+```bash
+POST /api/checkout              # { showId, seats, paymentProvider, couponCode? }
+GET  /api/orders/my             # Đơn hàng của user
+GET  /api/orders/:id            # Chi tiết đơn hàng
+```
 
-# Availability (should show A1/A2 as held)
-curl -s http://localhost:4000/api/shows/<SHOW_ID>/availability | jq '.availability[] | select(.state!="available")'
+### Tickets API
+```bash
+GET  /api/tickets/my            # Vé của user
+POST /api/tickets/:id/checkin   # Check-in (staff)
+GET  /api/tickets/code/:code    # Lookup bằng mã QR
 ```
 
 ---
 
-## 🧭 Gateway Mapping (example)
+## 🧪 Scripts hữu ích
+
+| Script | Mô tả |
+|--------|-------|
+| `npm run scrape:ticketbox` | Scrape sự kiện từ Ticketbox |
+| `npm run scrape:single` | Scrape một sự kiện cụ thể |
+| `npm run export:data` | Export dữ liệu ra JSON |
+| `npm run import:data` | Import dữ liệu từ JSON |
+| `npm run migrate:seatmap` | Migrate seatmap vào DB |
+| `npm run check:holds` | Kiểm tra Redis holds |
+| `npm run seed:auto` | Seed dữ liệu tự động |
+
+---
+
+## 📁 Frontend Modules
+
+| Module | Mô tả |
+|--------|-------|
+| **HomePage** | Trang chủ với slider, danh sách sự kiện theo category |
+| **LoginUI** | Form đăng nhập/đăng ký với validation |
+| **Ticketbox** | Chi tiết sự kiện, gallery, thông tin địa điểm |
+| **shows** | Danh sách suất diễn của một sự kiện |
+| **seatmapUI** | Chọn ghế với real-time availability |
+| **PurchaseUI** | Xác nhận đơn hàng, chọn phương thức thanh toán |
+| **my_ticket** | Xem vé đã mua, mã QR check-in |
+| **DashboardUI** | Admin dashboard với charts, thống kê |
+
+---
+
+## 🧭 Gateway Proxy Mapping
 
 ```
-/api/auth     -> http://localhost:4101/auth
-/api/events   -> http://localhost:4102/events
-/api/shows    -> http://localhost:4102/shows
-/api/holds    -> http://localhost:4102/holds
-/api/checkout -> http://localhost:4103/checkout   (future)
-/api/orders   -> http://localhost:4103/orders     (future)
+Frontend (Port 5500)
+    ↓
+Gateway (Port 4000)
+    ├→ /api/auth/*     → http://localhost:4101/auth
+    ├→ /api/events/*   → http://localhost:4102/events
+    ├→ /api/shows/*    → http://localhost:4102/shows
+    ├→ /api/holds/*    → http://localhost:4102/holds
+    ├→ /api/orders/*   → http://localhost:4102/orders
+    ├→ /api/checkout/* → http://localhost:4102/checkout
+    ├→ /api/tickets/*  → http://localhost:4102/tickets
+    ├→ /api/payments/* → http://localhost:4102/payments
+    └→ /api/dashboard/*→ http://localhost:4102/dashboard
 ```
-
-> Convention: services mount routes **without** `/api` prefix; gateway adds `/api`.
 
 ---
 
 ## 🚨 Troubleshooting
 
-- **JWT error: `secretOrPrivateKey must have a value`** → missing `JWT_SECRET` in `.env`.
-- **`workspace:*` install error** → use npm workspaces correctly; run `npm install` at repo root.
-- **Prisma P1012: multiple datasources** → ensure only **one** `datasource db` & one `generator` in `schema.prisma`.
-- **`SeatMap Not Found`** → `Show.seatMapId` is null or template JSON missing; also ensure `deletedAt` is null.
-- **401 on /holds** → missing Bearer token; verify `JWT_SECRET` matches between services.
-- **`Invalid where: id undefined`** → ensure `req.userId` is set by `authGuard` (note casing: `userId` not `userID`).
-- **Windows path quirks** → use explicit `.js` extensions in ESM imports.
+| Lỗi | Nguyên nhân & Giải pháp |
+|-----|-------------------------|
+| `JWT_SECRET must have a value` | Thiếu `JWT_SECRET` trong `.env` |
+| `workspace:* install error` | Chạy `npm install` ở thư mục root |
+| `Prisma P1012` | Chỉ được có 1 `datasource db` trong schema |
+| `SeatMap Not Found` | `Show.seatMapId` null hoặc thiếu template JSON |
+| `401 on /holds` | Thiếu Bearer token hoặc `JWT_SECRET` không khớp |
+| `Redis connection failed` | Đảm bảo Redis đang chạy (docker-compose up) |
+| `Hold expired` | TTL mặc định 300s, cần checkout trước khi hết hạn |
 
 ---
 
-## 📌 Roadmap
+## 📚 Documentation
 
-- Redis-based holds (multi-instance safe)
-- Checkout: `POST /checkout` → create `Order(pending)` + `Ticket[]` (unique `[showId,seatId]`) → mark `paid`
-- Webhooks for payment providers
-- Ticket QR & `POST /tickets/:id/checkin` (idempotent)
-- Observability: request logs, metrics
-- CI: lint, type-check, migration check
+- [SETUP.md](./SETUP.md) - Hướng dẫn cài đặt chi tiết
+- [ARCHITECTURE_FLOW.md](./ARCHITECTURE_FLOW.md) - Luồng kiến trúc hệ thống
+- [docs/API_TESTING.md](./docs/API_TESTING.md) - Hướng dẫn test API
+- [docs/postman_collection.json](./docs/postman_collection.json) - Postman collection
 
 ---
 
 ## 🧑‍💻 Dev Notes
 
-- Keep controllers thin → delegate to services.
-- Validate inputs with Zod at controller boundary.
-- Prefer **soft delete** (`deletedAt`) + proper DB indexes.
-- For microservices: avoid distributed transactions; use outbox/idempotency.
+- **Keep controllers thin** → delegate to services
+- **Validate inputs** với Zod at controller boundary
+- **Soft delete** (`deletedAt`) + proper DB indexes
+- **Idempotency** cho checkout để tránh duplicate orders
+- **Redis holds** với TTL để tránh lock ghế vĩnh viễn
+- **WebSocket** broadcast khi hold/release để sync realtime
+
+---
+
+## 📌 Roadmap
+
+- [x] Redis-based holds (multi-instance safe)
+- [x] Checkout với Order + Ticket transaction
+- [x] Payment integration (MoMo, VNPay)
+- [x] Ticket QR & check-in
+- [x] Dashboard analytics
+- [x] Coupon system
+- [ ] Email notifications
+- [ ] Mobile app
+- [ ] CI/CD pipeline
 
 ---
 
 ## License
 
 MIT (for learning/demo purposes).
+
+---
+
+**Repository:** [github.com/KHANGZKIT/Event_Ticketing](https://github.com/KHANGZKIT/Event_Ticketing)
