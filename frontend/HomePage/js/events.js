@@ -1,7 +1,9 @@
 // ========================
-// CẤU HÌNH API (Gateway)
+// CẤU HÌNH API (Gateway) - Auto-detect production/local
 // ========================
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:4000/api'
+  : 'https://gateway-production-6a61.up.railway.app/api';
 const EVENTS_BASE = `${API_BASE}/events`;
 
 // ====== RATE LIMIT & CACHE ======

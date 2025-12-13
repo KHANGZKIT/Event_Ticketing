@@ -5,8 +5,10 @@
   const fmt = new Intl.NumberFormat("vi-VN");
   const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
 
-  // ====== API Config ======
-  const API_BASE = "http://localhost:4000/api";
+  // ====== API Config - Auto-detect production/local ======
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? "http://localhost:4000/api"
+    : "https://gateway-production-6a61.up.railway.app/api";
 
   // ====== Auth Helpers ======
   function getAuthToken() {
@@ -78,8 +80,11 @@
   const modal = $$("#modal");
   const closeModal = $$("#closeModal");
   if (typeof io !== 'undefined') {
-    // Kết nối tới server Socket (Port 4000)
-    const socket = io('http://localhost:4000', {
+    // Kết nối tới server Socket - Auto-detect production/local
+    const SOCKET_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:4000'
+      : 'https://gateway-production-6a61.up.railway.app';
+    const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling']
     });
 

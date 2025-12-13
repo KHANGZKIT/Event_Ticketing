@@ -1,5 +1,7 @@
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:4000/api'
+    : 'https://gateway-production-6a61.up.railway.app/api';
 const urlParams = new URLSearchParams(window.location.search);
 
 let orderId = urlParams.get('orderId');

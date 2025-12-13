@@ -1,7 +1,9 @@
 // ========================
-// CẤU HÌNH API
+// CẤU HÌNH API - Auto-detect production/local
 // ========================
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? "http://localhost:4000/api"
+  : "https://gateway-production-6a61.up.railway.app/api";
 const EVENTS_BASE = `${API_BASE}/events`;
 
 // ========================
@@ -664,7 +666,10 @@ function updateLegendPrices() {
   if (legNorm) legNorm.textContent = vnd(getPriceForTier('A') || getPriceForTier('normal'));
 }
 
-const socket = io("http://localhost:4000", { withCredentials: true });
+const SOCKET_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? "http://localhost:4000"
+  : "https://gateway-production-6a61.up.railway.app";
+const socket = io(SOCKET_URL, { withCredentials: true });
 
 function joinCurrentShowRoom() {
   const roomId = currentShowId || qs.get("showId");
