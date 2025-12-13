@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng nhập/Đăng ký</title>
     <link rel="stylesheet" href="./style/logReg.css">
-    <meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               connect-src 'self' http://localhost:4000; 
-               img-src 'self' https://salt.tkbcdn.com data:;
-               style-src 'self' 'unsafe-inline'; 
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+               connect-src 'self' http://localhost:4000 https://gateway-production-6a61.up.railway.app https:; 
+               img-src 'self' https://salt.tkbcdn.com https: data:;
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+               font-src 'self' https://fonts.gstatic.com;
                script-src 'self' 'unsafe-inline' 'unsafe-eval';">
     <!-- Tuỳ chọn: tránh 404 favicon -->
     <link rel="icon" href="data:,">

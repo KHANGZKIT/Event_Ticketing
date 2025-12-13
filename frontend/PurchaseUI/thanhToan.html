@@ -9,11 +9,11 @@
   <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
-    connect-src 'self' http://localhost:4000 ws://localhost:4000 https://cdn.socket.io; 
-    img-src 'self' https://salt.tkbcdn.com https://i.pravatar.cc data:;
+    connect-src 'self' http://localhost:4000 ws://localhost:4000 https://gateway-production-6a61.up.railway.app wss://gateway-production-6a61.up.railway.app https://cdn.socket.io https:; 
+    img-src 'self' https://salt.tkbcdn.com https://i.pravatar.cc https: data:;
     font-src 'self' https://fonts.gstatic.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.socket.io;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.socket.io https://gateway-production-6a61.up.railway.app;
   ">
   <link rel="stylesheet" href="thanhToanStyle.css">
   <link rel="stylesheet" href="../shared/smooth-ux.css">
