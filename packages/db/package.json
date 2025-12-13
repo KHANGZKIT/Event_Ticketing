@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "main": "src/client.js",
-  "exports": { ".": "./src/client.js" },
+  "exports": {
+    ".": "./src/client.js"
+  },
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "prisma": "^6.19.0",
     "dotenv": "^17.2.3"
   },
-  
   "scripts": {
+    "postinstall": "prisma generate",
     "migrate:dev": "prisma migrate dev",
+    "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db": "npx prisma studio"
   },
