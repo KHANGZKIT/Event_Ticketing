@@ -68,23 +68,17 @@ export class VNPayProvider extends BasePaymentProvider {
     }
 
     /**
-     * Tạo HMAC-SHA512 theo đúng docs VNPAY:
-     *   1. Sort params by key
-     *   2. Create query string từ RAW values (không encode)
+     * Tạo HMAC-SHA512 theo VNPAY sample:
+     *   1. Sort params by key, encode values
+     *   2. Create query string từ ENCODED values
      *   3. Hash bằng HMAC_SHA512
      */
-    signHmac512(rawParams) {
-        // Filter và sort
-        const sortedKeys = Object.keys(rawParams)
-            .filter((k) => rawParams[k] !== null && rawParams[k] !== undefined && rawParams[k] !== "")
-            .sort();
-
-        // Tạo signData từ RAW values (không encode)
-        const signData = sortedKeys
-            .map((key) => `${key}=${rawParams[key]}`)
+    signHmac512(sortedEncodedParams) {
+        const signData = Object.keys(sortedEncodedParams)
+            .map((key) => `${key}=${sortedEncodedParams[key]}`)
             .join("&");
 
-        console.log("[VNPay] Signature query string (RAW):", signData);
+        console.log("[VNPay] Signature data:", signData.substring(0, 200) + "...");
 
         const hmac = crypto.createHmac("sha512", this.secretKey);
         return hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
@@ -100,15 +94,15 @@ export class VNPayProvider extends BasePaymentProvider {
         }
 
         const now = new Date();
-        const vnp_TxnRef = this.buildTxnRef(now); // theo dạng HHmmss
+        const vnp_TxnRef = this.buildTxnRef(now);
         const vnp_Amount = orderAmount * 100;
         const vnp_OrderInfo = orderInfo || `Thanh toan cho don hang ${orderId}`;
         const vnp_CreateDate = this.buildDate(now);
         const vnp_ExpireDate = this.buildDate(new Date(now.getTime() + 15 * 60 * 1000));
         const vnp_ReturnUrl = returnUrl || this.returnUrl;
-        const vnp_IpAddr = "127.0.0.1"; // test local
+        const vnp_IpAddr = "127.0.0.1";
 
-        // params RAW (chưa encode)
+        // Raw params
         let rawParams = {
             vnp_Version: "2.1.0",
             vnp_Command: "pay",
@@ -129,20 +123,21 @@ export class VNPayProvider extends BasePaymentProvider {
             rawParams.vnp_BankCode = this.bankCode;
         }
 
-        // 1) Sign bằng RAW params
-        const secureHash = this.signHmac512(rawParams);
-
-        // 2) Encode params cho URL
+        // 1) Filter, sort, encode theo đúng VNPAY sample
         const sortedKeys = Object.keys(rawParams)
             .filter((k) => rawParams[k] !== null && rawParams[k] !== undefined && rawParams[k] !== "")
             .sort();
 
-        const queryParts = sortedKeys.map((key) => {
-            const encVal = encodeURIComponent(String(rawParams[key])).replace(/%20/g, "+");
-            return `${key}=${encVal}`;
-        });
+        const sortedEncodedParams = {};
+        for (const k of sortedKeys) {
+            sortedEncodedParams[k] = encodeURIComponent(String(rawParams[k])).replace(/%20/g, "+");
+        }
 
-        // 3) Thêm SecureHash
+        // 2) Sign bằng ENCODED params
+        const secureHash = this.signHmac512(sortedEncodedParams);
+
+        // 3) Build URL với params đã encode + hash
+        const queryParts = sortedKeys.map((key) => `${key}=${sortedEncodedParams[key]}`);
         queryParts.push(`vnp_SecureHash=${secureHash}`);
 
         const query = queryParts.join("&");
@@ -153,7 +148,7 @@ export class VNPayProvider extends BasePaymentProvider {
             paymentUrl: finalUrl,
             provider: "vnpay",
             transactionId: null,
-            requestId: vnp_TxnRef // mình lưu TxnRef; còn orderId vẫn nằm trong vnp_OrderInfo + returnUrl
+            requestId: vnp_TxnRef
         };
     }
 
