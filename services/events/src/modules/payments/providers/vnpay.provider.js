@@ -65,17 +65,23 @@ export class VNPayProvider extends BasePaymentProvider {
     }
 
     /**
-     * Tạo HMAC-SHA512 theo đúng docs:
-     *   signData = querystring.stringify(vnp_Params, { encode: false })
-     *   secureHash = HMAC_SHA512(signData, secretKey)
+     * Tạo HMAC-SHA512 theo đúng docs VNPAY:
+     *   1. Sort params by key
+     *   2. Create query string từ RAW values (không encode)
+     *   3. Hash bằng HMAC_SHA512
      */
-    signHmac512(encodedSortedParams) {
-        const signData = Object.keys(encodedSortedParams)
-            .map((key) => `${key}=${encodedSortedParams[key]}`)
+    signHmac512(rawParams) {
+        // Filter và sort
+        const sortedKeys = Object.keys(rawParams)
+            .filter((k) => rawParams[k] !== null && rawParams[k] !== undefined && rawParams[k] !== "")
+            .sort();
+
+        // Tạo signData từ RAW values (không encode)
+        const signData = sortedKeys
+            .map((key) => `${key}=${rawParams[key]}`)
             .join("&");
 
-        console.log("[VNPay] Signature query string (unencoded):", signData);
-        console.log("[VNPay] Secret key:", this.secretKey);
+        console.log("[VNPay] Signature query string (RAW):", signData);
 
         const hmac = crypto.createHmac("sha512", this.secretKey);
         return hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
@@ -99,7 +105,7 @@ export class VNPayProvider extends BasePaymentProvider {
         const vnp_ReturnUrl = returnUrl || this.returnUrl;
         const vnp_IpAddr = "127.0.0.1"; // test local
 
-        // params thô (chưa encode)
+        // params RAW (chưa encode)
         let rawParams = {
             vnp_Version: "2.1.0",
             vnp_Command: "pay",
@@ -120,18 +126,23 @@ export class VNPayProvider extends BasePaymentProvider {
             rawParams.vnp_BankCode = this.bankCode;
         }
 
-        // 1) Encode + sort giống sample
-        let encodedSorted = encodeAndSortParams(rawParams);
+        // 1) Sign bằng RAW params
+        const secureHash = this.signHmac512(rawParams);
 
-        // 2) Tạo secure hash HMAC-SHA512
-        const secureHash = this.signHmac512(encodedSorted);
-        encodedSorted["vnp_SecureHash"] = secureHash; // 2.1.0: KHÔNG gửi vnp_SecureHashType
+        // 2) Encode params cho URL
+        const sortedKeys = Object.keys(rawParams)
+            .filter((k) => rawParams[k] !== null && rawParams[k] !== undefined && rawParams[k] !== "")
+            .sort();
 
-        // 3) Build query string gửi cho VNPAY (không encode thêm nữa, vì đã encode ở bước 1)
-        const query = Object.keys(encodedSorted)
-            .map((key) => `${key}=${encodedSorted[key]}`)
-            .join("&");
+        const queryParts = sortedKeys.map((key) => {
+            const encVal = encodeURIComponent(String(rawParams[key])).replace(/%20/g, "+");
+            return `${key}=${encVal}`;
+        });
 
+        // 3) Thêm SecureHash
+        queryParts.push(`vnp_SecureHash=${secureHash}`);
+
+        const query = queryParts.join("&");
         const finalUrl = `${this.baseUrl}?${query}`;
         console.log("[VNPay] Final URL:", finalUrl);
 
