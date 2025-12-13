@@ -43,24 +43,27 @@ export class VNPayProvider extends BasePaymentProvider {
         console.log("[VNPay CONFIG] secret len =", this.secretKey.length);
     }
 
-    // yyyyMMddHHmmss
+    // yyyyMMddHHmmss - VNPAY cần giờ Việt Nam (UTC+7)
     buildDate(date = new Date()) {
         const pad = (n) => n.toString().padStart(2, "0");
-        const y = date.getFullYear();
-        const M = pad(date.getMonth() + 1);
-        const d = pad(date.getDate());
-        const h = pad(date.getHours());
-        const m = pad(date.getMinutes());
-        const s = pad(date.getSeconds());
+        // Convert to Vietnam timezone (UTC+7)
+        const vnDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+        const y = vnDate.getUTCFullYear();
+        const M = pad(vnDate.getUTCMonth() + 1);
+        const d = pad(vnDate.getUTCDate());
+        const h = pad(vnDate.getUTCHours());
+        const m = pad(vnDate.getUTCMinutes());
+        const s = pad(vnDate.getUTCSeconds());
         return `${y}${M}${d}${h}${m}${s}`;
     }
 
-    // vnp_TxnRef kiểu 6 chữ số (giống sample của VNPAY)
+    // vnp_TxnRef kiểu 6 chữ số (giống sample của VNPAY) - cũng dùng giờ VN
     buildTxnRef(date = new Date()) {
         const pad = (n) => n.toString().padStart(2, "0");
-        const h = pad(date.getHours());
-        const m = pad(date.getMinutes());
-        const s = pad(date.getSeconds());
+        const vnDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+        const h = pad(vnDate.getUTCHours());
+        const m = pad(vnDate.getUTCMinutes());
+        const s = pad(vnDate.getUTCSeconds());
         return `${h}${m}${s}`; // HHmmss
     }
 
