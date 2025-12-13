@@ -34,7 +34,10 @@ const defaultOrigins = [
     'http://127.0.0.1:5501',
     'http://127.0.0.1:5502',
     'http://127.0.0.1:5503',
-    'http://127.0.0.1:5504'
+    'http://127.0.0.1:5504',
+    // Production URLs
+    'https://gateway-production-6a61.up.railway.app',
+    'https://event-ticketing-auth.vercel.app',
 ];
 const allowedOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
