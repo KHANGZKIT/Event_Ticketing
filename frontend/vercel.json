@@ -3,6 +3,10 @@
         {
             "source": "/",
             "destination": "/HomePage/source/TrangChu.html"
+        },
+        {
+            "source": "/frontend/(.*)",
+            "destination": "/$1"
         }
     ],
     "headers": [
