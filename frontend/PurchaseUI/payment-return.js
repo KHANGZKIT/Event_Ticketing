@@ -4,7 +4,19 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
     : 'https://gateway-production-6a61.up.railway.app/api';
 const urlParams = new URLSearchParams(window.location.search);
 
+// Lấy orderId từ param hoặc parse từ vnp_OrderInfo
 let orderId = urlParams.get('orderId');
+if (!orderId) {
+    // VNPAY trả về orderId trong vnp_OrderInfo: "Thanh toan cho don hang <orderId>"
+    const vnpOrderInfo = urlParams.get('vnp_OrderInfo');
+    if (vnpOrderInfo) {
+        const match = decodeURIComponent(vnpOrderInfo).match(/don hang\s+([0-9a-fA-F-]{36})/i);
+        if (match) {
+            orderId = match[1];
+            console.log('[payment-return] Extracted orderId from vnp_OrderInfo:', orderId);
+        }
+    }
+}
 
 // Lấy các phần tử DOM
 const statusIcon = document.getElementById('statusIcon');
