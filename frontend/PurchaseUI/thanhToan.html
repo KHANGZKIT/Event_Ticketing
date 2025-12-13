@@ -16,6 +16,7 @@
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.socket.io;
   ">
   <link rel="stylesheet" href="thanhToanStyle.css">
+  <link rel="stylesheet" href="../shared/smooth-ux.css">
 </head>
 
 <body>
@@ -23,14 +24,15 @@
   <div class="header">
     <a href="../HomePage/source/TrangChu.html"><img src="./logo.svg" alt=""></a>
     <form class="search-bar" action="../Ticketbox/code/events-search.html" method="GET">
-      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off">
-      <button type="submit">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m21 21-4.34-4.34" />
+      <span class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
-      </button>
+      </span>
+      <input type="text" name="q" placeholder="Bạn tìm gì hôm nay?" autocomplete="off">
+      <button type="submit" class="search-btn">Tìm kiếm</button>
     </form>
 
     <div class="my-ticket">
@@ -54,6 +56,42 @@
       <div class="login">
         <a href="../LoginUI/LogRegUI.html?tab=login" class="btn-login btn-link" aria-label="Đăng nhập">...</a>
         <a href="../LoginUI/LogRegUI.html?tab=register" class="btn-register btn-link" aria-label="Đăng ký">...</a>
+      </div>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+      <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" id="langToggle">
+        <svg class="lang-flag" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect fill="#da251d" width="512" height="512" />
+          <polygon fill="#ffff00"
+            points="256,100.172 287.416,196.678 388.86,196.678 306.722,255.992 338.138,352.498 256,293.184 173.862,352.498 205.278,255.992 123.14,196.678 224.584,196.678" />
+        </svg>
+        <span class="lang-code">VN</span>
+        <svg class="lang-caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option active" data-lang="vi">
+          <svg class="lang-flag" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="#da251d" width="512" height="512" />
+            <polygon fill="#ffff00"
+              points="256,100.172 287.416,196.678 388.86,196.678 306.722,255.992 338.138,352.498 256,293.184 173.862,352.498 205.278,255.992 123.14,196.678 224.584,196.678" />
+          </svg>
+          <span>Tiếng Việt</span>
+        </div>
+        <div class="lang-option" data-lang="en">
+          <svg class="lang-flag" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="#012169" width="512" height="512" />
+            <path fill="#fff" d="M0,0 L512,512 M512,0 L0,512" stroke="#fff" stroke-width="80" />
+            <path fill="#c8102e" d="M0,0 L512,512 M512,0 L0,512" stroke="#c8102e" stroke-width="50" />
+            <path fill="#fff" d="M256,0 V512 M0,256 H512" stroke="#fff" stroke-width="120" />
+            <path fill="#c8102e" d="M256,0 V512 M0,256 H512" stroke="#c8102e" stroke-width="70" />
+          </svg>
+          <span>English</span>
+        </div>
       </div>
     </div>
   </div>
@@ -413,6 +451,60 @@
     window.addEventListener('avatarUpdated', () => {
       renderAuthUI();
     });
+
+    // ===== Language Selector =====
+    (function () {
+      const langToggle = document.getElementById('langToggle');
+      const langDropdown = document.getElementById('langDropdown');
+      if (!langToggle || !langDropdown) return;
+
+      // Toggle dropdown
+      langToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = langDropdown.classList.contains('show');
+        langDropdown.classList.toggle('show');
+        langToggle.setAttribute('aria-expanded', !isOpen);
+      });
+
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!langToggle.contains(e.target) && !langDropdown.contains(e.target)) {
+          langDropdown.classList.remove('show');
+          langToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Handle language selection
+      langDropdown.querySelectorAll('.lang-option').forEach(option => {
+        option.addEventListener('click', () => {
+          const lang = option.dataset.lang;
+
+          // Update active state
+          langDropdown.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
+          option.classList.add('active');
+
+          // Update button text
+          const langCode = lang === 'vi' ? 'VN' : 'EN';
+          langToggle.querySelector('.lang-code').textContent = langCode;
+
+          // Update flag in button
+          const flagSvg = option.querySelector('.lang-flag').cloneNode(true);
+          langToggle.querySelector('.lang-flag').replaceWith(flagSvg);
+
+          // Save preference
+          localStorage.setItem('preferredLang', lang);
+
+          // Close dropdown
+          langDropdown.classList.remove('show');
+          langToggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Load saved language
+      const savedLang = localStorage.getItem('preferredLang') || 'vi';
+      const savedOption = langDropdown.querySelector(`[data-lang="${savedLang}"]`);
+      if (savedOption) savedOption.click();
+    })();
   </script>
   <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
   <script src="thanhToanJS.js" defer></script>

@@ -147,6 +147,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return Math.max(1, Math.ceil(t / s));
     }
 
+    // ====== Skeleton Loading Helpers ======
+    function generateSkeletonRows(count, columns) {
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += `<tr class="skeleton-row">`;
+            columns.forEach(col => {
+                html += `<td><div class="skeleton-bone ${col}"></div></td>`;
+            });
+            html += `</tr>`;
+        }
+        return html;
+    }
+
+    // Pre-defined skeleton templates for each table
+    const skeletonTemplates = {
+        recentOrders: () => generateSkeletonRows(5, ['small', 'large', 'chip']),
+        topEvents: () => generateSkeletonRows(5, ['large', 'price']),
+        upcomingShows: () => generateSkeletonRows(5, ['large', 'chip'])
+    };
+
     // ====== OVERVIEW ======
     function renderKPIs({ totalRevenue, totalOrders, ticketsSold, successRate, upcomingToday, attendeesToday }) {
         const kpiTickets = document.getElementById("kpi-tickets-sold");
@@ -371,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadUpcomingShows() {
         const tbody = document.querySelector("#upcoming-shows-table tbody");
         if (!tbody) return;
-        tbody.innerHTML = `<tr><td colspan="2">Đang tải...</td></tr>`;
+        tbody.innerHTML = skeletonTemplates.upcomingShows();
 
         try {
             const url = BASE_URL + "/api/dashboard/upcoming-shows?limit=5";
@@ -406,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadRecentOrders() {
         const tbody = document.querySelector("#recent-orders-table tbody");
         if (!tbody) return;
-        tbody.innerHTML = `<tr><td colspan="3">Đang tải...</td></tr>`;
+        tbody.innerHTML = skeletonTemplates.recentOrders();
 
         try {
             const url = BASE_URL + "/api/dashboard/tickets?page=1&size=5&order=desc";
@@ -421,11 +441,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            tbody.innerHTML = arr.map(x => {
+            tbody.innerHTML = arr.map((x, index) => {
                 const statusText = x.status === 'paid' || x.status === 'sold' ? 'Đã thanh toán' : 'Đã phát hành';
                 return `
         <tr>
-          <td>${x.id ? x.id.substring(0, 8) + '...' : 'N/A'}</td>
+          <td>${index + 1}</td>
           <td>${x.event?.name || x.eventName || "N/A"}</td>
           <td><span class="chip ${x.status === 'paid' || x.status === 'sold' ? 'green' : 'warn'}">${statusText}</span></td>
         </tr>

@@ -14,6 +14,7 @@
 
 html,
 body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   height: 100%;
 }
 
@@ -56,12 +57,12 @@ body {
 /* Light mode */
 [data-theme="light"] {
   --bg-primary: #f0f4f8;
-  --bg-secondary: #ffffff;
+  --bg-secondary: #ececec;
   --bg-card: rgba(255, 255, 255, 0.9);
   --bg-card-hover: rgba(255, 255, 255, 1);
-  --text-primary: #1e293b;
+  --text-primary: #24110eed;
   --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-muted: #020202ec;
   --glass-bg: rgba(255, 255, 255, 0.95);
   --glass-border: rgba(0, 0, 0, 0.08);
   --seat-booked: #cbd5e1;
@@ -293,7 +294,7 @@ body::before {
 }
 
 .cart-table th {
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -301,7 +302,7 @@ body::before {
 }
 
 .cart-table td {
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .cart-table tbody tr {

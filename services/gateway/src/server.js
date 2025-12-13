@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import compression from 'compression'; // ✅ THÊM: Nén response (giảm ~70% bandwidth)
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import axios from "axios";
@@ -42,7 +43,10 @@ io.on("connection", (socket) => {
         console.log("[ws] client disconnected:", socket.id);
     });
 })
-app.use(express.json());
+
+// ===== MIDDLEWARE STACK (thứ tự quan trọng) =====
+app.use(compression());                          // ✅ THÊM: Nén gzip/brotli
+app.use(express.json({ limit: '10kb' }));        // ✅ SỬA: Giới hạn body 10KB chống DoS
 app.use(helmet());
 app.use(cors({
     origin: true,

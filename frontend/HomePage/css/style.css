@@ -21,12 +21,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 30px;
+  padding: 12px 32px;
+  gap: 24px;
   position: sticky;
   top: 0;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 20px rgba(46, 204, 113, 0.25);
 }
 
 .header h1 a {
@@ -44,11 +45,25 @@ body {
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
 
+/* Logo sizing - bigger logo without increasing header height */
+.header>a img,
+.header img[alt=""] {
+  width: 300px;
+  height: auto;
+  max-height: 77px;
+  /* Logo to hơn */
+  object-fit: contain;
+  margin-top: 5px;
+  margin-left: 50px;
+}
+
 /* SEARCH BAR - New Design */
 .search-bar {
   display: flex;
   align-items: center;
-  width: 420px;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -180,7 +195,7 @@ body {
 }
 
 .flag-dropdown:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255, 0, 0);
 }
 
 .flag-icon {
@@ -774,7 +789,7 @@ button,
   justify-content: center;
 }
 
-/* ===== User Menu (Header Right) ===== */
+/* ===== User Menu - Ticketbox Style ===== */
 .auth-area {
   display: flex;
   align-items: center;
@@ -785,85 +800,234 @@ button,
   position: relative;
 }
 
+/* Pill Button - No background, just avatar + text */
 .user-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
+  padding: 5px 10px 5px 5px;
+  background: transparent;
   border: none;
-  border-radius: 10 px;
+  border-radius: 50px;
   cursor: pointer;
   line-height: 1;
-  box-shadow: 0 8px 25px rgba(246, 191, 253, 0.2), 0 8px 25px rgba(0, 224, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.user-btn .user-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: #000000;
-  max-width: 160px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.user-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.user-btn .caret {
-  width: 16px;
-  height: 16px;
-}
-
+/* Avatar - Red/Coral Circle */
 .avatar,
 .avatar-fallback {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .avatar-fallback {
   display: none;
-  /* mặc định ẩn, chỉ hiện khi ảnh lỗi */
-  background: #e5e7eb;
-  /* sẽ bị override bởi inline style */
-  color: #111827;
+  background: #e74c3c;
+  color: #fff;
   font-weight: 700;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
 }
 
-/* Khi ảnh lỗi (ẩn), hiện fallback */
 .user-btn img[style*="display: none"]+.avatar-fallback {
   display: flex;
 }
 
+/* User Name - Dark text */
+.user-btn .user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fbfbfb;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+/* Caret Arrow - Dark */
+.user-btn .caret {
+  width: 14px;
+  height: 14px;
+  color: #6b7280;
+  transition: transform 0.3s ease;
+}
+
+.user-btn[aria-expanded="true"] .caret {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu - Clean White */
 .user-dropdown {
   position: absolute;
   right: 0;
-  top: calc(100% + 6px);
-  min-width: 165px;
+  top: calc(100% + 8px);
+  min-width: 200px;
   background: #fff;
-  border: 1px solid #e9edf1;
-  border-radius: 5px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.088);
-  padding: 5px;
-  z-index: 50;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.user-dropdown.show,
+.user-dropdown:not([hidden]) {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown Items with Icons */
 .user-dropdown .dropdown-item {
-  display: block;
-  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
   border-radius: 8px;
   text-decoration: none;
-  color: #0c3d52;
+  color: #374151;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .user-dropdown .dropdown-item:hover {
-  background: #f3f6f8;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.user-dropdown .dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.user-dropdown .dropdown-item:hover svg {
+  color: #374151;
+}
+
+/* Logout item - special style */
+.user-dropdown .dropdown-item.logout {
+  color: #ef4444;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.user-dropdown .dropdown-item.logout svg {
+  color: #ef4444;
+}
+
+.user-dropdown .dropdown-item.logout:hover {
+  background: #fef2f2;
+}
+
+/* ===== Language Selector - Round Flag Button ===== */
+.flag-dropdown,
+.language-selector {
+  position: relative;
+}
+
+.lang-btn,
+.flag-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #da251d;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lang-btn:hover,
+.flag-dropdown:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide the arrow */
+.flag-arrow {
+  display: none;
+}
+
+/* Vietnam Flag Star - centered pseudo-element */
+.flag-dropdown::before,
+.lang-btn::before {
+  content: '★';
+  color: #ffff00;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Hide emoji icon since we use ::before */
+.flag-icon {
+  display: none;
+}
+
+/* Language Dropdown */
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 150px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+}
+
+.lang-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: background 0.2s ease;
+}
+
+.lang-option:hover {
+  background: #f3f4f6;
+}
+
+.lang-option.active {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.lang-option .lang-flag {
+  font-size: 20px;
 }
 
 @keyframes skeleton-pulse {

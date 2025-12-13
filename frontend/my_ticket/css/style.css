@@ -19,14 +19,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  box-shadow:
-    0 8px 32px rgba(46, 204, 113, 0.3),
-    0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 12px 32px;
+  gap: 24px;
+  box-shadow: 0 4px 20px rgba(46, 204, 113, 0.25);
   position: sticky;
   top: 0;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header a img {
+  height: 50px;
+  width: auto;
+  margin-left: 50px;
 }
 
 .header h1 a {
@@ -47,59 +52,60 @@ body {
     0 0 30px rgba(46, 204, 113, 0.6);
 }
 
-/* SEARCH BAR - Glassmorphism */
+/* SEARCH BAR - White Background */
 .search-bar {
   display: flex;
   align-items: center;
   width: 400px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff;
+  border-radius: 8px;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-bar:hover {
-  width: 420px;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 40px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .search-bar input {
   flex: 1;
   border: none;
   outline: none;
-  padding: 10px 24px;
+  padding: 12px 8px;
   font-size: 15px;
   background: transparent;
-  color: #fff;
+  color: #374151;
 }
 
 .search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #9ca3af;
 }
 
 .search-bar button {
   border: none;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 10px 24px;
+  border-left: 1px solid #e5e7eb;
+  background: transparent;
+  padding: 12px 20px;
+  color: #22c55e;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .search-bar button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: #f3f4f6;
+  color: #16a34a;
 }
 
 .search-bar button svg {
-  color: #fff;
+  color: #9ca3af;
 }
 
 /* MY TICKET BUTTON */
@@ -397,9 +403,9 @@ h2 {
   gap: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   /* Tối ưu: chỉ transition các properties cần thiết */
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
@@ -805,6 +811,7 @@ h2 {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -816,9 +823,12 @@ h2 {
 /* ================================================= */
 
 .account-glass-card {
-  max-width: 600px; /* Giới hạn chiều rộng thẻ */
-  margin: 0 auto;   /* Căn giữa thẻ */
-  background: rgba(30, 30, 50, 0.6); /* Màu nền kính mờ, tối hơn */
+  max-width: 600px;
+  /* Giới hạn chiều rộng thẻ */
+  margin: 0 auto;
+  /* Căn giữa thẻ */
+  background: rgba(30, 30, 50, 0.6);
+  /* Màu nền kính mờ, tối hơn */
   backdrop-filter: blur(25px);
   border-radius: 24px;
   padding: 40px;
@@ -834,17 +844,19 @@ h2 {
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  padding: 1px; /* Độ dày của viền */
+  padding: 1px;
+  /* Độ dày của viền */
   background: linear-gradient(135deg, #e940ff, #00e0ff);
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
-  mask: 
-    linear-gradient(#fff 0 0) content-box, 
+  mask:
+    linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  pointer-events: none; /* Cho phép click xuyên qua */
+  pointer-events: none;
+  /* Cho phép click xuyên qua */
 }
 
 /* Header: Avatar + Tên */
@@ -905,7 +917,8 @@ h2 {
   font-size: 28px;
   font-weight: 700;
   color: #fff;
-  text-transform: uppercase; /* Giống ảnh mẫu */
+  text-transform: uppercase;
+  /* Giống ảnh mẫu */
   letter-spacing: 1px;
   text-shadow: 0 2px 10px rgba(23, 188, 210, 0.429);
 }
@@ -929,12 +942,14 @@ h2 {
   gap: 12px;
   font-size: 16px;
   font-weight: 500;
-  color: #bdc3c7; /* Màu label nhạt hơn */
+  color: #bdc3c7;
+  /* Màu label nhạt hơn */
 }
 
 /* Icon trong label (màu xanh/tím giống ảnh) */
 .form-group label svg {
-  color: #00e0ff; /* Màu cyan */
+  color: #00e0ff;
+  /* Màu cyan */
   width: 20px;
   height: 20px;
   flex-shrink: 0;
@@ -947,7 +962,8 @@ h2 {
   padding: 16px 20px;
   font-size: 16px;
   color: #fff;
-  background: rgba(0, 0, 0, 0.25); /* Nền input tối hơn */
+  background: rgba(0, 0, 0, 0.25);
+  /* Nền input tối hơn */
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   transition: all 0.3s ease;
@@ -1001,7 +1017,8 @@ h2 {
 @media (max-width: 768px) {
   .account-glass-card {
     padding: 32px 24px;
-    margin: 0; /* Không căn giữa trên mobile */
+    margin: 0;
+    /* Không căn giữa trên mobile */
   }
 
   #account-username-display {
@@ -1075,6 +1092,7 @@ h2 {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1085,6 +1103,7 @@ h2 {
     transform: scale(0.8);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;

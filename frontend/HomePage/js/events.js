@@ -433,7 +433,7 @@ function buildLoggedOutHTML() {
   `;
 }
 
-function buildLoggedInHTML(displayName, avatarUrl, initials = 'U', bg = '#e5e7eb') {
+function buildLoggedInHTML(displayName, avatarUrl, initials = 'U', bg = '#f07167') {
   return `
     <div class="user-menu">
       <button class="user-btn" type="button" aria-haspopup="true" aria-expanded="false">
@@ -442,15 +442,42 @@ function buildLoggedInHTML(displayName, avatarUrl, initials = 'U', bg = '#e5e7eb
         <div class="avatar-fallback" title="${displayName}" style="background:${bg};">
           ${initials}
         </div>
-        <span class="user-name">${displayName}</span>
+        <span class="user-name">Tài khoản</span>
         <svg class="caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
       <div class="user-dropdown" hidden>
-        <a href="#" class="dropdown-item" id="gotoMyTickets">Vé của tôi</a>
-        <a href="#" class="dropdown-item" id="logoutBtn">Đăng xuất</a>
+        <a href="#" class="dropdown-item" id="gotoMyTickets">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+          </svg>
+          Vé của tôi
+        </a>
+        <a href="../../Ticketbox/code/my-events.html" class="dropdown-item">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/>
+            <line x1="3" x2="21" y1="10" y2="10"/>
+          </svg>
+          Sự kiện của tôi
+        </a>
+        <a href="../../my_ticket/source/my_ticket.html" class="dropdown-item">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="5"/>
+            <path d="M20 21a8 8 0 0 0-16 0"/>
+          </svg>
+          Tài khoản của tôi
+        </a>
+        <a href="#" class="dropdown-item logout" id="logoutBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
+          </svg>
+          Đăng xuất
+        </a>
       </div>
     </div>
   `;

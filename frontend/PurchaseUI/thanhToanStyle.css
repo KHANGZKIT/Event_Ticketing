@@ -64,76 +64,85 @@ body {
 
 /* ============ HEADER ============ */
 .header {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.95) 0%, rgba(22, 163, 74, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.95) 0%, rgba(39, 174, 96, 0.95) 100%);
   backdrop-filter: blur(20px);
   color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 60px;
+  padding: 12px 32px;
+  gap: 24px;
   position: sticky;
   top: 0;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 20px rgba(46, 204, 113, 0.25);
 }
 
 .header a img {
   height: 50px;
   width: auto;
+  margin-left: 50px;
 }
 
 /* Search Bar */
 .search-bar {
   display: flex;
-  width: 380px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-  transition: all 0.4s ease;
-}
-
-.search-bar:hover {
+  align-items: center;
   width: 400px;
-  box-shadow: 0 12px 40px rgba(34, 197, 94, 0.3);
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-bar input {
   flex: 1;
   border: none;
   outline: none;
-  padding: 14px 20px;
+  padding: 12px 8px;
   background: transparent;
-  color: #fff;
+  color: #374151;
   font-size: 15px;
 }
 
 .search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #9ca3af;
 }
 
 .search-bar button {
-  background: rgba(255, 255, 255, 0.2);
+  background: transparent;
   border: none;
-  padding: 14px 20px;
+  border-left: 1px solid #e5e7eb;
+  padding: 12px 20px;
+  color: #22c55e;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .search-bar button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  background: #f3f4f6;
+  color: #16a34a;
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #9ca3af;
 }
 
 .search-bar svg {
-  width: 20px;
-  height: 20px;
-  color: #fff;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
 }
 
 /* My Ticket & Buttons */
@@ -210,66 +219,191 @@ body {
   align-items: center;
 }
 
-/* User Menu */
+/* User Menu - Redesigned */
 .user-menu {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .user-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.15);
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(20px);
-  padding: 6px 12px;
+  padding: 6px 14px 6px 6px;
   border-radius: 999px;
   cursor: pointer;
   line-height: 1;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .user-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .user-btn .user-name {
   font-weight: 600;
   font-size: 14px;
   color: #fff;
-  max-width: 160px;
+  max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.02em;
 }
 
 .user-btn .caret {
-  width: 16px;
-  height: 16px;
-  color: #fff;
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: transform 0.3s ease;
 }
 
+.user-btn[aria-expanded="true"] .caret {
+  transform: rotate(180deg);
+}
+
+/* Avatar - Redesigned */
 .avatar,
 .avatar-fallback {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6) border-box;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-btn:hover .avatar,
+.user-btn:hover .avatar-fallback {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.4);
 }
 
 .avatar-fallback {
   display: none;
-  background: #e5e7eb;
-  color: #111827;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #fff;
   font-weight: 700;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   text-transform: uppercase;
+  border: none;
 }
 
 .user-btn img[style*="display: none"]+.avatar-fallback {
   display: flex;
+}
+
+/* Language Selector - New Component */
+.language-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.lang-flag {
+  width: 24px;
+  height: 18px;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.lang-code {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.lang-caret {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+.lang-btn[aria-expanded="true"] .lang-caret {
+  transform: rotate(180deg);
+}
+
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 140px;
+  background: #fff;
+  border: 1px solid #e9edf1;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  z-index: 60;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+}
+
+.lang-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.lang-option:hover {
+  background: #f3f4f6;
+}
+
+.lang-option.active {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+  color: #16a34a;
+}
+
+.lang-option .lang-flag {
+  width: 22px;
+  height: 16px;
 }
 
 .user-dropdown {
