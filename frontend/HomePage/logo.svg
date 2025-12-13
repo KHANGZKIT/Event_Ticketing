@@ -1,30 +1,72 @@
-<svg width="240" height="56" viewBox="0 0 240 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="TicketBook Logo">
+<svg width="230" height="44" viewBox="0 0 230 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="TicketBook Logo">
   <defs>
-    <linearGradient id="tbGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#10B981"/>
+    <!-- Aurora Gradient Animation -->
+    <linearGradient id="auroraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c2ff">
+        <animate attributeName="stop-color" values="#00c2ff;#33ff8c;#ffc640;#e54cff;#00c2ff" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%" stop-color="#33ff8c">
+        <animate attributeName="stop-color" values="#33ff8c;#ffc640;#e54cff;#00c2ff;#33ff8c" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#e54cff">
+        <animate attributeName="stop-color" values="#e54cff;#00c2ff;#33ff8c;#ffc640;#e54cff" dur="6s" repeatCount="indefinite"/>
+      </stop>
     </linearGradient>
-    <filter id="tbShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.15"/>
+    
+    <!-- Glow Filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow Filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00c2ff" flood-opacity="0.3">
+        <animate attributeName="flood-color" values="#00c2ff;#33ff8c;#e54cff;#00c2ff" dur="6s" repeatCount="indefinite"/>
+      </feDropShadow>
     </filter>
   </defs>
 
-  <!-- ICON vé -->
-  <g filter="url(#tbShadow)" transform="translate(6,6)">
-    <!-- Thân vé -->
-    <path d="M8 6a6 6 0 0 1 6-6h60a6 6 0 0 1 6 6v6a6 6 0 0 0 0 12v6a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6v-6a6 6 0 0 0 0-12V6z" fill="url(#tbGrad)"/>
-    <!-- Đường răng cưa -->
-    <path d="M44 4v28" stroke="white" stroke-width="2" stroke-dasharray="3 4" opacity=".85"/>
-    <!-- Ngôi sao: căn giữa phần phải, nâng cao lên -->
-    <path d="M62 6l3.6 6.8 7.5 1.1-5.4 5.3 1.3 7.2-6.9-3.5-6.9 3.5 1.3-7.2-5.4-5.3 7.5-1.1L62 6z"
-          fill="white" opacity=".95"/>
+  <!-- Animated Ticket Icon -->
+  <g filter="url(#shadow)" transform="translate(4,4)">
+    <!-- Main Ticket Body with Aurora Gradient -->
+    <path d="M6 4.5a4.5 4.5 0 0 1 4.5-4.5h45a4.5 4.5 0 0 1 4.5 4.5v4.5a4.5 4.5 0 0 0 0 9v4.5a4.5 4.5 0 0 1-4.5 4.5h-45a4.5 4.5 0 0 1-4.5-4.5v-4.5a4.5 4.5 0 0 0 0-9V4.5z" 
+          fill="url(#auroraGrad)">
+      <animate attributeName="opacity" values="0;1" dur="0.5s" fill="freeze"/>
+    </path>
+    
+    <!-- Dashed Line -->
+    <path d="M33 3v21" stroke="white" stroke-width="1.5" stroke-dasharray="2.5 3" opacity="0.85">
+      <animate attributeName="stroke-dashoffset" values="0;11" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Star with Pulse -->
+    <g filter="url(#glow)">
+      <path d="M47 4.5l2.7 5.1 5.6.8-4 4 1 5.4-5.2-2.6-5.2 2.6 1-5.4-4-4 5.6-.8L47 4.5z" fill="white" opacity="0.95">
+        <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+      </path>
+    </g>
   </g>
 
-  <!-- Wordmark -->
-  <g transform="translate(92,17)">
-    <text x="0" y="17" font-family="Poppins, Segoe UI, Arial" font-size="22" font-weight="700" fill="#fff">
-      <tspan>Ticket</tspan><tspan fill="url(#tbGrad)">Book</tspan>
+  <!-- Main Text - Big and Bold -->
+  <g transform="translate(72, 29)">
+    <text font-family="Inter, Poppins, Segoe UI, Arial" font-size="26" font-weight="800" 
+          fill="#ffffff" stroke="#1e293b" stroke-width="0.5" paint-order="stroke fill">
+      <tspan>Ticket</tspan><tspan fill="url(#auroraGrad)" stroke="none">Book</tspan>
+      <animate attributeName="opacity" values="0;1" dur="0.5s" fill="freeze"/>
     </text>
-    <text x="0" y="34" font-family="Poppins, Segoe UI, Arial" font-size="10" fill="#ffffffff" letter-spacing=".08em">EVENT PLATFORM</text>
+  </g>
+  
+  <!-- Floating particles -->
+  <g opacity="0.5">
+    <circle cx="68" cy="8" r="1.2" fill="#00c2ff">
+      <animate attributeName="cy" values="8;5;8" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="195" cy="36" r="1" fill="#33ff8c">
+      <animate attributeName="cy" values="36;32;36" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
   </g>
 </svg>

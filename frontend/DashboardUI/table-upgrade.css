@@ -1,18 +1,17 @@
 /* ============================================ */
 /* 🎨 MODERN TABLE UPGRADE - TicketBook Dashboard */
+/* Clean Light/Dark Mode Design */
 /* ============================================ */
 
-/* Cards Container cho các bảng */
+/* ===== LIGHT MODE (Default) ===== */
 .recent-orders-card,
 .top-events-card,
 .upcoming-events-card {
     background: #ffffff;
-    border-radius: 5px;
+    border-radius: 16px;
     padding: 0;
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -20,29 +19,27 @@
 .recent-orders-card:hover,
 .top-events-card:hover,
 .upcoming-events-card:hover {
-    box-shadow:
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
 
-/* Card Header */
+/* Card Header - Purple gradient for both modes */
 .card-head {
-    padding: 10px 12px;
+    padding: 14px 20px;
     background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     color: white;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
     border-bottom: none;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .card-head::before {
     content: "📋";
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .top-events-card .card-head::before {
@@ -53,38 +50,34 @@
     content: "📅";
 }
 
-/* Table Styling */
+/* Table Styling - Light Mode */
 .data-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
 }
 
 .data-table thead {
-    background: linear-gradient(to right, #f8fafc, #f1f5f9);
-    border-bottom: 2px solid #e2e8f0;
+    background: #f8f9fc;
 }
 
 .data-table thead th {
-    padding: 16px 20px;
+    padding: 14px 20px;
     text-align: left;
-    font-size: 13px;
-    font-weight: 700;
-    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .data-table tbody tr {
-    border-bottom: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s ease;
 }
 
 .data-table tbody tr:hover {
-    background: linear-gradient(to right, #f8fafc, #ffffff);
-    transform: scale(1.01);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #f9fafb;
 }
 
 .data-table tbody tr:last-child {
@@ -92,36 +85,36 @@
 }
 
 .data-table tbody td {
-    padding: 16px 20px;
+    padding: 14px 20px;
     font-size: 14px;
-    color: #1e293b;
+    color: #374151;
 }
 
-/* ID Column - Monospace */
+/* STT Column */
 .data-table tbody td:first-child {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: #64748b;
     font-weight: 600;
+    color: #6b7280;
+    text-align: center;
+    width: 50px;
 }
 
-/* Event Name Column - Highlight */
+/* Event Name Column */
 .data-table tbody td:nth-child(2) {
-    font-weight: 600;
-    color: #0f172a;
-    max-width: 300px;
+    font-weight: 500;
+    color: #111827;
+    max-width: 280px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Badge for numbers/counts */
+/* Badge/Chip styling */
 .badge {
     display: inline-block;
     padding: 4px 12px;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
@@ -129,57 +122,218 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #94a3b8;
+    padding: 40px 20px;
+    color: #9ca3af;
 }
 
 .empty-state-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: 40px;
+    margin-bottom: 12px;
     opacity: 0.5;
 }
 
 .empty-state-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ===== DARK MODE ===== */
+body.dark-mode .recent-orders-card,
+body.dark-mode .top-events-card,
+body.dark-mode .upcoming-events-card {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .recent-orders-card:hover,
+body.dark-mode .top-events-card:hover,
+body.dark-mode .upcoming-events-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .data-table thead {
+    background: rgba(51, 65, 85, 0.6);
+}
+
+body.dark-mode .data-table thead th {
+    color: #94a3b8;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .data-table tbody tr {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .data-table tbody td {
+    color: #e2e8f0;
+}
+
+body.dark-mode .data-table tbody td:first-child {
+    color: #94a3b8;
+}
+
+body.dark-mode .data-table tbody td:nth-child(2) {
+    color: #f1f5f9;
+}
+
+body.dark-mode .empty-state,
+body.dark-mode .empty-state-text {
+    color: #94a3b8;
+}
+
+/* Scrollbar - Light Mode */
+.table-container {
+    overflow-x: auto;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Scrollbar - Dark Mode */
+body.dark-mode .table-container::-webkit-scrollbar-track {
+    background: rgba(30, 41, 59, 0.5);
+}
+
+body.dark-mode .table-container::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+}
+
+body.dark-mode .table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .card-head {
-        font-size: 16px;
-        padding: 16px 20px;
+        font-size: 14px;
+        padding: 12px 16px;
     }
 
     .data-table thead th,
     .data-table tbody td {
-        padding: 12px 16px;
+        padding: 10px 14px;
         font-size: 13px;
     }
 }
 
-/* Scrollable table container */
-.table-container {
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
+/* ============================================ */
+/* 🦴 SKELETON LOADING ANIMATION */
+/* ============================================ */
+
+/* Keyframe animation for shimmer effect */
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
 }
 
-.table-container::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+/* Skeleton row container */
+.skeleton-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 16px;
+    border-bottom: 1px solid #f3f4f6;
 }
 
-.table-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
+.skeleton-row:last-child {
+    border-bottom: none;
 }
 
-.table-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
+/* Skeleton bone element */
+.skeleton-bone {
+    background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+    background-size: 200px 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: 6px;
 }
 
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+/* Different bone sizes */
+.skeleton-bone.small {
+    width: 40px;
+    height: 16px;
+}
+
+.skeleton-bone.medium {
+    width: 120px;
+    height: 16px;
+}
+
+.skeleton-bone.large {
+    width: 200px;
+    height: 16px;
+    flex: 1;
+    max-width: 280px;
+}
+
+.skeleton-bone.chip {
+    width: 80px;
+    height: 24px;
+    border-radius: 12px;
+}
+
+.skeleton-bone.price {
+    width: 100px;
+    height: 18px;
+}
+
+/* Dark mode skeleton */
+body.dark-mode .skeleton-row {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .skeleton-bone {
+    background: linear-gradient(90deg, #334155 0%, #475569 50%, #334155 100%);
+    background-size: 200px 100%;
+}
+
+/* Skeleton loading container */
+.skeleton-container {
+    padding: 0;
+}
+
+/* Pulse animation alternative */
+@keyframes skeleton-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.skeleton-pulse {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
