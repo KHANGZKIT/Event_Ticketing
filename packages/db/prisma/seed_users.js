@@ -1,6 +1,8 @@
 // packages/db/prisma/seed_users.js
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
+
 const prisma = new PrismaClient();
 
 /* Tên tiếng Việt phổ biến */
@@ -12,6 +14,7 @@ const FIRST = ["An", "Anh", "Bình", "Châu", "Chi", "Dũng", "Duy", "Giang", "H
 const removeDiacritics = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d");
 const slug = (s) => removeDiacritics(s).toLowerCase().replace(/[^a-z\s]/g, "").trim().replace(/\s+/g, ".");
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const randLetters = (n = 2) => Array.from({ length: n }, () => String.fromCharCode(97 + Math.floor(Math.random() * 26))).join("");
 
 function makeFullName() { return `${pick(LAST)} ${pick(MIDDLE)} ${pick(FIRST)}`; }
@@ -28,14 +31,27 @@ function makeEmailFromName(fullName, taken) {
     return email;
 }
 
+// Generate a random seat ID like "A1", "B5", "C12"
+function generateSeatId(usedSeats) {
+    const rows = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let seatId;
+    let attempts = 0;
+    do {
+        const row = rows[Math.floor(Math.random() * 10)]; // A-J
+        const num = randInt(1, 20);
+        seatId = `${row}${num}`;
+        attempts++;
+    } while (usedSeats.has(seatId) && attempts < 100);
+    usedSeats.add(seatId);
+    return seatId;
+}
+
 async function main() {
-    const COUNT = 400;
+    const USER_COUNT = randInt(100, 150); // 100-150 users
     const DEFAULT_PW = "Password@123";
     const pwHash = await bcrypt.hash(DEFAULT_PW, 8);
 
-    // Giữ admin, xoá user cũ khác nếu muốn làm sạch
-    await prisma.userRole.deleteMany({ where: { user: { email: { not: "admin@gmail.com" } } } });
-    await prisma.user.deleteMany({ where: { email: { not: "admin@gmail.com" } } });
+    console.log(`🚀 Starting seed: ${USER_COUNT} users with orders...`);
 
     // Đảm bảo role 'user' tồn tại
     const roleUser = await prisma.role.upsert({
@@ -45,15 +61,31 @@ async function main() {
         select: { id: true },
     });
 
+    // Lấy danh sách shows có sẵn
+    const shows = await prisma.show.findMany({
+        where: { deletedAt: null },
+        select: { id: true, eventId: true },
+        take: 50
+    });
+
+    if (shows.length === 0) {
+        console.warn("⚠️ No shows found. Please seed events/shows first. Skipping order creation.");
+    }
+
     const taken = new Set();
-    const ops = [];
-    for (let i = 0; i < COUNT; i++) {
+    const usedSeatsPerShow = new Map(); // showId -> Set of used seatIds
+
+    let totalOrders = 0;
+    let totalTickets = 0;
+
+    for (let i = 0; i < USER_COUNT; i++) {
         const fullName = makeFullName();
         const email = makeEmailFromName(fullName, taken);
 
-        // Tạo user + gán role qua bảng nối UserRole (nested create)
-        ops.push(
-            prisma.user.create({
+        // Tạo user + gán role (skip nếu email đã tồn tại)
+        let user;
+        try {
+            user = await prisma.user.create({
                 data: {
                     email,
                     passwordHash: pwHash,
@@ -62,12 +94,95 @@ async function main() {
                         create: [{ role: { connect: { id: roleUser.id } } }],
                     },
                 },
-            })
-        );
+            });
+        } catch (err) {
+            if (err.code === 'P2002') {
+                // Email already exists, skip
+                continue;
+            }
+            throw err;
+        }
+
+        // Nếu có shows, tạo 1-2 orders cho user
+        if (shows.length > 0) {
+            const numOrders = randInt(1, 2); // 1-2 orders per user
+
+            for (let o = 0; o < numOrders; o++) {
+                const show = pick(shows);
+                const numSeats = randInt(1, 2); // 1-2 seats per order
+                const pricePerSeat = randInt(100000, 500000); // 100k - 500k VND
+
+                // Get or create used seats set for this show
+                if (!usedSeatsPerShow.has(show.id)) {
+                    usedSeatsPerShow.set(show.id, new Set());
+                }
+                const usedSeats = usedSeatsPerShow.get(show.id);
+
+                // Generate unique seat IDs for this order
+                const seatIds = [];
+                for (let s = 0; s < numSeats; s++) {
+                    seatIds.push(generateSeatId(usedSeats));
+                }
+
+                const totalAmount = pricePerSeat * numSeats;
+
+                try {
+                    // Tạo Order với status 'paid'
+                    const order = await prisma.order.create({
+                        data: {
+                            userId: user.id,
+                            showId: show.id,
+                            amount: totalAmount,
+                            status: "paid",
+                            currency: "VND",
+                        }
+                    });
+
+                    // Tạo Tickets cho order
+                    for (const seatId of seatIds) {
+                        await prisma.ticket.create({
+                            data: {
+                                showId: show.id,
+                                seatId: seatId,
+                                orderId: order.id,
+                                code: randomUUID().slice(0, 8).toUpperCase(),
+                            }
+                        });
+                        totalTickets++;
+                    }
+
+                    // Tạo Payment cho order
+                    await prisma.payment.create({
+                        data: {
+                            orderId: order.id,
+                            provider: pick(["vnpay", "momo", "zalopay"]),
+                            amount: totalAmount,
+                            currency: "VND",
+                            status: "succeeded",
+                            paidAt: new Date(Date.now() - randInt(1, 30) * 24 * 60 * 60 * 1000), // 1-30 days ago
+                        }
+                    });
+
+                    totalOrders++;
+                } catch (err) {
+                    // Skip if duplicate seat (unique constraint)
+                    if (err.code !== 'P2002') {
+                        console.warn(`⚠️ Error creating order for user ${email}:`, err.message);
+                    }
+                }
+            }
+        }
+
+        if ((i + 1) % 20 === 0) {
+            console.log(`   ✓ Created ${i + 1}/${USER_COUNT} users...`);
+        }
     }
 
-    await prisma.$transaction(ops, { timeout: 60000 });
-    console.log(`✓ Created ${COUNT} users, all with role 'user'. Default password: ${DEFAULT_PW}`);
+    console.log(`\n✅ Seed completed!`);
+    console.log(`   - Users: ${USER_COUNT}`);
+    console.log(`   - Orders: ${totalOrders}`);
+    console.log(`   - Tickets: ${totalTickets}`);
+    console.log(`   - Default password: ${DEFAULT_PW}`);
 }
 
 main()

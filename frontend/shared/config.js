@@ -7,8 +7,15 @@ const API_CONFIG = {
     // Local development URL
     LOCAL_URL: 'http://localhost:4000',
 
+    // Set to true to always use production API (for testing production from localhost)
+    FORCE_PRODUCTION: true,
+
     // Detect environment
     get BASE_URL() {
+        // Force production mode
+        if (this.FORCE_PRODUCTION) {
+            return this.PRODUCTION_URL;
+        }
         // If running on localhost, use local API
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return this.LOCAL_URL;
