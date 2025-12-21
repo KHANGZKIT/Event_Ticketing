@@ -126,8 +126,12 @@ async function main() {
 
                 const totalAmount = pricePerSeat * numSeats;
 
+                // Random date trong 30 ngày gần đây
+                const daysAgo = randInt(1, 30);
+                const orderDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+
                 try {
-                    // Tạo Order với status 'paid'
+                    // Tạo Order với status 'paid' và createdAt spread
                     const order = await prisma.order.create({
                         data: {
                             userId: user.id,
@@ -135,10 +139,12 @@ async function main() {
                             amount: totalAmount,
                             status: "paid",
                             currency: "VND",
+                            createdAt: orderDate,
+                            updatedAt: orderDate,
                         }
                     });
 
-                    // Tạo Tickets cho order
+                    // Tạo Tickets cho order với cùng ngày
                     for (const seatId of seatIds) {
                         await prisma.ticket.create({
                             data: {
@@ -146,6 +152,8 @@ async function main() {
                                 seatId: seatId,
                                 orderId: order.id,
                                 code: randomUUID().slice(0, 8).toUpperCase(),
+                                createdAt: orderDate,
+                                updatedAt: orderDate,
                             }
                         });
                         totalTickets++;
@@ -159,7 +167,9 @@ async function main() {
                             amount: totalAmount,
                             currency: "VND",
                             status: "succeeded",
-                            paidAt: new Date(Date.now() - randInt(1, 30) * 24 * 60 * 60 * 1000), // 1-30 days ago
+                            paidAt: orderDate,
+                            createdAt: orderDate,
+                            updatedAt: orderDate,
                         }
                     });
 

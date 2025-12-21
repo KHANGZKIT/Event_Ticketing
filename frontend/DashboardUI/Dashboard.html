@@ -348,11 +348,107 @@
 
       <section id="page-reports" class="hidden" data-page="reports">
         <div class="section-title">
-          <h3><i class="fa-solid fa-chart-line"></i> Báo cáo</h3>
+          <h3><i class="fa-solid fa-chart-line"></i> Báo cáo Doanh thu</h3>
         </div>
-        <div class="card">
+
+        <!-- Bộ lọc báo cáo -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-head">Chọn khoảng thời gian</div>
           <div class="card-body">
-            <p>Trang cài đặt đang được xây dựng.</p>
+            <div class="report-filters" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+              <div class="filter-group">
+                <label for="report-start-date">Từ ngày</label>
+                <input type="date" id="report-start-date" class="form-control">
+              </div>
+              <div class="filter-group">
+                <label for="report-end-date">Đến ngày</label>
+                <input type="date" id="report-end-date" class="form-control">
+              </div>
+              <div class="filter-group">
+                <label for="report-group">Nhóm theo</label>
+                <select id="report-group" class="form-control">
+                  <option value="day">Ngày</option>
+                  <option value="week">Tuần</option>
+                  <option value="month">Tháng</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="btn-view-report">
+                <i class="fa-solid fa-magnifying-glass-chart"></i> Xem báo cáo
+              </button>
+              <button class="btn btn-success" id="btn-export-excel">
+                <i class="fa-solid fa-file-excel"></i> Xuất Excel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs tổng hợp -->
+        <div id="report-kpis" class="kpi-grid" style="margin-bottom: 20px;">
+          <div class="kpi">
+            <h4>Tổng doanh thu</h4>
+            <p id="report-kpi-revenue">0 VND</p>
+          </div>
+          <div class="kpi">
+            <h4>Tổng đơn hàng</h4>
+            <p id="report-kpi-orders">0</p>
+          </div>
+          <div class="kpi">
+            <h4>Tổng vé bán</h4>
+            <p id="report-kpi-tickets">0</p>
+          </div>
+          <div class="kpi">
+            <h4>Tỷ lệ thành công</h4>
+            <p id="report-kpi-success">0%</p>
+          </div>
+        </div>
+
+        <!-- Biểu đồ doanh thu -->
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div class="card">
+            <div class="card-head">Biểu đồ Doanh thu theo thời gian</div>
+            <div class="card-body">
+              <canvas id="report-revenue-chart" height="250"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">Biểu đồ Số vé bán theo thời gian</div>
+            <div class="card-body">
+              <canvas id="report-tickets-chart" height="250"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng thống kê chi tiết -->
+        <div class="card">
+          <div class="card-head">Bảng thống kê chi tiết theo ngày</div>
+          <div class="card-body">
+            <div id="report-loading" style="display: none; text-align: center; padding: 20px;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--primary-color);"></i>
+              <p>Đang tải dữ liệu báo cáo...</p>
+            </div>
+            <div id="report-empty" style="display: none; text-align: center; padding: 40px; color: #888;">
+              <i class="fa-solid fa-chart-pie" style="font-size: 48px; margin-bottom: 16px;"></i>
+              <p>Chọn khoảng thời gian và bấm "Xem báo cáo" để hiển thị dữ liệu.</p>
+            </div>
+            <table id="report-table" class="table" style="display: none;">
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Doanh thu (VND)</th>
+                  <th>Số đơn hàng</th>
+                  <th>Số vé bán</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr style="font-weight: bold; background: var(--primary-color-light, #f0f0ff);">
+                  <td>TỔNG CỘNG</td>
+                  <td id="report-total-revenue">0</td>
+                  <td id="report-total-orders">0</td>
+                  <td id="report-total-tickets">0</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
       </section>

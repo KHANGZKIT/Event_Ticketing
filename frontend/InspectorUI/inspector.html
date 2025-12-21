@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Inspector - Event Ticketing</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inspector.css">
+</head>
+
+<body class="dark-mode">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1><i class="fas fa-qrcode"></i> Ticket Inspector</h1>
+            <p>Quét mã QR hoặc tải ảnh vé để check-in</p>
+        </div>
+        <div class="header-right">
+            <span id="user-info" class="user-badge">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Staff</span>
+            </span>
+            <button id="logout-btn" class="btn btn-outline">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Upload Zone -->
+        <section class="upload-section">
+            <div id="upload-zone" class="upload-zone">
+                <input type="file" id="qr-input" accept="image/*" hidden>
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p class="upload-text">Kéo thả ảnh QR vào đây</p>
+                <p class="upload-subtext">hoặc <span class="upload-link">click để chọn file</span></p>
+                <p class="upload-formats">Hỗ trợ: PNG, JPG, JPEG</p>
+            </div>
+
+            <!-- Preview Area -->
+            <div id="preview-area" class="preview-area hidden">
+                <img id="preview-image" src="" alt="QR Preview">
+                <button id="clear-btn" class="btn-clear">
+                    <i class="fas fa-times"></i> Xóa
+                </button>
+            </div>
+        </section>
+
+        <!-- Manual Input -->
+        <section class="manual-section">
+            <div class="divider">
+                <span>hoặc nhập thủ công</span>
+            </div>
+            <div class="manual-input-group">
+                <input type="text" id="ticket-id-input" placeholder="Nhập Ticket ID...">
+                <button id="manual-checkin-btn" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Check-in
+                </button>
+            </div>
+        </section>
+
+        <!-- Result Display -->
+        <section id="result-section" class="result-section hidden">
+            <div id="result-card" class="result-card">
+                <!-- Success State -->
+                <div class="result-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 id="result-title" class="result-title">Check-in thành công!</h2>
+                <p id="result-message" class="result-message">Vé đã được xác nhận</p>
+
+                <!-- Ticket Info -->
+                <div id="ticket-info" class="ticket-info">
+                    <div class="info-row">
+                        <span class="info-label">Ticket ID</span>
+                        <span id="info-ticket-id" class="info-value">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ghế</span>
+                        <span id="info-seat" class="info-value">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Thời gian check-in</span>
+                        <span id="info-time" class="info-value">-</span>
+                    </div>
+                </div>
+
+                <button id="reset-btn" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Check-in vé khác
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="inspector.js"></script>
+</body>
+
+</html>

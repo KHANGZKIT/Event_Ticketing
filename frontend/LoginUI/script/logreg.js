@@ -202,11 +202,17 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
         // 3) Redirect theo quyền
-        if (isAdminFrom(me)) {
+        const roles = Array.isArray(me?.roles) ? me.roles : (me?.user?.roles || []);
+        const rolesLower = roles.map(r => String(r).toLowerCase());
+
+        if (rolesLower.includes('admin')) {
           // admin → Dashboard
           window.location.href = toURL("../DashboardUI/Dashboard.html");
+        } else if (rolesLower.includes('ticket_inspector') || rolesLower.includes('staff')) {
+          // ticket_inspector hoặc staff → Inspector page
+          window.location.href = "/frontend/InspectorUI/inspector.html";
         } else {
-          // user thường → Home (đổi path nếu bạn muốn)
+          // user thường → Home
           window.location.href = "/frontend/HomePage/source/TrangChu.html";
         }
       } catch (err) {

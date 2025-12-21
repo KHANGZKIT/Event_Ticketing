@@ -44,3 +44,27 @@ redisDebugRouter.get('/debug/redis/keys', async (req, res) => {
     res.json({ warning: 'DEV ONLY: KEYS blocks on big keyspace', keys });
 });
 
+/** DELETE /debug/redis/holds - Clear all holds for testing */
+redisDebugRouter.delete('/debug/redis/holds', async (req, res) => {
+    const redis = getRedis();
+
+    // Find and delete all hold:* keys
+    const holdKeys = await redis.keys('hold:*');
+    const heldKeys = await redis.keys('held:*');
+    const lockKeys = await redis.keys('lock:*');
+
+    let deleted = 0;
+    const allKeys = [...holdKeys, ...heldKeys, ...lockKeys];
+
+    if (allKeys.length > 0) {
+        deleted = await redis.del(...allKeys);
+    }
+
+    res.json({
+        ok: true,
+        deleted,
+        holdKeys: holdKeys.length,
+        heldKeys: heldKeys.length,
+        lockKeys: lockKeys.length
+    });
+});

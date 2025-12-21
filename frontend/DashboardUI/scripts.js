@@ -1339,6 +1339,324 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // ====== REPORTS PAGE ======
+    let reportRevenueChart = null;
+    let reportTicketsChart = null;
+    let reportData = { revenue: [], tickets: [], kpis: {} };
+
+    // Set default dates (last 30 days)
+    function initReportDates() {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+
+        const startInput = document.getElementById("report-start-date");
+        const endInput = document.getElementById("report-end-date");
+
+        if (startInput) startInput.value = startDate.toISOString().split("T")[0];
+        if (endInput) endInput.value = endDate.toISOString().split("T")[0];
+    }
+
+    async function loadReports() {
+        const startInput = document.getElementById("report-start-date");
+        const endInput = document.getElementById("report-end-date");
+        const groupSelect = document.getElementById("report-group");
+        const loading = document.getElementById("report-loading");
+        const empty = document.getElementById("report-empty");
+        const table = document.getElementById("report-table");
+
+        if (!startInput?.value || !endInput?.value) {
+            alert("Vui lòng chọn khoảng thời gian!");
+            return;
+        }
+
+        const startDate = startInput.value;
+        const endDate = endInput.value;
+        const group = groupSelect?.value || "day";
+
+        // Show loading
+        if (loading) loading.style.display = "block";
+        if (empty) empty.style.display = "none";
+        if (table) table.style.display = "none";
+
+        try {
+            // Calculate days difference for period param
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+            let periodParam = "all";
+            if (daysDiff <= 7) periodParam = "7";
+            else if (daysDiff <= 30) periodParam = "30";
+            else if (daysDiff <= 90) periodParam = "90";
+
+            // Fetch data from existing APIs
+            const [kpisRes, revenueRes, ticketsRes] = await Promise.all([
+                apiFetch(BASE_URL + "/api/dashboard/kpis?period=" + periodParam),
+                apiFetch(BASE_URL + "/api/dashboard/revenue?period=" + periodParam + "&group=" + group),
+                apiFetch(BASE_URL + "/api/dashboard/ticket-sales?period=" + periodParam + "&group=" + group),
+            ]);
+
+            let kpis = {};
+            let revenueSeries = [];
+            let ticketsSeries = [];
+
+            if (kpisRes?.ok) kpis = await kpisRes.json();
+            if (revenueRes?.ok) revenueSeries = await revenueRes.json();
+            if (ticketsRes?.ok) ticketsSeries = await ticketsRes.json();
+
+            // Filter by date range
+            revenueSeries = safeArray(revenueSeries).filter(r => r.date >= startDate && r.date <= endDate);
+            ticketsSeries = safeArray(ticketsSeries).filter(r => r.date >= startDate && r.date <= endDate);
+
+            // Store for export
+            reportData = { revenue: revenueSeries, tickets: ticketsSeries, kpis };
+
+            // Render KPIs
+            renderReportKPIs(kpis);
+
+            // Render Charts
+            renderReportRevenueChart(revenueSeries, group);
+            renderReportTicketsChart(ticketsSeries, group);
+
+            // Render Table
+            renderReportTable(revenueSeries, ticketsSeries);
+
+            if (loading) loading.style.display = "none";
+            if (revenueSeries.length === 0 && ticketsSeries.length === 0) {
+                if (empty) {
+                    empty.style.display = "block";
+                    empty.querySelector("p").textContent = "Không có dữ liệu trong khoảng thời gian đã chọn.";
+                }
+            }
+
+        } catch (e) {
+            console.error("loadReports error:", e);
+            if (loading) loading.style.display = "none";
+            if (empty) {
+                empty.style.display = "block";
+                empty.querySelector("p").textContent = "Lỗi tải dữ liệu: " + e.message;
+            }
+        }
+    }
+
+    function renderReportKPIs(kpis) {
+        const revenue = document.getElementById("report-kpi-revenue");
+        const orders = document.getElementById("report-kpi-orders");
+        const tickets = document.getElementById("report-kpi-tickets");
+        const success = document.getElementById("report-kpi-success");
+
+        if (revenue) revenue.textContent = fmtVND(kpis.totalRevenue || 0) + " VND";
+        if (orders) orders.textContent = fmtVND(kpis.totalOrders || 0);
+        if (tickets) tickets.textContent = fmtVND(kpis.ticketsSold || 0);
+        if (success) success.textContent = round1(kpis.successRate || 0) + "%";
+    }
+
+    function renderReportRevenueChart(series, group) {
+        const el = document.getElementById("report-revenue-chart");
+        if (!el || typeof Chart === "undefined") return;
+
+        if (reportRevenueChart) {
+            try { reportRevenueChart.destroy(); } catch (e) { }
+            reportRevenueChart = null;
+        }
+
+        const ctx = el.getContext("2d");
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, "rgba(124, 93, 250, 0.5)");
+        gradient.addColorStop(1, "rgba(124, 93, 250, 0.05)");
+
+        const labels = series.map(x => x.date);
+        const data = series.map(x => Number(x.amount || 0));
+        const unit = group === "week" ? "tuần" : group === "month" ? "tháng" : "ngày";
+
+        reportRevenueChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Doanh thu theo " + unit,
+                    data,
+                    borderColor: "#7C5DFA",
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => fmtVND(ctx.parsed.y) + " đ"
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderReportTicketsChart(series, group) {
+        const el = document.getElementById("report-tickets-chart");
+        if (!el || typeof Chart === "undefined") return;
+
+        if (reportTicketsChart) {
+            try { reportTicketsChart.destroy(); } catch (e) { }
+            reportTicketsChart = null;
+        }
+
+        const ctx = el.getContext("2d");
+        const labels = series.map(x => x.date);
+        const data = series.map(x => Number(x.count || 0));
+        const unit = group === "week" ? "tuần" : group === "month" ? "tháng" : "ngày";
+
+        reportTicketsChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Số vé theo " + unit,
+                    data,
+                    backgroundColor: "rgba(54, 179, 126, 0.7)",
+                    borderColor: "#36B37E",
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.parsed.y + " vé"
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderReportTable(revenueSeries, ticketsSeries) {
+        const table = document.getElementById("report-table");
+        const tbody = table?.querySelector("tbody");
+        if (!tbody) return;
+
+        // Merge data by date
+        const dataMap = new Map();
+        revenueSeries.forEach(r => {
+            dataMap.set(r.date, { date: r.date, revenue: r.amount || 0, orders: 0, tickets: 0 });
+        });
+        ticketsSeries.forEach(t => {
+            const existing = dataMap.get(t.date) || { date: t.date, revenue: 0, orders: 0, tickets: 0 };
+            existing.tickets = t.count || 0;
+            dataMap.set(t.date, existing);
+        });
+
+        const rows = Array.from(dataMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Không có dữ liệu</td></tr>`;
+            table.style.display = "table";
+            return;
+        }
+
+        let totalRevenue = 0, totalOrders = 0, totalTickets = 0;
+
+        tbody.innerHTML = rows.map(r => {
+            totalRevenue += r.revenue;
+            totalOrders += r.orders;
+            totalTickets += r.tickets;
+            return `
+                <tr>
+                    <td>${r.date}</td>
+                    <td>${fmtVND(r.revenue)}</td>
+                    <td>${r.orders}</td>
+                    <td>${r.tickets}</td>
+                </tr>
+            `;
+        }).join("");
+
+        // Update totals
+        const totalRevenueEl = document.getElementById("report-total-revenue");
+        const totalOrdersEl = document.getElementById("report-total-orders");
+        const totalTicketsEl = document.getElementById("report-total-tickets");
+
+        if (totalRevenueEl) totalRevenueEl.textContent = fmtVND(totalRevenue);
+        if (totalOrdersEl) totalOrdersEl.textContent = totalOrders;
+        if (totalTicketsEl) totalTicketsEl.textContent = totalTickets;
+
+        table.style.display = "table";
+    }
+
+    function exportReportToExcel() {
+        const startDate = document.getElementById("report-start-date")?.value || "";
+        const endDate = document.getElementById("report-end-date")?.value || "";
+
+        if (reportData.revenue.length === 0 && reportData.tickets.length === 0) {
+            alert("Vui lòng xem báo cáo trước khi xuất Excel!");
+            return;
+        }
+
+        // Merge data
+        const dataMap = new Map();
+        reportData.revenue.forEach(r => {
+            dataMap.set(r.date, { date: r.date, revenue: r.amount || 0, tickets: 0 });
+        });
+        reportData.tickets.forEach(t => {
+            const existing = dataMap.get(t.date) || { date: t.date, revenue: 0, tickets: 0 };
+            existing.tickets = t.count || 0;
+            dataMap.set(t.date, existing);
+        });
+
+        const rows = Array.from(dataMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+
+        // Create CSV content
+        let csv = "Ngày,Doanh thu (VND),Số vé bán\n";
+        let totalRevenue = 0, totalTickets = 0;
+
+        rows.forEach(r => {
+            csv += `${r.date},${r.revenue},${r.tickets}\n`;
+            totalRevenue += r.revenue;
+            totalTickets += r.tickets;
+        });
+
+        csv += `\nTỔNG CỘNG,${totalRevenue},${totalTickets}\n`;
+        csv += `\nBáo cáo từ ${startDate} đến ${endDate}\n`;
+        csv += `Xuất lúc: ${new Date().toLocaleString("vi-VN")}\n`;
+
+        // Download
+        const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `BaoCaoDoanhThu_${startDate}_${endDate}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Event listeners for Reports page
+    const btnViewReport = document.getElementById("btn-view-report");
+    const btnExportExcel = document.getElementById("btn-export-excel");
+
+    if (btnViewReport) {
+        btnViewReport.addEventListener("click", loadReports);
+    }
+
+    if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", exportReportToExcel);
+    }
+
+    // Initialize report dates when page loads
+    initReportDates();
+
+    // Show empty state initially
+    const reportEmpty = document.getElementById("report-empty");
+    if (reportEmpty) reportEmpty.style.display = "block";
+
     // Start
     showPage("overview");
 });

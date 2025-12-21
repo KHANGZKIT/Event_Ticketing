@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketBook - Kiến trúc Hệ thống</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-orange: #f97316;
+            --border-color: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='0.5'/%3E%3C/svg%3E") repeat;
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .nav-tab .icon {
+            font-size: 1.1rem;
+        }
+
+        .diagram-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .diagram-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-blue);
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-card.purple {
+            border-left-color: var(--accent-purple);
+        }
+
+        .info-card.green {
+            border-left-color: var(--accent-emerald);
+        }
+
+        .info-card.orange {
+            border-left-color: var(--accent-orange);
+        }
+
+        .info-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: var(--bg-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .port-badge {
+            background: var(--accent-emerald);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                justify-content: center;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .mermaid {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>🎫 TicketBook Architecture</h1>
+        <p>Sơ đồ Kiến trúc Tổng quan Hệ thống Đặt vé Sự kiện</p>
+    </header>
+
+    <div class="container">
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">
+                <span class="icon">📊</span> Tổng quan
+            </button>
+            <button class="nav-tab" data-tab="component">
+                <span class="icon">🧩</span> Component Diagram
+            </button>
+            <button class="nav-tab" data-tab="deployment">
+                <span class="icon">🚀</span> Deployment Diagram
+            </button>
+            <button class="nav-tab" data-tab="sequence">
+                <span class="icon">🔄</span> Sequence Diagram
+            </button>
+            <button class="nav-tab" data-tab="class">
+                <span class="icon">📐</span> Class Diagram
+            </button>
+        </nav>
+
+        <!-- Overview Section -->
+        <section id="overview" class="diagram-section active">
+            <div class="card">
+                <h2 class="card-title">📊 Tổng quan Hệ thống</h2>
+                <p class="card-description">
+                    TicketBook là hệ thống đặt vé sự kiện được xây dựng theo kiến trúc Microservices,
+                    với API Gateway làm điểm vào duy nhất cho tất cả các request từ client.
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Port</th>
+                            <th>Công nghệ</th>
+                            <th>Mô tả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🚪 Gateway</td>
+                            <td><span class="port-badge">4000</span></td>
+                            <td>Express.js, http-proxy</td>
+                            <td>Reverse proxy, static files, auth guard</td>
+                        </tr>
+                        <tr>
+                            <td>🔐 Auth Service</td>
+                            <td><span class="port-badge">4101</span></td>
+                            <td>Express.js, Prisma, JWT</td>
+                            <td>Đăng ký, đăng nhập, quản lý user</td>
+                        </tr>
+                        <tr>
+                            <td>📅 Events Service</td>
+                            <td><span class="port-badge">4102</span></td>
+                            <td>Express.js, Prisma, Socket.IO</td>
+                            <td>Events, shows, orders, payments, tickets</td>
+                        </tr>
+                        <tr>
+                            <td>🐘 PostgreSQL</td>
+                            <td><span class="port-badge">5432</span></td>
+                            <td>PostgreSQL 15</td>
+                            <td>Database chính</td>
+                        </tr>
+                        <tr>
+                            <td>💾 Redis</td>
+                            <td><span class="port-badge">6379</span></td>
+                            <td>Redis 7</td>
+                            <td>Seat holds, session cache</td>
+                        </tr>
+                        <tr>
+                            <td>🌐 Frontend</td>
+                            <td>-</td>
+                            <td>HTML/CSS/JS (Vanilla)</td>
+                            <td>SPA-like với multiple pages</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🌐 Frontend Modules</h3>
+                    <p>7 UI modules: HomePage, LoginUI, SeatmapUI, PurchaseUI, MyTicketUI, DashboardUI, InspectorUI</p>
+                    <span class="tech-badge">HTML5</span>
+                    <span class="tech-badge">CSS3</span>
+                    <span class="tech-badge">JavaScript</span>
+                </div>
+                <div class="info-card purple">
+                    <h3>💳 Payment Providers</h3>
+                    <p>Tích hợp MoMo và VNPay với webhook callbacks để xử lý thanh toán realtime</p>
+                    <span class="tech-badge">MoMo</span>
+                    <span class="tech-badge">VNPay</span>
+                </div>
+                <div class="info-card green">
+                    <h3>⚡ Real-time Features</h3>
+                    <p>Socket.IO cho cập nhật ghế realtime, Redis cho seat holds với TTL 15 phút</p>
+                    <span class="tech-badge">Socket.IO</span>
+                    <span class="tech-badge">Redis</span>
+                </div>
+                <div class="info-card orange">
+                    <h3>🔒 Security</h3>
+                    <p>JWT authentication, Helmet middleware, CORS configuration, Rate limiting</p>
+                    <span class="tech-badge">JWT</span>
+                    <span class="tech-badge">Helmet</span>
+                    <span class="tech-badge">bcrypt</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Component Diagram -->
+        <section id="component" class="diagram-section">
+            <div class="card">
+                <h2 class="card-title">🧩 Component Diagram</h2>
+                <p class="card-description">
+                    Sơ đồ thể hiện các thành phần chính của hệ thống và cách chúng giao tiếp với nhau.
+                </p>
+                <div class="mermaid">
+                    graph TB
+                    subgraph "Frontend Layer"
+                    FE["🌐 Frontend<br />(7 UI Modules)"]
+                    end
+
+                    subgraph "API Gateway Layer"
+                    GW["🚪 Gateway Service<br />Port: 4000"]
+                    end
+
+                    subgraph "Microservices Layer"
+                    AUTH["🔐 Auth Service<br />Port: 4101"]
+                    EVENTS["📅 Events Service<br />Port: 4102"]
+                    end
+
+                    subgraph "Data Layer"
+                    PG[("🐘 PostgreSQL<br />Port: 5432")]
+                    RD[("💾 Redis<br />Port: 6379")]
+                    end
+
+                    subgraph "External Services"
+                    MOMO["💳 MoMo"]
+                    VNPAY["💳 VNPay"]
+                    end
+
+                    FE -->|"HTTP/HTTPS"| GW
+                    GW -->|"/api/auth/*"| AUTH
+                    GW -->|"/api/events/*<br />/api/orders/*<br />/api/payments/*"| EVENTS
+
+                    AUTH --> PG
+                    EVENTS --> PG
+                    EVENTS --> RD
+                    EVENTS <-->|"Webhook"| MOMO
+                        EVENTS <-->|"Webhook"| VNPAY
+                </div>
+            </div>
+        </section>
+
+        <!-- Deployment Diagram -->
+        <section id="deployment" class="diagram-section">
+            <div class="card">
+                <h2 class="card-title">🚀 Deployment Diagram</h2>
+                <p class="card-description">
+                    Kiến trúc triển khai sử dụng Railway cho backend và Vercel cho frontend.
+                </p>
+                <div class="mermaid">
+                    graph TB
+                    subgraph "Production - Railway Cloud"
+                    direction TB
+                    GW["🚪 Gateway<br />gateway.railway.app"]
+                    AS["🔐 Auth Service"]
+                    ES["📅 Events Service"]
+                    PG[("🐘 PostgreSQL")]
+                    RD[("💾 Redis")]
+                    end
+
+                    subgraph "CDN - Vercel"
+                    FE["🌐 Static Frontend<br />ticketbook.vercel.app"]
+                    end
+
+                    subgraph "Payment Gateways"
+                    MOMO["💳 MoMo API"]
+                    VNPAY["💳 VNPay API"]
+                    end
+
+                    USER["👤 User"] -->|"HTTPS"| FE
+                    FE -->|"API calls"| GW
+                    GW --> AS
+                    GW --> ES
+                    AS --> PG
+                    ES --> PG
+                    ES --> RD
+                    ES <--> MOMO
+                        ES <--> VNPAY
+                </div>
+            </div>
+        </section>
+
+        <!-- Sequence Diagram -->
+        <section id="sequence" class="diagram-section">
+            <div class="card">
+                <h2 class="card-title">🔄 Sequence Diagram - Booking Flow</h2>
+                <p class="card-description">
+                    Luồng đặt vé từ khi chọn ghế đến khi thanh toán thành công.
+                </p>
+                <div class="mermaid">
+                    sequenceDiagram
+                    autonumber
+                    participant U as 👤 User
+                    participant FE as 🌐 Frontend
+                    participant GW as 🚪 Gateway
+                    participant ES as 📅 Events
+                    participant RD as 💾 Redis
+                    participant DB as 🐘 PostgreSQL
+                    participant PAY as 💳 Payment
+
+                    rect rgb(59, 130, 246, 0.1)
+                    Note over U, PAY: Bước 1: Giữ ghế
+                    U->>FE: Chọn ghế
+                    FE->>GW: POST /api/holds
+                    GW->>ES: Forward
+                    ES->>RD: SET hold (TTL 15min)
+                    ES-->>FE: ✓ Ghế đã được giữ
+                    end
+
+                    rect rgb(139, 92, 246, 0.1)
+                    Note over U, PAY: Bước 2: Tạo đơn hàng
+                    U->>FE: Xác nhận đặt
+                    FE->>GW: POST /api/orders
+                    GW->>ES: Create order
+                    ES->>DB: INSERT Order
+                    ES-->>FE: Order ID
+                    end
+
+                    rect rgb(16, 185, 129, 0.1)
+                    Note over U, PAY: Bước 3: Thanh toán
+                    FE->>GW: POST /api/payments/create
+                    GW->>ES: Create payment
+                    ES->>PAY: Get payment URL
+                    ES-->>FE: Redirect URL
+                    U->>PAY: Thanh toán
+                    PAY->>ES: Webhook callback
+                    ES->>DB: UPDATE Order, CREATE Tickets
+                    ES->>RD: Release holds
+                    end
+
+                    rect rgb(249, 115, 22, 0.1)
+                    Note over U, PAY: Bước 4: Xem vé
+                    U->>FE: Xem vé của tôi
+                    FE->>GW: GET /api/tickets/my
+                    ES-->>FE: Tickets + QR codes
+                    end
+                </div>
+            </div>
+        </section>
+
+        <!-- Class Diagram -->
+        <section id="class" class="diagram-section">
+            <div class="card">
+                <h2 class="card-title">📐 Class Diagram - Database Schema</h2>
+                <p class="card-description">
+                    Sơ đồ lớp thể hiện cấu trúc database với các entities và quan hệ.
+                </p>
+                <div class="mermaid">
+                    classDiagram
+                    class User {
+                    +String id
+                    +String email
+                    +String passwordHash
+                    +String fullName
+                    +DateTime createdAt
+                    }
+
+                    class Role {
+                    +Int id
+                    +String name
+                    }
+
+                    class Event {
+                    +String id
+                    +String name
+                    +String city
+                    +String cover
+                    +DateTime startsAt
+                    +String category
+                    }
+
+                    class Show {
+                    +String id
+                    +String eventId
+                    +DateTime startsAt
+                    +String venue
+                    +ShowStatus status
+                    }
+
+                    class Order {
+                    +String id
+                    +String userId
+                    +String showId
+                    +Int amount
+                    +OrderStatus status
+                    }
+
+                    class Payment {
+                    +String id
+                    +String orderId
+                    +String provider
+                    +Int amount
+                    +PaymentStatus status
+                    }
+
+                    class Ticket {
+                    +String id
+                    +String showId
+                    +String seatId
+                    +String code
+                    +DateTime checkedInAt
+                    }
+
+                    class Venue {
+                    +String id
+                    +String name
+                    +String address
+                    }
+
+                    class Coupon {
+                    +String id
+                    +String code
+                    +String discountType
+                    +Int discountValue
+                    }
+
+                    User "1" --> "*" Order : places
+                    Event "1" --> "*" Show : has
+                    Show "1" --> "*" Ticket : contains
+                    Show "1" --> "*" Order : receives
+                    Order "1" --> "1" Payment : has
+                    Order "1" --> "*" Ticket : includes
+                    Venue "1" --> "*" Event : hosts
+                    Coupon "1" --> "*" Order : applies to
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>TicketBook System Architecture © 2024 | Built with ❤️</p>
+    </footer>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#f1f5f9',
+                primaryBorderColor: '#475569',
+                lineColor: '#94a3b8',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#334155',
+                background: '#1e293b',
+                mainBkg: '#1e293b',
+                nodeBorder: '#475569',
+                clusterBkg: '#334155',
+                clusterBorder: '#475569',
+                titleColor: '#f1f5f9',
+                edgeLabelBackground: '#1e293b',
+                actorTextColor: '#f1f5f9',
+                actorBkg: '#3b82f6',
+                actorBorder: '#475569',
+                signalColor: '#f1f5f9',
+                signalTextColor: '#f1f5f9',
+                labelBoxBkgColor: '#334155',
+                labelBoxBorderColor: '#475569',
+                labelTextColor: '#f1f5f9',
+                loopTextColor: '#f1f5f9',
+                noteBkgColor: '#334155',
+                noteTextColor: '#f1f5f9',
+                noteBorderColor: '#475569',
+                activationBkgColor: '#3b82f6',
+                activationBorderColor: '#475569',
+                sequenceNumberColor: '#f1f5f9'
+            },
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                diagramMarginX: 50,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                boxTextMargin: 5,
+                noteMargin: 10,
+                messageMargin: 35,
+                mirrorActors: true,
+                useMaxWidth: true
+            }
+        });
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.diagram-section').forEach(s => s.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                const targetId = tab.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

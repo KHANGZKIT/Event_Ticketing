@@ -558,6 +558,10 @@
       </div>
     </div>
     <div class="ticket-actions">
+      <button class="btn-download" data-ticket="${ticket.id}" title="Tải mã QR để check-in">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Tải QR
+      </button>
       <button class="btn-view" data-order="${order.id}" data-ticket="${ticket.id}">Xem chi tiết</button>
       </div>
   </div>`;
@@ -651,6 +655,49 @@
           alert(`Order ${orderId}\nTicket ${ticketId}`);
         });
       });
+
+      // Download QR button handler
+      listEl.querySelectorAll('.btn-download').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const ticketId = btn.getAttribute('data-ticket');
+          if (!ticketId) return;
+
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-small"></span> Đang tải...';
+
+          try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/tickets/${ticketId}/qr`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+              throw new Error('Không thể tải mã QR');
+            }
+
+            // Get blob and download
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ticket-${ticketId}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Reset button
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tải QR`;
+          } catch (err) {
+            console.error('Download QR error:', err);
+            alert('Lỗi khi tải mã QR. Vui lòng thử lại.');
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Tải QR`;
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
       filterByTab('all');
 
     } catch (e) {

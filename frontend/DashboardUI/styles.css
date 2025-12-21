@@ -572,6 +572,33 @@ body.dark-mode #theme-toggle i {
   background: var(--secondary-color);
 }
 
+.btn-success {
+  background: #36B37E;
+  color: white;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #00875A;
+}
+
+.form-control {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background: var(--card-bg-color);
+  color: var(--text-color);
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+}
+
 .content {
   padding: 24px 30px;
 }

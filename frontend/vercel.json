@@ -5,6 +5,10 @@
             "destination": "/HomePage/source/TrangChu.html"
         },
         {
+            "source": "/inspector",
+            "destination": "/InspectorUI/inspector.html"
+        },
+        {
             "source": "/frontend/(.*)",
             "destination": "/$1"
         }
