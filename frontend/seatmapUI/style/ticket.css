@@ -1,19 +1,17 @@
 /* ====================================================
-   TICKET MODAL - MODERN REDESIGN
-   Premium ticket design with glassmorphism effects
+   TICKET MODAL - FLAT PROFESSIONAL DESIGN
+   Clean, high-contrast, utilitarian aesthetic
    ==================================================== */
 
 :root {
-  --ticket-primary: #7C5DFA;
-  --ticket-primary-light: rgba(124, 93, 250, 0.15);
-  --ticket-accent: #00D9FF;
+  --ticket-primary: #f59e0b;
+  --ticket-accent: #06b6d4;
   --ticket-success: #22c55e;
-  --ticket-bg: #0f172a;
-  --ticket-card: #1e293b;
-  --ticket-text: #f8fafc;
-  --ticket-muted: #94a3b8;
-  --ticket-border: rgba(148, 163, 184, 0.2);
-  --ticket-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --ticket-bg: #09090b;
+  --ticket-card: #18181b;
+  --ticket-text: #fafafa;
+  --ticket-muted: #71717a;
+  --ticket-border: #3f3f46;
 }
 
 /* =============================
@@ -28,12 +26,10 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(0, 0, 0, 0.8);
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 #checkoutModal[aria-hidden="true"] {
@@ -48,23 +44,21 @@
 
 .modal-card {
   width: min(700px, 95vw);
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
-  border: 1px solid var(--ticket-border);
-  border-radius: 24px;
-  box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  background: var(--ticket-card) !important;
+  border: 1px solid var(--ticket-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: modalSlideIn 0.3s ease;
 }
 
 @keyframes modalSlideIn {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(20px);
+    transform: scale(0.95) translateY(10px);
   }
 
   to {
@@ -78,18 +72,17 @@
 }
 
 /* =============================
-   TICKET DESIGN
+   TICKET DESIGN - FLAT
    ============================= */
 
 .ticket {
   width: 100%;
   display: flex;
-  border-radius: 20px;
+  border-radius: 4px !important;
   overflow: hidden;
-  background: var(--ticket-card);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  background: var(--ticket-bg) !important;
+  border: 1px solid var(--ticket-border) !important;
+  box-shadow: none !important;
   position: relative;
 }
 
@@ -100,25 +93,13 @@
   top: 20px;
   bottom: 20px;
   left: calc(60% - 1px);
-  width: 2px;
-  background: repeating-linear-gradient(to bottom,
-      transparent,
-      transparent 8px,
-      rgba(148, 163, 184, 0.3) 8px,
-      rgba(148, 163, 184, 0.3) 16px);
+  width: 1px;
+  background: var(--ticket-border);
 }
 
-/* Punch hole effect - top */
+/* NO punch holes - too decorative */
 .ticket::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: calc(60% - 12px);
-  width: 24px;
-  height: 24px;
-  background: var(--ticket-bg);
-  border-radius: 50%;
-  box-shadow: 0 24px 0 0 var(--ticket-bg);
+  display: none;
 }
 
 /* =============================
@@ -135,20 +116,20 @@
   position: relative;
 }
 
-/* Brand Logo */
+/* Brand Logo - FLAT */
 .brand {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: var(--ticket-primary-light);
-  color: var(--ticket-primary);
-  border: 1px solid rgba(124, 93, 250, 0.3);
+  background: transparent !important;
+  color: var(--ticket-primary) !important;
+  border: 1px solid var(--ticket-primary) !important;
   width: fit-content;
 }
 
@@ -187,26 +168,27 @@
 }
 
 .meta span:first-child::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'%3E%3C/path%3E%3C/svg%3E");
 }
 
 .meta span:last-child::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'%3E%3C/path%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'%3E%3C/path%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'%3E%3C/path%3E%3C/svg%3E");
 }
 
-/* Seat Info Badge */
+/* Seat Info Badge - FLAT */
 .serial {
   margin-top: 12px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 4px;
+  font-size: 13px;
   font-weight: 600;
-  background: linear-gradient(135deg, var(--ticket-primary), #a855f7);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(124, 93, 250, 0.4);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--ticket-primary) !important;
+  color: #000 !important;
+  box-shadow: none !important;
   width: fit-content;
 }
 
@@ -216,7 +198,7 @@
 }
 
 /* =============================
-   RIGHT SIDE - QR & PRICE
+   RIGHT SIDE - QR & PRICE (FLAT)
    ============================= */
 
 .ticket-right {
@@ -228,48 +210,33 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  background: var(--ticket-gradient);
+  background: #27272a !important;
+  border-left: 1px solid var(--ticket-border);
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative circles */
+/* NO decorative circles */
 .ticket-right::before,
 .ticket-right::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  display: none;
 }
 
-.ticket-right::before {
-  width: 150px;
-  height: 150px;
-  top: -50px;
-  right: -50px;
-}
-
-.ticket-right::after {
-  width: 100px;
-  height: 100px;
-  bottom: -30px;
-  left: -30px;
-}
-
-/* Price Badge */
+/* Price Badge - FLAT */
 .price-badge {
   position: relative;
   z-index: 1;
   padding: 8px 20px;
-  border-radius: 30px;
+  border-radius: 4px;
   font-size: 20px;
   font-weight: 800;
-  letter-spacing: 0.03em;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0;
+  background: var(--ticket-bg) !important;
+  backdrop-filter: none !important;
+  border: 1px solid var(--ticket-border) !important;
+  color: var(--ticket-primary) !important;
+  box-shadow: none !important;
 }
 
 /* QR Code Container */
@@ -278,22 +245,21 @@
   z-index: 1;
   width: 140px;
   height: 140px;
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 12px;
-  background: #ffffff;
+  background: #ffffff !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(255, 255, 255, 0.1);
+  box-shadow: none !important;
+  border: 1px solid var(--ticket-border);
 }
 
 .qr img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 /* =============================
@@ -312,63 +278,53 @@
 .btn-ok,
 .btn-cancel {
   flex: 1;
-  padding: 16px 24px;
-  border-radius: 14px;
+  padding: 14px 24px;
+  border-radius: 4px;
   border: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 
-/* Pay Button - Primary */
+/* Pay Button - PRIMARY (FLAT) */
 .btn-ok {
-  background: linear-gradient(135deg, var(--ticket-primary) 0%, #a855f7 100%);
-  color: #ffffff;
-  box-shadow: 0 8px 25px rgba(124, 93, 250, 0.4);
+  background: var(--ticket-primary) !important;
+  color: #000 !important;
+  box-shadow: none !important;
   position: relative;
   overflow: hidden;
 }
 
+/* NO shine effect */
 .btn-ok::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+  display: none;
 }
 
 .btn-ok:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(124, 93, 250, 0.5);
-}
-
-.btn-ok:hover::before {
-  left: 100%;
+  transform: translateY(-1px);
+  opacity: 0.9;
 }
 
 .btn-ok:active {
   transform: translateY(0);
 }
 
-/* Cancel Button */
+/* Cancel Button - FLAT */
 .btn-cancel {
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--ticket-muted);
-  border: 1px solid var(--ticket-border);
+  background: transparent !important;
+  color: var(--ticket-muted) !important;
+  border: 1px solid var(--ticket-border) !important;
 }
 
 .btn-cancel:hover {
-  background: rgba(148, 163, 184, 0.2);
-  color: var(--ticket-text);
-  border-color: rgba(148, 163, 184, 0.4);
+  background: var(--ticket-bg) !important;
+  color: var(--ticket-text) !important;
+  border-color: var(--ticket-muted) !important;
 }
 
 /* =============================
@@ -383,14 +339,14 @@
 
   .modal-card {
     padding: 20px;
-    border-radius: 24px 24px 0 0;
+    border-radius: 8px 8px 0 0;
     max-height: 90vh;
     overflow-y: auto;
   }
 
   .ticket {
     flex-direction: column;
-    border-radius: 16px;
+    border-radius: 4px;
   }
 
   .ticket::after,
@@ -408,7 +364,9 @@
     padding: 24px 20px;
     min-height: 180px;
     order: 1;
-    border-radius: 16px 16px 0 0;
+    border-radius: 4px 4px 0 0;
+    border-left: none;
+    border-bottom: 1px solid var(--ticket-border);
   }
 
   .event {
@@ -416,8 +374,8 @@
   }
 
   .brand {
-    font-size: 11px;
-    padding: 6px 14px;
+    font-size: 10px;
+    padding: 5px 12px;
   }
 
   .qr {
@@ -436,7 +394,7 @@
 
   .btn-ok,
   .btn-cancel {
-    padding: 14px 20px;
+    padding: 12px 20px;
   }
 }
 
@@ -445,13 +403,17 @@
    ============================= */
 
 [data-theme="light"] .modal-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(249, 250, 251, 0.95));
-  border-color: rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border-color: #e5e7eb !important;
 }
 
 [data-theme="light"] .ticket {
-  background: #ffffff;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+
+[data-theme="light"] .ticket::after {
+  background: #e5e7eb;
 }
 
 [data-theme="light"] .ticket-left {
@@ -466,13 +428,28 @@
   color: #6b7280;
 }
 
-[data-theme="light"] .btn-cancel {
-  background: #f3f4f6;
-  color: #6b7280;
+[data-theme="light"] .ticket-right {
+  background: #f3f4f6 !important;
   border-color: #e5e7eb;
 }
 
+[data-theme="light"] .price-badge {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: var(--ticket-primary) !important;
+}
+
+[data-theme="light"] .qr {
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .btn-cancel {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  border-color: #e5e7eb !important;
+}
+
 [data-theme="light"] .btn-cancel:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: #e5e7eb !important;
+  color: #374151 !important;
 }

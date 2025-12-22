@@ -466,14 +466,16 @@ body {
   box-shadow: none !important;
 }
 
-/* Held seats - SOLID RED */
+/* Held seats - SOLID RED, VISIBLE */
 .seat.purchasing,
 .seat.held {
-  background: var(--seat-held);
-  border: none;
-  color: #fff;
+  background: #dc2626 !important;
+  border: 2px solid #ef4444 !important;
+  color: #fff !important;
   cursor: not-allowed;
-  animation: pulse-held 1.5s infinite;
+  font-weight: 700;
+  box-shadow: none !important;
+  animation: pulse-held 1.2s ease-in-out infinite;
 }
 
 @keyframes pulse-held {
@@ -484,7 +486,7 @@ body {
   }
 
   50% {
-    opacity: 0.6;
+    opacity: 0.85;
   }
 }
 
