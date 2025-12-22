@@ -60,7 +60,7 @@ export async function createHold(req, res, next) {
     } catch (e) {
         console.error('[POST /holds] Unhandled error:', e);
         console.error('[POST /holds] Error stack:', e.stack);
-        
+
         // Xử lý lỗi conflict đặc biệt
         if (e?.status === 409) {
             return res.status(409).json({
@@ -70,14 +70,14 @@ export async function createHold(req, res, next) {
                 message: e.message || 'Seat(s) already held'
             });
         }
-        
-        return res.status(e?.status || 500).json({ 
+
+        return res.status(e?.status || 500).json({
             ok: false,
-            error: { 
-                code: e?.status || 500, 
+            error: {
+                code: e?.status || 500,
                 message: e.message || 'Internal server error',
                 details: process.env.NODE_ENV === 'development' ? e.stack : undefined
-            } 
+            }
         });
     }
 }

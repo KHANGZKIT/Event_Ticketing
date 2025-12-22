@@ -41,6 +41,14 @@ io.on("connection", (socket) => {
         socket.join(`show:${showId}`);
         console.log(`[ws] socket ${socket.id} joined room show:${showId}`);
     });
+
+    // Join user-specific room for waitlist notifications
+    socket.on("join-user", (userId) => {
+        if (!userId) return;
+        socket.join(`user:${userId}`);
+        console.log(`[ws] socket ${socket.id} joined room user:${userId}`);
+    });
+
     socket.on("disconnect", () => {
         console.log("[ws] client disconnected:", socket.id);
     });
@@ -80,6 +88,28 @@ app.post("/internal/ws/seat-updated", (req, res) => {
         status,    // "HELD" | "RELEASED"
         holdId: holdId || null,
         expiresAt: expiresAt || null,
+    });
+
+    res.json({ ok: true });
+});
+
+// Internal endpoint for waitlist offer notifications
+app.post("/internal/ws/waitlist-offer", (req, res) => {
+    const { userId, showId, seats, expiresAt } = req.body || {};
+
+    if (!userId || !showId || !Array.isArray(seats)) {
+        return res.status(400).json({
+            error: { code: "BAD_WS_PAYLOAD", message: "Missing userId/showId/seats" },
+        });
+    }
+
+    console.log("[ws] sending waitlist-offer to user:", userId, { showId, seats });
+
+    io.to(`user:${userId}`).emit("waitlist-offer", {
+        showId,
+        seats,
+        expiresAt,
+        message: "Bạn có vé! Hãy accept trong 10 phút."
     });
 
     res.json({ ok: true });

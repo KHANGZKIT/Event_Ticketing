@@ -6,6 +6,7 @@ import { getSeatMap } from '../shows/shows.service.js';
 import { incrMetric } from '../../metrics/metrics.js';
 import { logx } from '../../utils/logx.js';
 import axios from 'axios';   // ⬅️ THÊM DÒNG NÀY
+import * as waitlistService from '../waitlist/waitlist.service.js';
 
 const GATEWAY_INTERNAL_URL =
     process.env.GATEWAY_INTERNAL_URL || "http://localhost:4000";
@@ -244,6 +245,14 @@ export async function releaseHold(holdId) {
         });
     } catch (err) {
         console.error("[holds.release] WS notify failed:", err.message);
+    }
+
+    // 🆕 Trigger waitlist - offer seats to next person in queue
+    try {
+        await waitlistService.processAvailableSeats(h.showId, h.seats);
+    } catch (err) {
+        console.error("[holds.release] Waitlist trigger failed:", err.message);
+        // Non-blocking, continue with release
     }
 
     return { ok: true, released: h.seats.length, out };

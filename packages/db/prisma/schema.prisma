@@ -281,3 +281,30 @@ model IdempotencyKey {
   @@index([createdAt])
   @@index([expiresAt])
 }
+
+/**
+ * ============ Waitlist Queue (Hàng đợi khi hết vé) ============
+ */
+
+model WaitlistEntry {
+  id        String          @id @default(uuid())
+  userId    String
+  showId    String
+  status    WaitlistStatus  @default(waiting)
+  seatCount Int             @default(1)  // Số ghế user muốn mua
+  joinedAt  DateTime        @default(now())
+  offeredAt DateTime?
+  expiresAt DateTime?       // Thời điểm offer hết hạn
+
+  @@unique([userId, showId])
+  @@index([showId, status])
+  @@index([status, joinedAt])
+}
+
+enum WaitlistStatus {
+  waiting     // Đang chờ trong queue
+  offered     // Đã được offer, đang chờ accept
+  accepted    // Đã accept, chuyển sang checkout
+  expired     // Offer hết hạn
+  cancelled   // User hủy đăng ký
+}

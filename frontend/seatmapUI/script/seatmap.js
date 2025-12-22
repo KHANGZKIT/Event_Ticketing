@@ -316,6 +316,24 @@ async function loadSeatMap(showId) {
 
 
   renderSeatMap(seats, held, booked);
+
+  // Check if show is sold-out (for waitlist feature)
+  const totalSeats = seats.length;
+  const unavailableSeats = held.size + booked.size;
+  const availableSeats = totalSeats - unavailableSeats;
+
+  console.log(`[seatmap] Availability: ${availableSeats}/${totalSeats} seats available (${booked.size} booked, ${held.size} held)`);
+
+  // Show waitlist section if no available seats
+  if (availableSeats === 0 && totalSeats > 0) {
+    console.log("[seatmap] SOLD OUT - showing waitlist section");
+    showWaitlistSection();
+  } else {
+    // Hide waitlist section if there are available seats
+    if (waitlistSection) {
+      waitlistSection.style.display = 'none';
+    }
+  }
 }
 
 function tierClass(t) {
@@ -352,15 +370,12 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
 
     });
   } else {
-    seatMapEl.style.display = "grid";
-    const maxCol = Math.max(...seatList.map(s => Number(s.col ?? 0))) + 1 || 14;
-    // Grid không có cột label, chỉ có ghế - layout compact hơn
-    seatMapEl.style.gridTemplateColumns = `repeat(${maxCol}, var(--seat-size))`;
-    seatMapEl.style.gap = "var(--seat-gap)";
-    seatMapEl.style.justifyContent = "center";
+    // Flex layout with aisles (Left - Center - Right sections)
+    seatMapEl.style.display = "flex";
+    seatMapEl.style.flexDirection = "column";
+    seatMapEl.style.gap = "8px";
     seatMapEl.style.alignItems = "center";
     seatMapEl.style.width = "100%";
-    seatMapEl.style.maxWidth = "100%";
 
     const sorted = [...seatList].sort((a, b) => {
       const ra = a.row ?? 9999, rb = b.row ?? 9999;
@@ -370,19 +385,59 @@ function renderSeatMap(seatList, heldSet, bookedSet) {
       return String(a.label).localeCompare(String(b.label), "vi");
     });
 
-    // Render ghế không có nhãn hàng/cột riêng - hiển thị đầy đủ label trên ghế
+    // Group seats by row
+    const rowMap = new Map();
     sorted.forEach(s => {
-      const price = getPriceForTier(s.tier);
-      const btn = document.createElement("button");
-      btn.className = 'seat ' + tierClass(s.tier);
-      btn.textContent = s.label;
-      btn.dataset.seat = s.label;  // ⬅️ THÊM
-      btn.setAttribute('aria-label', `Ghế ${s.label}`);
-      btn.setAttribute('title', `Ghế ${s.label} - ${s.tier}`);
-      applyStatus(btn, s.label, heldSet, bookedSet);
-      btn.addEventListener("click", () => toggleSelect(btn, s.label, s.tier, price));
-      seatMapEl.appendChild(btn);
+      const rowKey = s.row ?? 'unknown';
+      if (!rowMap.has(rowKey)) {
+        rowMap.set(rowKey, []);
+      }
+      rowMap.get(rowKey).push(s);
+    });
 
+    // Render each row with aisles
+    rowMap.forEach((seatsInRow, rowKey) => {
+      const rowContainer = document.createElement('div');
+      rowContainer.className = 'seat-row';
+      rowContainer.style.display = 'flex';
+      rowContainer.style.gap = 'var(--seat-gap)';
+      rowContainer.style.alignItems = 'center';
+
+      const totalSeats = seatsInRow.length;
+      const seatsPerSection = Math.ceil(totalSeats / 3);
+
+      seatsInRow.forEach((s, idx) => {
+        const price = getPriceForTier(s.tier);
+        const btn = document.createElement("button");
+        btn.className = 'seat ' + tierClass(s.tier);
+        btn.textContent = s.label;
+        btn.dataset.seat = s.label;
+        btn.dataset.tier = s.tier;
+        btn.dataset.price = price;
+        btn.setAttribute('aria-label', `Ghế ${s.label}`);
+
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.className = 'seat-tooltip';
+        tooltip.innerHTML = `
+          <div class="tooltip-row">Hàng ${s.label.charAt(0)} - Ghế ${s.label}</div>
+          <div class="tooltip-price">${vnd(price)}</div>
+        `;
+        btn.appendChild(tooltip);
+
+        applyStatus(btn, s.label, heldSet, bookedSet);
+        btn.addEventListener("click", () => toggleSelect(btn, s.label, s.tier, price));
+        rowContainer.appendChild(btn);
+
+        // Add aisle gaps after left and center sections
+        if (idx === seatsPerSection - 1 || idx === seatsPerSection * 2 - 1) {
+          const aisle = document.createElement('div');
+          aisle.style.width = 'var(--aisle-gap)';
+          rowContainer.appendChild(aisle);
+        }
+      });
+
+      seatMapEl.appendChild(rowContainer);
     });
   }
 }
@@ -706,4 +761,354 @@ socket.on("seat-updated", (payload) => {
       }
     }
   });
+
+  // Re-check sold-out status after seat updates
+  checkSoldOutStatus();
 });
+
+// Check if show is sold-out and show/hide waitlist section
+function checkSoldOutStatus() {
+  const allSeats = document.querySelectorAll('.seat');
+  const availableSeats = document.querySelectorAll('.seat:not(.booked):not(.held)');
+
+  const totalSeats = allSeats.length;
+  const availableCount = availableSeats.length;
+
+  console.log(`[seatmap] Real-time check: ${availableCount}/${totalSeats} seats available`);
+
+  if (availableCount === 0 && totalSeats > 0) {
+    console.log("[seatmap] SOLD OUT - showing waitlist section");
+    showWaitlistSection();
+  } else {
+    // Hide waitlist section if seats became available
+    if (waitlistSection) {
+      waitlistSection.style.display = 'none';
+    }
+  }
+}
+
+// ========================
+// WAITLIST FUNCTIONALITY
+// ========================
+
+// DOM Elements for Waitlist
+const waitlistSection = document.getElementById('waitlistSection');
+const waitlistJoinForm = document.getElementById('waitlistJoinForm');
+const waitlistWaiting = document.getElementById('waitlistWaiting');
+const joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
+const leaveWaitlistBtn = document.getElementById('leaveWaitlistBtn');
+const seatCountInput = document.getElementById('seatCountInput');
+const waitlistPositionNum = document.getElementById('waitlistPositionNum');
+const waitlistTotalNum = document.getElementById('waitlistTotalNum');
+const waitlistStatus = document.getElementById('waitlistStatus');
+
+// Waitlist Offer Modal DOM
+const waitlistOfferModal = document.getElementById('waitlistOfferModal');
+const offerSeats = document.getElementById('offerSeats');
+const offerCountdown = document.getElementById('offerCountdown');
+const acceptOfferBtn = document.getElementById('acceptOfferBtn');
+const declineOfferBtn = document.getElementById('declineOfferBtn');
+
+// Waitlist state
+let isInWaitlist = false;
+let currentOffer = null;
+let countdownInterval = null;
+
+// Get current user ID from token
+function getCurrentUserId() {
+  const authStr = localStorage.getItem('auth') || sessionStorage.getItem('auth');
+  if (authStr) {
+    try {
+      const auth = JSON.parse(authStr);
+      return auth?.userId || auth?.user?.id || null;
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+// Join user room for waitlist notifications
+function joinUserRoom() {
+  const userId = getCurrentUserId();
+  if (userId) {
+    console.log("[ws] joining user room:", userId);
+    socket.emit("join-user", userId);
+  }
+}
+
+// Call after socket connects
+socket.on("connect", () => {
+  console.log("[ws] connected", socket.id);
+  joinCurrentShowRoom();
+  joinUserRoom(); // Join user room for waitlist offers
+});
+
+// Check waitlist position on page load
+async function checkWaitlistStatus() {
+  if (!currentShowId || !isAuthenticated()) return;
+
+  try {
+    const token = getAuthToken();
+    const response = await fetchJSON(`${API_BASE}/waitlist/${currentShowId}/position`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response && response.status === 'waiting') {
+      showWaitlistWaiting(response.position, response.total);
+    } else if (response && response.status === 'offered') {
+      // User has an active offer
+      showOfferModal(response.offer);
+    }
+  } catch (e) {
+    // User not in waitlist, which is fine
+    console.log('[waitlist] Not in waitlist or error:', e.message);
+  }
+}
+
+// Show waitlist section (for sold-out shows)
+function showWaitlistSection() {
+  if (waitlistSection) {
+    waitlistSection.style.display = 'block';
+  }
+}
+
+// Show waiting state
+function showWaitlistWaiting(position, total) {
+  isInWaitlist = true;
+  if (waitlistJoinForm) waitlistJoinForm.style.display = 'none';
+  if (waitlistWaiting) waitlistWaiting.style.display = 'flex';
+  if (waitlistPositionNum) waitlistPositionNum.textContent = `#${position}`;
+  if (waitlistTotalNum) waitlistTotalNum.textContent = total;
+  if (waitlistStatus) waitlistStatus.textContent = 'Đang chờ trong hàng đợi...';
+}
+
+// Show join form
+function showWaitlistJoinForm() {
+  isInWaitlist = false;
+  if (waitlistJoinForm) waitlistJoinForm.style.display = 'flex';
+  if (waitlistWaiting) waitlistWaiting.style.display = 'none';
+  if (waitlistStatus) waitlistStatus.textContent = 'Đăng ký nhận thông báo khi có vé';
+}
+
+// Join waitlist
+async function joinWaitlist() {
+  if (!isAuthenticated()) {
+    alert('Vui lòng đăng nhập để tham gia waitlist');
+    return;
+  }
+
+  const seatCount = parseInt(seatCountInput?.value || '1', 10);
+  const token = getAuthToken();
+
+  try {
+    joinWaitlistBtn.disabled = true;
+    joinWaitlistBtn.textContent = 'Đang xử lý...';
+
+    const response = await fetchJSON(`${API_BASE}/waitlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ showId: currentShowId, seatCount })
+    });
+
+    if (response.success || response.alreadyJoined) {
+      showWaitlistWaiting(response.position, response.total);
+    }
+  } catch (e) {
+    alert('Không thể tham gia waitlist: ' + e.message);
+  } finally {
+    if (joinWaitlistBtn) {
+      joinWaitlistBtn.disabled = false;
+      joinWaitlistBtn.innerHTML = '<span>🔔</span> Tham gia Waitlist';
+    }
+  }
+}
+
+// Leave waitlist
+async function leaveWaitlist() {
+  if (!currentShowId) return;
+
+  const token = getAuthToken();
+
+  try {
+    leaveWaitlistBtn.disabled = true;
+
+    await fetchJSON(`${API_BASE}/waitlist/${currentShowId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    showWaitlistJoinForm();
+  } catch (e) {
+    alert('Không thể rời waitlist: ' + e.message);
+  } finally {
+    if (leaveWaitlistBtn) leaveWaitlistBtn.disabled = false;
+  }
+}
+
+// Show offer modal with countdown
+function showOfferModal(offer) {
+  currentOffer = offer;
+
+  if (offerSeats) {
+    offerSeats.textContent = offer.seats?.join(', ') || 'N/A';
+  }
+
+  // Start countdown
+  startOfferCountdown(offer.expiresAt);
+
+  // Show modal
+  if (waitlistOfferModal) {
+    waitlistOfferModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// Hide offer modal
+function hideOfferModal() {
+  if (waitlistOfferModal) {
+    waitlistOfferModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+
+  currentOffer = null;
+}
+
+// Start countdown timer
+function startOfferCountdown(expiresAt) {
+  if (countdownInterval) clearInterval(countdownInterval);
+
+  function updateCountdown() {
+    const now = Date.now();
+    const remaining = expiresAt - now;
+
+    if (remaining <= 0) {
+      if (offerCountdown) offerCountdown.textContent = '00:00';
+      clearInterval(countdownInterval);
+      hideOfferModal();
+      alert('Offer đã hết hạn!');
+      showWaitlistJoinForm();
+      return;
+    }
+
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+
+    if (offerCountdown) {
+      offerCountdown.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+  }
+
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Accept offer
+async function acceptOffer() {
+  if (!currentShowId || !currentOffer) return;
+
+  const token = getAuthToken();
+
+  try {
+    acceptOfferBtn.disabled = true;
+    acceptOfferBtn.textContent = 'Đang xử lý...';
+
+    const response = await fetchJSON(`${API_BASE}/waitlist/${currentShowId}/accept`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.success && response.holdId) {
+      hideOfferModal();
+
+      // Redirect to checkout
+      const purchaseParams = new URLSearchParams({
+        showId: currentShowId,
+        holdId: response.holdId,
+        seats: response.seats.join(','),
+        eventId: eventIdParam || ''
+      });
+
+      sessionStorage.setItem('purchaseData', JSON.stringify({
+        showId: currentShowId,
+        holdId: response.holdId,
+        eventId: eventIdParam || '',
+        seats: response.seats,
+        expiresAt: response.expiresAt
+      }));
+
+      window.location.href = `/frontend/PurchaseUI/thanhToan.html?${purchaseParams.toString()}`;
+    }
+  } catch (e) {
+    alert('Không thể accept offer: ' + e.message);
+    acceptOfferBtn.disabled = false;
+    acceptOfferBtn.textContent = '✅ Nhận vé ngay';
+  }
+}
+
+// Decline offer
+async function declineOffer() {
+  if (!currentShowId) return;
+
+  const token = getAuthToken();
+
+  try {
+    await fetchJSON(`${API_BASE}/waitlist/${currentShowId}/decline`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    hideOfferModal();
+    showWaitlistJoinForm();
+  } catch (e) {
+    console.error('Decline error:', e);
+    hideOfferModal();
+    showWaitlistJoinForm();
+  }
+}
+
+// Socket listener for waitlist offer
+socket.on("waitlist-offer", (payload) => {
+  console.log("[ws] waitlist-offer received:", payload);
+
+  if (payload.showId === currentShowId) {
+    showOfferModal(payload);
+  }
+});
+
+// Event listeners for waitlist buttons
+if (joinWaitlistBtn) {
+  joinWaitlistBtn.addEventListener('click', joinWaitlist);
+}
+
+if (leaveWaitlistBtn) {
+  leaveWaitlistBtn.addEventListener('click', leaveWaitlist);
+}
+
+if (acceptOfferBtn) {
+  acceptOfferBtn.addEventListener('click', acceptOffer);
+}
+
+if (declineOfferBtn) {
+  declineOfferBtn.addEventListener('click', declineOffer);
+}
+
+// Check waitlist status after page loads
+setTimeout(() => {
+  if (currentShowId) {
+    checkWaitlistStatus();
+  }
+}, 1000);
+
+// Demo: Show waitlist section (remove in production - should only show when sold-out)
+// Uncomment this line to always show waitlist for testing:
+// setTimeout(() => showWaitlistSection(), 2000);
+

@@ -20,6 +20,7 @@ import { holdsConsumeRouter } from './modules/holds/holds.consume.routes.js';
 import { dashboardRouter } from './modules/dashboard/dashboard.router.js';
 import couponsRouter from './modules/coupons/coupons.routes.js';
 import seatmapsRouter from './modules/seatmaps/seatmaps.routes.js';
+import waitlistRouter from './modules/waitlist/waitlist.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -69,6 +70,7 @@ app.use('/api/tickets', ticketsRouter);
 app.use('/api/tickets', ticketsQRRouter);
 app.use('/api/coupons', couponsRouter);
 app.use('/api/seatmaps', seatmapsRouter);
+app.use('/api/waitlist', waitlistRouter);
 
 app.use(holdsMetricsRouter)
 await ensureRedis();

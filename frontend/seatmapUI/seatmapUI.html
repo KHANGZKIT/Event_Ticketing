@@ -97,6 +97,38 @@
           <button id="checkoutBtn" class="btn-primary">Đặt vé</button>
         </div>
       </div>
+
+      <!-- WAITLIST SECTION (Hiển thị khi sold-out) -->
+      <div id="waitlistSection" class="waitlist-section" style="display: none;">
+        <div class="waitlist-card">
+          <div class="waitlist-icon">🔔</div>
+          <h3>Sự kiện đã hết vé</h3>
+          <p id="waitlistStatus">Đăng ký nhận thông báo khi có vé</p>
+
+          <!-- Form join waitlist -->
+          <div id="waitlistJoinForm">
+            <label for="seatCountInput">Số ghế muốn mua:</label>
+            <input type="number" id="seatCountInput" min="1" max="10" value="1" />
+            <button id="joinWaitlistBtn" class="btn-waitlist">
+              <span>🔔</span> Tham gia Waitlist
+            </button>
+          </div>
+
+          <!-- Trạng thái đang chờ -->
+          <div id="waitlistWaiting" style="display: none;">
+            <div class="waitlist-position">
+              <span>Vị trí của bạn:</span>
+              <strong id="waitlistPositionNum">#1</strong>
+            </div>
+            <div class="waitlist-total">
+              Tổng: <span id="waitlistTotalNum">1</span> người đang chờ
+            </div>
+            <button id="leaveWaitlistBtn" class="btn-danger-outline">
+              Rời khỏi Waitlist
+            </button>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- MAIN: Sân khấu + sơ đồ ghế -->
@@ -173,6 +205,40 @@
       <div class="modal-foot">
         <button id="modalPay" class="btn-ok">Thanh toán</button>
         <button id="modalClose" class="btn-cancel">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL WAITLIST OFFER (Khi người dùng được offer vé) -->
+  <div id="waitlistOfferModal" class="modal-overlay waitlist-offer-modal" aria-hidden="true">
+    <div class="modal-card offer-card" role="dialog" aria-modal="true">
+      <div class="offer-header">
+        <div class="offer-celebration">🎉</div>
+        <h2>ĐẾN LƯỢT BẠN!</h2>
+        <p>Bạn có cơ hội mua vé ngay bây giờ</p>
+      </div>
+
+      <div class="offer-body">
+        <div class="offer-seats">
+          <span class="label">Ghế:</span>
+          <strong id="offerSeats">A1, A2</strong>
+        </div>
+
+        <div class="offer-countdown">
+          <span class="label">Còn lại:</span>
+          <div class="countdown-timer">
+            <strong id="offerCountdown">10:00</strong>
+          </div>
+        </div>
+
+        <div class="offer-warning">
+          ⚠️ Nếu không accept, cơ hội sẽ chuyển cho người tiếp theo
+        </div>
+      </div>
+
+      <div class="offer-actions">
+        <button id="acceptOfferBtn" class="btn-accept">✅ Nhận vé ngay</button>
+        <button id="declineOfferBtn" class="btn-decline">❌ Từ chối</button>
       </div>
     </div>
   </div>
