@@ -604,6 +604,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ====== EVENTS ======
+    // Load full events data with cover images
+    async function loadEvents() {
+        try {
+            console.log('[loadEvents] Fetching from:', `${BASE_URL}/api/events`);
+
+            const headers = {};
+            const token = getAuthToken();
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const res = await fetch(`${BASE_URL}/api/events`, { headers });
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+
+            const data = await res.json();
+            console.log('[DEBUG] Events API response:', data);
+
+            const events = Array.isArray(data) ? data : (data.items || []);
+            console.log('[DEBUG] Total events:', events.length);
+            if (events.length > 0) {
+                console.log('[DEBUG] First event fields:', Object.keys(events[0]));
+                console.log('[DEBUG] First event cover:', events[0].cover);
+            }
+
+            renderEvents(events);
+        } catch (e) {
+            console.error('[Events] Error loading:', e);
+            renderEvents([]); // Show empty state
+        }
+    }
+
+    // Expose globally
+    window.loadEvents = loadEvents;
+
     function chipStatus(s) {
         if (!s) return '<span class="chip">N/A</span>';
         const cls = s === "published" ? "ok" : s === "draft" ? "warn" : "danger";
@@ -623,8 +660,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Serial number (01, 02, 03...)
                 const serialNum = String(index + 1).padStart(2, '0');
 
-                // Event info with thumbnail
-                const thumbnail = ev.coverImage || ev.cover || '/frontend/DashboardUI/logo.jpg';
+                // Event info with thumbnail - try multiple field names
+                const thumbnail = ev.coverImage || ev.cover || ev.image || ev.imageUrl || ev.thumbnail || ev.posterUrl || '/frontend/DashboardUI/logo.jpg';
+
+                // Debug: log if missing cover
+                if (!ev.coverImage && !ev.cover && !ev.image && !ev.imageUrl && !ev.thumbnail && !ev.posterUrl) {
+                    console.warn('[DEBUG] Event missing cover:', ev.name, '| Fields:', Object.keys(ev));
+                }
+
                 const venue = ev.city || ev.venue || 'N/A';
 
                 // Date/Time (use createdAt or startsAt)
@@ -688,13 +731,24 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .join("");
     }
-    async function loadEvents() {
-        const res = await apiFetch(BASE_URL + "/api/events?limit=20&order=desc");
+
+    // Events pagination state
+    let eventsPage = 1;
+    let eventsTotalPages = 1;
+    const EVENTS_PAGE_SIZE = 10;
+
+    async function loadEvents(page = 1) {
+        eventsPage = page;
+        const res = await apiFetch(BASE_URL + `/api/events?page=${page}&pageSize=${EVENTS_PAGE_SIZE}&order=desc`);
         if (!res.ok) {
             console.error("Events API error", res.status);
             return;
         }
         const data = await res.json();
+
+        // Get total pages from response
+        eventsTotalPages = data.totalPages || Math.ceil((data.total || 0) / EVENTS_PAGE_SIZE) || 1;
+
         const arr = Array.isArray(data?.items)
             ? data.items
             : Array.isArray(data)
@@ -703,6 +757,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const items = arr.map((x) => ({
             id: x.id,
             name: x.name,
+            cover: x.cover,
+            city: x.city,
+            startsAt: x.startsAt,
             showsCount:
                 x.showsCount != null
                     ? x.showsCount
@@ -713,7 +770,53 @@ document.addEventListener("DOMContentLoaded", () => {
             createdAt: x.createdAt,
         }));
         renderEvents(items);
+        renderEventsPagination();
     }
+
+    function renderEventsPagination() {
+        const container = document.getElementById('events-pagination');
+        if (!container) return;
+
+        let html = '<div class="pagination">';
+
+        // Previous button
+        html += `<button class="pagination-btn" ${eventsPage <= 1 ? 'disabled' : ''} onclick="window.loadEventsPage(${eventsPage - 1})">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>`;
+
+        // Page numbers
+        const maxVisible = 5;
+        let startPage = Math.max(1, eventsPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(eventsTotalPages, startPage + maxVisible - 1);
+        if (endPage - startPage < maxVisible - 1) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" onclick="window.loadEventsPage(1)">1</button>`;
+            if (startPage > 2) html += `<span class="pagination-ellipsis">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="pagination-btn ${i === eventsPage ? 'active' : ''}" onclick="window.loadEventsPage(${i})">${i}</button>`;
+        }
+
+        if (endPage < eventsTotalPages) {
+            if (endPage < eventsTotalPages - 1) html += `<span class="pagination-ellipsis">...</span>`;
+            html += `<button class="pagination-btn" onclick="window.loadEventsPage(${eventsTotalPages})">${eventsTotalPages}</button>`;
+        }
+
+        // Next button
+        html += `<button class="pagination-btn" ${eventsPage >= eventsTotalPages ? 'disabled' : ''} onclick="window.loadEventsPage(${eventsPage + 1})">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>`;
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // Expose pagination function globally
+    window.loadEventsPage = loadEvents;
 
     // ====== TICKETS ======
     let ticketsPage = 1;
@@ -811,15 +914,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderTicketsPager(page, totalPages) {
-        const host = document.getElementById("tickets-pager");
-        if (!host) return;
-        const p = Number(page || 1);
-        const tp = Math.max(1, Number(totalPages || 1));
-        host.innerHTML = `
-      <button id="tk-prev" ${p <= 1 ? "disabled" : ""}>Prev</button>
-      <span>Page ${p} / ${tp}</span>
-      <button id="tk-next" ${p >= tp ? "disabled" : ""}>Next</button>
-    `;
+        const container = document.getElementById("tickets-pager");
+        if (!container) return;
+
+        const currentPage = Number(page || 1);
+        const total = Math.max(1, Number(totalPages || 1));
+
+        let html = '<div class="pagination">';
+
+        // Previous button
+        html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} id="tk-prev">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>`;
+
+        // Page numbers
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(total, startPage + maxVisible - 1);
+        if (endPage - startPage < maxVisible - 1) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" data-page="1">1</button>`;
+            if (startPage > 2) html += `<span class="pagination-ellipsis">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+
+        if (endPage < total) {
+            if (endPage < total - 1) html += `<span class="pagination-ellipsis">...</span>`;
+            html += `<button class="pagination-btn" data-page="${total}">${total}</button>`;
+        }
+
+        // Next button
+        html += `<button class="pagination-btn" ${currentPage >= total ? 'disabled' : ''} id="tk-next">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>`;
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Event listeners
         const prev = document.getElementById("tk-prev");
         const next = document.getElementById("tk-next");
         if (prev) {
@@ -836,6 +974,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 loadTickets();
             });
         }
+
+        // Page number buttons
+        container.querySelectorAll('[data-page]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pageNum = parseInt(btn.getAttribute('data-page'));
+                if (!isNaN(pageNum) && pageNum !== currentPage) {
+                    ticketsPage = pageNum;
+                    loadTickets();
+                }
+            });
+        });
     }
 
     async function loadTickets() {
@@ -2106,6 +2255,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }, 500);
+
+    // Load events with cover images
+    loadEvents();
 
     // Start
     showPage("overview");

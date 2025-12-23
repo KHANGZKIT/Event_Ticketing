@@ -710,7 +710,7 @@ body.dark-mode #theme-toggle i {
 .card {
   background: var(--card-bg-color);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
   box-shadow: var(--shadow);
   transition: all 0.3s ease;
@@ -1168,6 +1168,7 @@ body.dark-mode #theme-toggle i {
   margin-bottom: 16px;
   opacity: 0.5;
 }
+
 /* ====== Orders Table - Engineering Style ====== */
 .orders-table .table td:first-child {
   font-family: var(--font-mono);
@@ -1549,4 +1550,53 @@ body.dark-mode #theme-toggle i {
 .expires-date.expired {
   color: var(--accent-danger);
   font-weight: 600;
+}
+
+/* ====== Pagination UI ====== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.pagination-btn.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+  color: var(--text-muted);
+  padding: 0 4px;
+  user-select: none;
 }
