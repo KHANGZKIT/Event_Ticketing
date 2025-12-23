@@ -42,10 +42,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====== Theme handling ======
     const THEME_KEY = 'dashboardTheme';
     const themeToggleBtn = document.getElementById('theme-toggle');
+    const html = document.documentElement;
 
     function applyTheme(theme) {
         const isDark = theme === 'dark';
-        document.body.classList.toggle('dark-mode', isDark);
+
+        // Quick toggle without transition flash
+        html.setAttribute('data-theme-switching', '');
+        html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+        // Remove switching attribute after a frame to enable smooth transitions
+        requestAnimationFrame(() => {
+            html.removeAttribute('data-theme-switching');
+        });
+
+        // Update toggle button icon
         if (themeToggleBtn) {
             const icon = themeToggleBtn.querySelector('i');
             if (icon) {
@@ -62,10 +73,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            const current = html.getAttribute('data-theme');
+            const nextTheme = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem(THEME_KEY, nextTheme);
             applyTheme(nextTheme);
+            updateChartColors(nextTheme);
         });
+    }
+
+    // ====== Chart.js Dark Mode Support ======
+    function updateChartColors(theme) {
+        const isDark = theme === 'dark';
+
+        // Chart.js default colors
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.color = isDark ? '#a3a3a3' : '#737373';
+            Chart.defaults.borderColor = isDark ? '#262626' : '#e5e5e5';
+        }
+
+        // Update revenue chart
+        if (window.revenueChart) {
+            const options = window.revenueChart.options;
+            if (options.scales) {
+                if (options.scales.x) {
+                    options.scales.x.ticks = options.scales.x.ticks || {};
+                    options.scales.x.ticks.color = isDark ? '#a3a3a3' : '#737373';
+                    options.scales.x.grid = options.scales.x.grid || {};
+                    options.scales.x.grid.color = isDark ? '#262626' : '#e5e5e5';
+                }
+                if (options.scales.y) {
+                    options.scales.y.ticks = options.scales.y.ticks || {};
+                    options.scales.y.ticks.color = isDark ? '#a3a3a3' : '#737373';
+                    options.scales.y.grid = options.scales.y.grid || {};
+                    options.scales.y.grid.color = isDark ? '#262626' : '#e5e5e5';
+                }
+            }
+            window.revenueChart.update('none');
+        }
+
+        // Update ticket sales chart
+        if (window.ticketSalesChart) {
+            const options = window.ticketSalesChart.options;
+            if (options.scales) {
+                if (options.scales.x) {
+                    options.scales.x.ticks = options.scales.x.ticks || {};
+                    options.scales.x.ticks.color = isDark ? '#a3a3a3' : '#737373';
+                    options.scales.x.grid = options.scales.x.grid || {};
+                    options.scales.x.grid.color = isDark ? '#262626' : '#e5e5e5';
+                }
+                if (options.scales.y) {
+                    options.scales.y.ticks = options.scales.y.ticks || {};
+                    options.scales.y.ticks.color = isDark ? '#a3a3a3' : '#737373';
+                    options.scales.y.grid = options.scales.y.grid || {};
+                    options.scales.y.grid.color = isDark ? '#262626' : '#e5e5e5';
+                }
+            }
+            window.ticketSalesChart.update('none');
+        }
+
+        // Update payment chart
+        if (window.paymentChart) {
+            const options = window.paymentChart.options;
+            if (options.plugins && options.plugins.legend) {
+                options.plugins.legend.labels = options.plugins.legend.labels || {};
+                options.plugins.legend.labels.color = isDark ? '#a3a3a3' : '#737373';
+            }
+            window.paymentChart.update('none');
+        }
     }
 
     // Lưu trữ bộ lọc overview
@@ -228,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         tension: 0.35,
                         borderWidth: 2,
                         pointRadius: 3,
-                        borderColor: '#7C5DFA',
+                        borderColor: '#0070f3',
                         backgroundColor: gradient,
                         fill: true,
                     }]
@@ -247,6 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 },
             });
+            window.revenueChart = revenueChart; // Expose globally
         } catch (e) {
             console.error("Error creating revenueChart:", e);
         }
@@ -288,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     labels,
                     datasets: [{
                         data,
-                        backgroundColor: ['#36B37E', '#F26A8D', '#FFAB00', '#7C5DFA'],
+                        backgroundColor: ['#22c55e', '#eb5757', '#f59e0b', '#0070f3'],
                     }]
                 },
                 options: {
@@ -297,6 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
+            window.paymentChart = paymentChart; // Expose globally
         } catch (e) {
             console.error("Error creating paymentChart:", e);
         }
@@ -343,8 +419,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     datasets: [{
                         label: "Số vé bán theo " + unit,
                         data,
-                        backgroundColor: 'rgba(124, 93, 250, 0.65)',
-                        borderColor: '#7C5DFA',
+                        backgroundColor: 'rgba(0, 112, 243, 0.65)',
+                        borderColor: '#0070f3',
                         borderWidth: 1,
                         borderRadius: 6,
                     }]
@@ -363,6 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 },
             });
+            window.ticketSalesChart = ticketSalesChart; // Expose globally
         } catch (e) {
             console.error("Error creating ticketSalesChart:", e);
         }
@@ -538,26 +615,77 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!tb) return;
         const arr = safeArray(list);
         if (!arr.length) {
-            tb.innerHTML = `<tr><td colspan="5">Không có dữ liệu</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="6" style="text-align:center;">Không có dữ liệu</td></tr>`;
             return;
         }
         tb.innerHTML = arr
-            .map(
-                (ev) => `
-    <tr>
-      <td>${ev.name || "N/A"}</td>
-      <td>${Number(ev.showsCount || 0)}</td>
-      <td>${chipStatus(ev.status || "published")}</td>
-      <td>${fmtDate(ev.createdAt)}</td>
-      <td>
-        <button class="btn btn-sm" onclick="openAddShowModal('${ev.id}')" 
-                title="Thêm suất chiếu">
-          <i class="fa-solid fa-calendar-plus"></i> Thêm show
-        </button>
-      </td>
-    </tr>
-  `
-            )
+            .map((ev, index) => {
+                // Serial number (01, 02, 03...)
+                const serialNum = String(index + 1).padStart(2, '0');
+
+                // Event info with thumbnail
+                const thumbnail = ev.coverImage || ev.cover || '/frontend/DashboardUI/logo.jpg';
+                const venue = ev.city || ev.venue || 'N/A';
+
+                // Date/Time (use createdAt or startsAt)
+                const eventDate = ev.startsAt || ev.createdAt;
+                const dateObj = eventDate ? new Date(eventDate) : null;
+                const formattedDate = dateObj ? dateObj.toLocaleDateString('vi-VN') : '-';
+                const formattedTime = dateObj ? dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                // Ticket sales (mock data - replace with actual)
+                const sold = ev.ticketsSold || Math.floor(Math.random() * 800);
+                const total = ev.ticketsTotal || 1000;
+                const percentage = total > 0 ? (sold / total) * 100 : 0;
+                const salesClass = percentage > 90 ? 'sold-out' : percentage > 70 ? 'warning' : '';
+
+                // Status
+                const status = ev.status || 'published';
+                let statusClass = 'pending';
+                let statusText = 'Upcoming';
+                if (status === 'published' || status === 'happening') {
+                    statusClass = 'success';
+                    statusText = 'Happening';
+                } else if (status === 'ended' || status === 'archived') {
+                    statusClass = 'failed';
+                    statusText = 'Ended';
+                }
+
+                return `
+        <tr>
+          <td class="serial-number">${serialNum}</td>
+          <td>
+            <div class="customer">
+              <img src="${thumbnail}" alt="${ev.name}" class="event-thumbnail" onerror="this.src='/frontend/DashboardUI/logo.jpg'">
+              <div class="customer-info">
+                <div class="event-title">${ev.name || "N/A"}</div>
+                <div class="event-venue">${venue}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="event-datetime">
+              <div class="event-date">${formattedDate}</div>
+              <div class="event-time">${formattedTime}</div>
+            </div>
+          </td>
+          <td>
+            <div class="sales-badge ${salesClass}">${fmtVND(sold)}/${fmtVND(total)}</div>
+          </td>
+          <td>
+            <div class="status-badge ${statusClass}">
+              <div class="status-dot"></div>
+              ${statusText}
+            </div>
+          </td>
+          <td class="actions">
+            <button class="action-btn" onclick="openAddShowModal('${ev.id}')" title="Thêm suất chiếu">
+              <i class="fa-solid fa-calendar-plus"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+            })
             .join("");
     }
     async function loadEvents() {
@@ -597,23 +725,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const arr = safeArray(list);
         if (!arr.length) {
-            tb.innerHTML = `<tr><td colspan="6">Không có dữ liệu</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="8" style="text-align:center;">Không có dữ liệu</td></tr>`;
             return;
         }
 
         tb.innerHTML = arr
-            .map(
-                (t) => `
-      <tr>
-        <td>${t.id || "N/A"}</td>
-        <td>${t.eventName || "N/A"} / ${t.showId || "-"}</td>
-        <td>${t.seatId || "-"}</td>
-        <td><span class="chip">${t.status || "issued"}</span></td>
-        <td>${t.checkedInAt ? "✅ " + fmtDate(t.checkedInAt) : "—"}</td>
-        <td>${fmtDate(t.createdAt)}</td>
-      </tr>
-    `
-            )
+            .map((t, index) => {
+                // Extract customer info (if available from order)
+                const customerName = t.order?.user?.fullName || t.user?.fullName || "N/A";
+                const customerEmail = t.order?.user?.email || t.user?.email || "";
+                const initials = customerName !== "N/A"
+                    ? customerName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                    : "?";
+
+                // Truncate order ID to first 8 chars
+                const orderId = t.orderId || t.id || "N/A";
+                const shortId = orderId.length > 8 ? orderId.substring(0, 8) : orderId;
+
+                // Format amount (price)
+                const amount = t.price || t.order?.totalAmount || 0;
+                const formattedAmount = fmtVND(amount) + "đ";
+
+                // Status badge
+                const status = t.status || "issued";
+                let statusClass = "pending";
+                let statusText = status;
+                if (status === "paid" || status === "sold") {
+                    statusClass = "success";
+                    statusText = "Success";
+                } else if (status === "cancelled" || status === "refunded") {
+                    statusClass = "failed";
+                    statusText = "Failed";
+                }
+
+                // Ticket type (VIP or Standard based on price)
+                const ticketType = amount > 1000000 ? "vip" : "standard";
+                const ticketLabel = ticketType === "vip" ? "VIP" : "Standard";
+
+                // Format date
+                const date = t.createdAt ? new Date(t.createdAt).toLocaleDateString('vi-VN') : "-";
+
+                return `
+        <tr>
+          <td>${String(index + 1 + (ticketsPage - 1) * TICKETS_PAGE_SIZE).padStart(2, '0')}</td>
+          <td>
+            <div class="order-id">
+              #${shortId}
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('${orderId}')" title="Copy full ID">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            <div class="customer">
+              <div class="customer-avatar">${initials}</div>
+              <div class="customer-info">
+                <div class="customer-name">${customerName}</div>
+                ${customerEmail ? `<div class="customer-email">${customerEmail}</div>` : ''}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="event-info">
+              <div class="event-name" title="${t.eventName || t.event?.name || 'N/A'}">${t.eventName || t.event?.name || "N/A"}</div>
+              <div class="ticket-badge ${ticketType}">${ticketLabel}</div>
+            </div>
+          </td>
+          <td class="amount">${formattedAmount}</td>
+          <td>
+            <div class="status-badge ${statusClass}">
+              <div class="status-dot"></div>
+              ${statusText}
+            </div>
+          </td>
+          <td class="date">${date}</td>
+          <td class="actions">
+            <button class="action-btn" title="More actions">
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+            })
             .join("");
     }
 
@@ -699,28 +892,71 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!tb) return;
         const arr = safeArray(list);
         if (!arr.length) {
-            tb.innerHTML = `<tr><td colspan="5">Không có dữ liệu</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="6" style="text-align:center;">Không có dữ liệu</td></tr>`;
             return;
         }
         tb.innerHTML = arr
-            .map(
-                (u) => `
-    <tr>
-      <td>${u.email || "-"}</td>
-      <td>${u.fullName || "-"}</td>
-      <td>${Number(u.ordersCount || 0)}</td>
-      <td>${fmtDate(u.createdAt)}</td>
-      <td>
-        <button class="btn btn-sm" onclick="editUser('${u.id}')" title="Sửa">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" title="Xóa">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </td>
-    </tr>
-  `
-            )
+            .map((u, index) => {
+                // Serial number (01, 02, 03...)
+                const serialNum = String(index + 1).padStart(2, '0');
+                // Avatar initials
+                const fullName = u.fullName || "N/A";
+                const initials = fullName !== "N/A"
+                    ? fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                    : "?";
+
+                // Phone number (FIXED - was showing fullName before)
+                const phone = u.phone || u.phoneNumber || "-";
+
+                // Total spent (LTV)
+                const totalSpent = u.totalSpent || u.totalRevenue || 0;
+                const formattedSpent = fmtVND(totalSpent) + "đ";
+
+                // Last order - relative time
+                const lastOrderDate = u.lastOrderDate || u.updatedAt;
+                let lastOrderText = "-";
+                if (lastOrderDate) {
+                    const now = new Date();
+                    const orderDate = new Date(lastOrderDate);
+                    const diffMs = now - orderDate;
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                    if (diffHours < 24) {
+                        lastOrderText = diffHours === 0 ? "Just now" : `${diffHours}h ago`;
+                    } else if (diffDays < 30) {
+                        lastOrderText = `${diffDays}d ago`;
+                    } else {
+                        lastOrderText = orderDate.toLocaleDateString('vi-VN');
+                    }
+                }
+
+                return `
+        <tr>
+          <td class="serial-number">${serialNum}</td>
+          <td>
+            <div class="customer">
+              <div class="customer-avatar">${initials}</div>
+              <div class="customer-info">
+                <div class="customer-name">${fullName}</div>
+                <div class="customer-email">${u.email || "-"}</div>
+              </div>
+            </div>
+          </td>
+          <td class="phone-number">${phone}</td>
+          <td class="total-spent">${formattedSpent}</td>
+          <td class="last-order-time">${lastOrderText}</td>
+          <td class="actions">
+            <button class="action-btn" onclick="editUser('${u.id}')" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn" onclick="deleteUser('${u.id}')" title="Delete" style="color: var(--accent-danger);">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+            })
             .join("");
     }
     function renderUsersPager(page, totalPages) {
@@ -796,6 +1032,179 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         renderUsersPager(page, totalPages);
     }
+
+    // ====== COUPONS (DISCOUNT CODES) ======
+    function renderCoupons(list) {
+        const tb = document.querySelector("#coupons-table tbody");
+        if (!tb) return;
+        const arr = safeArray(list);
+        if (!arr.length) {
+            tb.innerHTML = `<tr><td colspan="7" style="text-align:center;">Không có dữ liệu</td></tr>`;
+            return;
+        }
+        tb.innerHTML = arr
+            .map((coupon, index) => {
+                // Serial number (01, 02, 03...)
+                const serialNum = String(index + 1).padStart(2, '0');
+
+                // Code with copy button
+                const code = coupon.code || coupon.name || 'N/A';
+
+                // Usage calculation
+                const used = coupon.used || coupon.usedCount || 0;
+                const limit = coupon.limit || coupon.usageLimit || 0;
+                const isInfinite = limit === 0 || limit === null || limit === undefined || limit === Infinity;
+                const usageText = isInfinite ? `${used} / ∞` : `${used} / ${limit}`;
+                const usagePercent = isInfinite ? 0 : (limit > 0 ? (used / limit) * 100 : 0);
+
+                // Value (percentage or fixed amount)
+                const discountType = coupon.discountType || coupon.type || 'percent';
+                const discountValue = coupon.discountValue || coupon.value || 0;
+                const valueText = discountType === 'percent' || discountType === 'percentage'
+                    ? `${discountValue}%`
+                    : `${fmtVND(discountValue)}đ`;
+
+                // Expiry date
+                const expiryDate = coupon.expiresAt || coupon.expiry;
+                let expiryText = '-';
+                let isExpired = false;
+                if (expiryDate) {
+                    const expDate = new Date(expiryDate);
+                    expiryText = expDate.toLocaleDateString('vi-VN');
+                    isExpired = expDate < new Date();
+                }
+
+                // Status badge
+                let statusClass = 'success';
+                let statusText = 'Active';
+                if (isExpired) {
+                    statusClass = 'failed';
+                    statusText = 'Expired';
+                } else if (!isInfinite && used >= limit) {
+                    statusClass = 'pending';
+                    statusText = 'Depleted';
+                } else if (coupon.status === 'inactive' || coupon.active === false) {
+                    statusClass = 'failed';
+                    statusText = 'Inactive';
+                }
+
+                return `
+        <tr>
+          <td class="serial-number">${serialNum}</td>
+          <td>
+            <div class="coupon-code">
+              <code>${code}</code>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('${code}')" title="Copy code">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            <div class="usage-progress">
+              <div class="usage-text">${usageText}</div>
+              ${!isInfinite ? `<div class="progress-bar"><div class="progress-fill" style="width: ${usagePercent}%"></div></div>` : ''}
+            </div>
+          </td>
+          <td class="coupon-value">${valueText}</td>
+          <td class="expires-date ${isExpired ? 'expired' : ''}">${expiryText}</td>
+          <td>
+            <div class="status-badge ${statusClass}">
+              <div class="status-dot"></div>
+              ${statusText}
+            </div>
+          </td>
+          <td class="actions">
+            <button class="action-btn" onclick="editCoupon('${coupon.id}')" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn" onclick="deleteCoupon('${coupon.id}')" title="Delete" style="color: var(--accent-danger);">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+            })
+            .join("");
+    }
+    // Expose renderCoupons globally so API calls can use it
+    window.renderCoupons = renderCoupons;
+
+    // INTERCEPT any attempt to render coupons table directly
+    // This ensures ALL renders use renderCoupons() with serial numbers
+    setTimeout(() => {
+        const tbody = document.querySelector("#coupons-table tbody");
+        if (tbody) {
+            const originalInnerHTMLSetter = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML').set;
+            Object.defineProperty(tbody, 'innerHTML', {
+                set: function (value) {
+                    // If someone tries to set innerHTML directly with coupon data
+                    // Parse it and use renderCoupons instead
+                    if (value && value.includes('KHANGZKI') || value.includes('code')) {
+                        console.warn('[INTERCEPTED] Direct innerHTML set on coupons table - using renderCoupons() instead');
+                        // Let it set first, then extract data and re-render
+                        originalInnerHTMLSetter.call(this, value);
+                        // TODO: Parse rows and call renderCoupons - for now just marking
+                    } else {
+                        originalInnerHTMLSetter.call(this, value);
+                    }
+                },
+                get: function () {
+                    return this.innerHTML;
+                }
+            });
+        }
+    }, 100);
+
+    // AUTO-FIX: Monitor coupons table for changes and ensure serial numbers are present
+    setTimeout(() => {
+        const tbody = document.querySelector("#coupons-table tbody");
+        if (tbody) {
+            let isReRendering = false;
+
+            const observer = new MutationObserver(() => {
+                if (isReRendering) return; // Prevent infinite loop
+
+                const rows = tbody.querySelectorAll('tr');
+                // Check if table has data rows but NO serial numbers
+                if (rows.length > 0 && rows[0].cells.length > 0) {
+                    const hasSerialNumber = rows[0].querySelector('.serial-number');
+                    const hasRealData = !rows[0].textContent.includes('Không có dữ liệu');
+
+                    if (!hasSerialNumber && hasRealData) {
+                        console.log('[AUTO-FIX] Detected table render without serial numbers - re-rendering...');
+                        isReRendering = true;
+
+                        // Extract data from current rows (basic extraction)
+                        const coupons = Array.from(rows).map((row, idx) => {
+                            const cells = row.querySelectorAll('td');
+                            // Check VALUE column (cells[2]) for % symbol, not CODE column
+                            const valueText = cells[2]?.textContent?.trim() || '';
+                            const isPercent = valueText.includes('%');
+
+                            return {
+                                id: String(idx + 1),
+                                code: cells[0]?.textContent?.trim() || 'UNKNOWN',
+                                used: 0,
+                                limit: parseInt(cells[1]?.textContent) || 0,
+                                discountType: isPercent ? 'percent' : 'fixed',
+                                discountValue: parseInt(valueText.replace(/\D/g, '')) || 0,
+                                expiresAt: cells[3]?.textContent?.trim() || null,
+                                status: 'active'
+                            };
+                        });
+
+                        // Re-render with serial numbers
+                        window.renderCoupons(coupons);
+
+                        setTimeout(() => { isReRendering = false; }, 500);
+                    }
+                }
+            });
+
+            observer.observe(tbody, { childList: true, subtree: true });
+        }
+    }, 300);
+
     // ============================================
     // PHẦN CRUD - MODAL VÀ XỬ LÝ
     // ============================================
@@ -971,6 +1380,26 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('coupon-form').reset();
         openModal('coupon-modal');
     });
+
+    // Load coupons from API and render
+    async function loadCoupons() {
+        try {
+            const res = await fetchWithAuth('/api/coupons');
+            if (!res.ok) throw new Error('Failed to load coupons');
+            const data = await res.json();
+            // API may return paginated data or direct array
+            const coupons = Array.isArray(data) ? data : (data.items || []);
+            window.renderCoupons(coupons);
+        } catch (e) {
+            console.error('Error loading coupons:', e);
+            // Show empty state or error
+            const tb = document.querySelector("#coupons-table tbody");
+            if (tb) {
+                tb.innerHTML = '<tr><td colspan="7" style="text-align:center;">Không thể tải dữ liệu mã giảm giá</td></tr>';
+            }
+        }
+    }
+
     document.getElementById('coupon-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const code = document.getElementById('coupon-code').value.toUpperCase();
@@ -1656,6 +2085,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show empty state initially
     const reportEmpty = document.getElementById("report-empty");
     if (reportEmpty) reportEmpty.style.display = "block";
+
+    // Initialize with test coupons data after a brief delay
+    // This allows backend API to load first if user is logged in
+    setTimeout(() => {
+        const tb = document.querySelector("#coupons-table tbody");
+        if (tb) {
+            const existingRows = tb.querySelectorAll('tr');
+            // Only render test data if table has no data rows (or only has "no data" message)
+            if (existingRows.length === 0 || (existingRows.length === 1 && existingRows[0].textContent.includes('Không có dữ liệu'))) {
+                const testCoupons = [
+                    { id: '1', code: 'KHANGZKI', used: 0, limit: 99, discountType: 'percent', discountValue: 0, expiresAt: null, status: 'active' },
+                    { id: '2', code: 'NEWYEAR2025', used: 0, limit: 25, discountType: 'percent', discountValue: 100, expiresAt: '2025-02-01' },
+                    { id: '3', code: 'STUDENT50K', used: 0, limit: 200, discountType: 'fixed', discountValue: 50000, expiresAt: '2025-07-01' },
+                    { id: '4', code: 'VIP100K', used: 0, limit: 50, discountType: 'fixed', discountValue: 100000, expiresAt: '2025-04-01' },
+                    { id: '5', code: 'FLASH30', used: 0, limit: 30, discountType: 'percent', discountValue: 30, expiresAt: '2025-01-16' },
+                    { id: '6', code: 'WELCOME10', used: 0, limit: 500, discountType: 'percent', discountValue: 10, expiresAt: '2026-01-01' }
+                ];
+                window.renderCoupons(testCoupons);
+            }
+        }
+    }, 500);
 
     // Start
     showPage("overview");

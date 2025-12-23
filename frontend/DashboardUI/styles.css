@@ -1,60 +1,74 @@
 /* ====== Imports & Variables ====== */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 :root {
-  --primary-color: #7C5DFA;
-  --primary-color-light: #f3f0ff;
-  --secondary-color: #F26A8D;
-  --bg-color: #bdb9b967;
-  --card-bg-color: #FFFFFF;
-  --text-color: #333333;
-  --text-color-light: #8A8A8A;
-  --border-color: #EFEFEF;
-  --sidebar-bg: var(--card-bg-color);
-  --sidebar-text: #9A9A9A;
-  --sidebar-text-active-bg: var(--primary-color-light);
-  --sidebar-text-active-color: var(--primary-color);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  --chip-green-bg: #E6F8F0;
-  --chip-green-text: #00875A;
-  --chip-red-bg: #FFF0F0;
-  --chip-red-text: #DE350B;
+  /* Fonts */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Light Mode Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-card: #ffffff;
+
+  --text-primary: #171717;
+  --text-secondary: #737373;
+  --text-muted: #a3a3a3;
+
+  --border-default: #e5e5e5;
+  --border-subtle: #f5f5f5;
+
+  --accent-primary: #0070f3;
+  --accent-danger: #eb5757;
+  --accent-success: #22c55e;
+  --accent-warning: #f59e0b;
+
+  /* Legacy variable mappings for compatibility */
+  --primary-color: var(--accent-primary);
+  --primary-color-light: #e6f2ff;
+  --secondary-color: var(--accent-danger);
+  --bg-color: var(--bg-secondary);
+  --card-bg-color: var(--bg-card);
+  --text-color: var(--text-primary);
+  --text-color-light: var(--text-secondary);
+  --border-color: var(--border-default);
+  --sidebar-bg: var(--bg-card);
+  --sidebar-text: var(--text-secondary);
+  --sidebar-text-active-bg: #e6f2ff;
+  --sidebar-text-active-color: var(--accent-primary);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  /* Chips */
+  --chip-green-bg: #e6f8f0;
+  --chip-green-text: #00875a;
+  --chip-red-bg: #fff0f0;
+  --chip-red-text: #de350b;
   --chip-warn-bg: #fffbeb;
   --chip-warn-text: #92400e;
 
   --sidebar-width: 280px;
 }
 
-/* ====== Layout ====== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+[data-theme="dark"] {
+  /* Dark Mode Colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #171717;
+  --bg-card: #1a1a1a;
 
-html,
-body {
-  height: 100%;
-}
+  --text-primary: #ededed;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: background 0.3s ease, color 0.3s ease;
-}
+  --border-default: #262626;
+  --border-subtle: #1a1a1a;
 
-body.dark-mode {
-  --bg-color: #0f172a;
-  --card-bg-color: #1e293b;
-  --text-color: #f8fafc;
-  --text-color-light: #94a3b8;
-  --border-color: rgba(148, 163, 184, 0.2);
-  --sidebar-bg: #111827;
-  --sidebar-text: #cbd5f5;
-  --sidebar-text-active-bg: rgba(124, 93, 250, 0.18);
-  --sidebar-text-active-color: #c4b5fd;
-  --shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  /* Legacy mappings for dark mode */
+  --primary-color-light: rgba(0, 112, 243, 0.15);
+  --sidebar-text: #a3a3a3;
+  --sidebar-text-active-bg: rgba(0, 112, 243, 0.15);
+  --sidebar-text-active-color: #60a5fa;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
   --chip-green-bg: rgba(34, 197, 94, 0.15);
   --chip-green-text: #4ade80;
   --chip-red-bg: rgba(248, 113, 113, 0.15);
@@ -63,9 +77,46 @@ body.dark-mode {
   --chip-warn-text: #facc15;
 }
 
+/* ====== Global Smooth Transitions ====== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+html[data-theme-switching] * {
+  transition: none !important;
+}
+
+/* ====== Layout ====== */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ====== Typography - Monospace for Data ====== */
+.kpi p,
+.stat-value,
+.table td:not(:first-child),
+.revenue-amount,
+.ticket-count,
+.price,
+.count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 .main {
@@ -1028,15 +1079,15 @@ body.dark-mode #theme-toggle i {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent-primary);
   color: white !important;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  transform: translateY(-1px);
+  opacity: 0.9;
 }
 
 .btn-sm {
@@ -1046,13 +1097,14 @@ body.dark-mode #theme-toggle i {
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #5c3fc2 0%, #79028b 100%);
+  background: var(--accent-danger);
   color: white !important;
+  box-shadow: none;
 }
 
 .btn-danger:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(193, 13, 148, 0.306);
+  opacity: 0.9;
 }
 
 /* ===== Modal Animation ===== */
@@ -1115,4 +1167,386 @@ body.dark-mode #theme-toggle i {
   font-size: 48px;
   margin-bottom: 16px;
   opacity: 0.5;
+}
+/* ====== Orders Table - Engineering Style ====== */
+.orders-table .table td:first-child {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Order ID Column */
+.order-id {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-btn {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: opacity 0.15s ease;
+  font-size: 12px;
+}
+
+.order-id:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  background: var(--border-default);
+  color: var(--text-primary);
+}
+
+/* Customer Column */
+.customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.customer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), #00a8ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.customer-email {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Event Column */
+.event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.ticket-badge.vip {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.ticket-badge.standard {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+/* Amount Column */
+.amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: right;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.status-badge.success .status-dot {
+  background: #22c55e;
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.status-badge.pending .status-dot {
+  background: #f59e0b;
+}
+
+.status-badge.failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.status-badge.failed .status-dot {
+  background: #ef4444;
+}
+
+/* Actions Column */
+.action-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  font-size: 14px;
+}
+
+.action-btn:hover {
+  background: var(--border-default);
+  color: var(--text-primary);
+}
+
+/* ====== Events Table ====== */
+.event-thumbnail {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--border-default);
+}
+
+.event-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.event-venue {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.event-datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-date {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.event-time {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.sales-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0, 112, 243, 0.1);
+  color: var(--accent-primary);
+}
+
+.sales-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.sales-badge.sold-out {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* ====== Customers Table ====== */
+.phone-number {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.total-spent {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: right;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.last-order-time {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ====== Coupons Table ====== */
+.code-snippet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.progress-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border-default);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.warning {
+  background: #f59e0b;
+}
+
+.progress-fill.danger {
+  background: #ef4444;
+}
+
+.coupon-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: right;
+  color: var(--text-primary);
+}
+
+.expires-date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ====== Coupon Code Styling ====== */
+.coupon-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coupon-code code {
+  font-family: var(--font-mono);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid var(--border-default);
+}
+
+/* ====== Usage Progress ====== */
+.usage-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.usage-text {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-hover);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  transition: width 0.3s ease;
+}
+
+/* ====== Expired Date ====== */
+.expires-date.expired {
+  color: var(--accent-danger);
+  font-weight: 600;
 }

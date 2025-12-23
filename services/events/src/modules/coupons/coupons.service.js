@@ -48,6 +48,25 @@ export async function updateCoupon(id, data) {
 }
 
 export async function deleteCoupon(id) {
+    // Check if coupon exists
+    const coupon = await prisma.coupon.findUnique({
+        where: { id },
+        include: { orders: { select: { id: true } } }
+    });
+
+    if (!coupon) {
+        const e = new Error('Coupon not found');
+        e.status = 404;
+        throw e;
+    }
+
+    // Check if coupon is being used by any orders
+    if (coupon.orders && coupon.orders.length > 0) {
+        const e = new Error(`Cannot delete coupon: ${coupon.orders.length} order(s) are using this coupon`);
+        e.status = 409; // Conflict
+        throw e;
+    }
+
     return prisma.coupon.delete({ where: { id } });
 }
 

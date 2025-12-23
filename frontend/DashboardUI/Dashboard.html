@@ -264,23 +264,23 @@
 
       <section id="page-events" class="hidden" data-page="events">
         <div class="section-title">
-          <h3>🗂️ Sự kiện</h3>
+          <h3>Sự kiện</h3>
           <div style="display: flex; gap: 10px;">
             <button id="btn-add-event" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm sự kiện</button>
             <button id="ev-refresh" class="btn">Làm mới</button>
           </div>
         </div>
         <div class="card">
-          <div class="card-head">Danh sách sự kiện mới nhất</div>
           <div class="card-body">
-            <table class="table" id="events-table">
+            <table class="table events-table" id="events-table">
               <thead>
                 <tr>
-                  <th>Tên sự kiện</th>
-                  <th>Số suất chiếu</th>
-                  <th>Trạng thái</th>
-                  <th>Ngày tạo</th>
-                  <th>Hành động</th>
+                  <th style="width: 50px; text-align: center;">#</th>
+                  <th>Event Info</th>
+                  <th>Date/Time</th>
+                  <th>Ticket Sales</th>
+                  <th>Status</th>
+                  <th style="width: 60px; text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -291,21 +291,22 @@
 
       <section id="page-tickets" class="hidden" data-page="tickets">
         <div class="section-title">
-          <h3>🎟️ Đơn hàng</h3>
+          <h3>Đơn hàng</h3>
           <div><button id="tk-refresh" class="btn">Làm mới</button></div>
         </div>
         <div class="card">
-          <div class="card-head">Tất cả đơn hàng</div>
           <div class="card-body">
-            <table class="table" id="tickets-table">
+            <table class="table orders-table" id="tickets-table">
               <thead>
                 <tr>
-                  <th>Mã vé</th>
-                  <th>Sự kiện / Suất</th>
-                  <th>Ghế</th>
-                  <th>Trạng thái</th>
-                  <th>Đã check-in</th>
-                  <th>Ngày tạo</th>
+                  <th style="width: 50px;">#</th>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Event/Ticket</th>
+                  <th style="text-align: right;">Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th style="width: 60px; text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -317,26 +318,26 @@
 
       <section id="page-users" class="hidden" data-page="users">
         <div class="section-title">
-          <h3>👤 Khách hàng</h3>
+          <h3>Khách hàng</h3>
           <div style="display: flex; gap: 12px; align-items: center;">
             <button id="btn-add-user" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Thêm khách
               hàng</button>
             <input type="text" id="users-search" placeholder="Tìm kiếm email hoặc tên..."
-              style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 250px;">
+              style="padding: 8px 12px; border: 1px solid var(--border-default); border-radius: 6px; font-size: 14px; min-width: 250px; background: var(--bg-card); color: var(--text-primary);">
             <button id="us-refresh" class="btn">Làm mới</button>
           </div>
         </div>
         <div class="card">
-          <div class="card-head">Danh sách khách hàng</div>
           <div class="card-body">
-            <table class="table" id="users-table">
+            <table class="table customers-table" id="users-table">
               <thead>
                 <tr>
-                  <th>Email</th>
-                  <th>Họ tên</th>
-                  <th>Đơn hàng</th>
-                  <th>Ngày tạo</th>
-                  <th>Hành động</th>
+                  <th style="width: 50px; text-align: center;">#</th>
+                  <th>User</th>
+                  <th>Phone</th>
+                  <th style="text-align: right;">Total Spent</th>
+                  <th>Last Order</th>
+                  <th style="width: 120px; text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -454,25 +455,24 @@
       </section>
       <section id="page-coupons" class="hidden" data-page="coupons">
         <div class="section-title">
-          <h3><i class="fa-solid fa-tags"></i> Mã giảm giá</h3>
+          <h3>Mã giảm giá</h3>
           <button id="btn-add-coupon" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> Tạo mã mới
           </button>
         </div>
 
         <div class="card">
-          <div class="card-head">Danh sách mã giảm giá</div>
           <div class="card-body">
-            <table class="table" id="coupons-table">
+            <table class="table coupons-table" id="coupons-table">
               <thead>
                 <tr>
-                  <th>Mã Code</th>
-                  <th>Loại</th>
-                  <th>Giá trị</th>
-                  <th>Giới hạn</th>
-                  <th>Đã dùng</th>
-                  <th>Hết hạn</th>
-                  <th>Hành động</th>
+                  <th style="width: 50px; text-align: center;">#</th>
+                  <th>Code</th>
+                  <th>Usage</th>
+                  <th style="text-align: right;">Value</th>
+                  <th>Expires</th>
+                  <th>Status</th>
+                  <th style="width: 120px; text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody></tbody>
